@@ -1,3 +1,6 @@
+.idea
+.mvn/.gradle-enterprise/gradle-enterprise-workspace-id
+
 # Compiled class file
 *.class
 

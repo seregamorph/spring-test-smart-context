@@ -1,0 +1,2 @@
+com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener
+com.github.seregamorph.testsmartcontext.testng.CurrentTestListener

@@ -1,7 +1,8 @@
 ## Improving Spring Boot Test efficiency
 
-### How it works
-TODO
+### Problem statement and solution
+Please watch the presentation: https://www.youtube.com/watch?v=_Vci_5nr8R0 ,
+it explains the problem and the suggested solution.
 
 ### Supported versions
 Java 8+

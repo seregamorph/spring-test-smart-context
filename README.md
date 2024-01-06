@@ -13,6 +13,9 @@ it explains the problem and the suggested solution.
 
 `JUnit 5 Jupiter` TODO (work in progress)
 
+### Limitations
+At the moment only single thread execution per module is supported.
+
 ### How to use
 Add maven dependency (not yet available in maven central):
 ```xml

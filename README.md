@@ -5,13 +5,13 @@ Please watch the presentation: https://www.youtube.com/watch?v=_Vci_5nr8R0 ,
 it explains the problem and the suggested solution.
 
 ### Supported versions
-Java 8+
+`Java` 8+
 
-Spring Boot 2.1.0+, 3.x
+`Spring Boot` 2.1.0+, 3.x
 
-TestNG 7.7.0+
+`TestNG` 7.7.0+
 
-JUnit 5 Jupiter TODO (work in progress)
+`JUnit 5 Jupiter` TODO (work in progress)
 
 ### How to use
 Add maven dependency (not yet available in maven central):
@@ -24,7 +24,7 @@ Add maven dependency (not yet available in maven central):
 </dependency>
 ```
 Or Gradle dependency:
-```kotlin
+```groovy
 testImplementation("com.github.seregamorph:spring-test-smart-context:0.1-SNAPSHOT")
 ```
 For projects with TestNG tests this will automatically setup

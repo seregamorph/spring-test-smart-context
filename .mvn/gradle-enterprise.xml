@@ -1,9 +1,0 @@
-<gradleEnterprise>
-    <buildScan>
-        <!--
-        https://docs.gradle.com/enterprise/maven-extension/
-        We should not allow auto-submitting build scans
-        -->
-        <publish>ALWAYS</publish>
-    </buildScan>
-</gradleEnterprise>

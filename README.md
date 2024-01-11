@@ -14,7 +14,7 @@ it explains the problem and the suggested solution.
 `JUnit 5 Jupiter` TODO (work in progress)
 
 ### Limitations
-At the moment only single thread execution per module is supported.
+At the moment only single thread test execution per module is supported.
 
 ### How to use
 Add maven dependency (not yet available in maven central):
@@ -32,7 +32,7 @@ testImplementation("com.github.seregamorph:spring-test-smart-context:0.1-SNAPSHO
 ```
 For projects with TestNG tests this will automatically setup
 [SmartDirtiesSuiteListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/testng/SmartDirtiesSuiteListener.java) 
-which will automatically reorder test classes and prepare the list of last test class per context configuration.
+which will reorder test classes and prepare the list of last test class per context configuration.
 The integration test classes should add
 [SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java):
 ```java

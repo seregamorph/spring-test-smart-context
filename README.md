@@ -1,8 +1,17 @@
 ## Improving Spring Boot Test efficiency
 
 ### Problem statement and solution
-Please watch the presentation: https://www.youtube.com/watch?v=_Vci_5nr8R0 ,
+The full presentation is available here: https://www.youtube.com/watch?v=_Vci_5nr8R0 ,
 it explains the problem and the suggested solution.
+
+Spring test framework creates an application context according to test class configuration.
+The context is cached and reused for all subsequent tests. If there is an existing context
+with the same configuration, it will be reused. Otherwise, the new context will be created.
+This is a very efficient and flexible approach, but it has a drawback: eventually this may
+lead to out of memory errors if the number of unique configurations is too high and context
+has a lot of heavyweight beans like TestContainers. In many cases simple static bean 
+definition can help, but this project suggests another approach: reordering test classes
+and eager context cleanup.
 
 ### Supported versions
 `Java` 8+

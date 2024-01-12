@@ -12,13 +12,38 @@
 
     <artifactId>spring-test-smart-context</artifactId>
 
-    <description></description>
+    <description>
+        Improving Spring Boot test efficiency. See the readme at
+        https://github.com/seregamorph/spring-test-smart-context
+    </description>
 
     <properties>
         <spring.version>5.3.29</spring.version>
         <testng.version>7.8.0</testng.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
     </properties>
+
+    <developers>
+        <developer>
+            <id>seregamorph</id>
+            <name>Sergey Chernov</name>
+            <email>serega.morph[at]gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/seregamorph/spring-test-smart-context</url>
+        <connection>scm:git:git@github.com:seregamorph/spring-test-smart-context.git</connection>
+        <developerConnection>scm:git:git@github.com:seregamorph/spring-test-smart-context.git</developerConnection>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <dependencies>
         <dependency>

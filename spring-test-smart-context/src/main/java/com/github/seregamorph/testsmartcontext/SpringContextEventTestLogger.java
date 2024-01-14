@@ -1,7 +1,7 @@
 package com.github.seregamorph.testsmartcontext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class SpringContextEventTestLogger implements InitializingBean, DisposableBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpringContextEventTestLogger.class);
+    private static final Log LOGGER = LogFactory.getLog(SpringContextEventTestLogger.class);
 
     private static final ThreadLocal<Class<?>> currentAfterClass = new ThreadLocal<>();
 
@@ -26,7 +26,7 @@ public class SpringContextEventTestLogger implements InitializingBean, Disposabl
 
     @Override
     public void afterPropertiesSet() {
-        LOGGER.info("Creating context for {}", CurrentTestContext.getCurrentTestClass());
+        LOGGER.info("Creating context for " + CurrentTestContext.getCurrentTestClass());
     }
 
     @Override
@@ -38,7 +38,7 @@ public class SpringContextEventTestLogger implements InitializingBean, Disposabl
         } else {
             // triggered from IntegrationTestRunner.springTestContextAfterTestClass via
             // SmartDirtiesContextTestExecutionListener or spring DirtiesContextTestExecutionListener
-            LOGGER.info("Destroying context for {}", afterClass);
+            LOGGER.info("Destroying context for " + afterClass);
         }
     }
 }

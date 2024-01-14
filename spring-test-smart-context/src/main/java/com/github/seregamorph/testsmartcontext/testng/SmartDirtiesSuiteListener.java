@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.context.TestContextBootstrapper;
@@ -38,7 +38,7 @@ import org.testng.xml.XmlSuite;
 @SuppressWarnings("CodeBlock2Expr")
 public class SmartDirtiesSuiteListener implements IAlterSuiteListener, IMethodInterceptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SmartDirtiesSuiteListener.class);
+    private static final Log LOGGER = LogFactory.getLog(SmartDirtiesSuiteListener.class);
 
     @Override
     public void alter(List<XmlSuite> suites) {
@@ -132,6 +132,7 @@ public class SmartDirtiesSuiteListener implements IAlterSuiteListener, IMethodIn
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
         pw.println("Tests grouped and reordered by MergedContextConfiguration (" + configToTests.size() + ")");
+        pw.println("------");
         configToTests.values().forEach(itClasses -> {
             for (Class<?> itClass : itClasses.classes()) {
                 pw.println(itClass.getName());

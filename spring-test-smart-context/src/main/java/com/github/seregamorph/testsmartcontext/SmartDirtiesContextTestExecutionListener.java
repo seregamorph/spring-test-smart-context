@@ -1,8 +1,8 @@
 package com.github.seregamorph.testsmartcontext;
 
 import com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 
@@ -18,7 +18,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  */
 public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecutionListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SmartDirtiesContextTestExecutionListener.class);
+    private static final Log LOGGER = LogFactory.getLog(SmartDirtiesContextTestExecutionListener.class);
 
     @Override
     public int getOrder() {
@@ -31,7 +31,7 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
     public void afterTestClass(TestContext testContext) {
         Class<?> testClass = testContext.getTestClass();
         if (SmartDirtiesTestsHolder.isLastClassPerConfig(testClass)) {
-            LOGGER.info("markDirty {}", testClass.getName());
+            LOGGER.info("markDirty " + testClass.getName());
             testContext.markApplicationContextDirty(null);
         }
     }

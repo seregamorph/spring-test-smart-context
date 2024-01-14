@@ -18,7 +18,7 @@ and eager context cleanup.
 
 `Spring Boot` 2.1.0+, 3.x
 
-`TestNG` 7.7.0+
+`TestNG` 7.0.0+
 
 `JUnit 5 Jupiter` TODO (work in progress)
 

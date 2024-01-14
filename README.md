@@ -16,7 +16,7 @@ and eager context cleanup.
 ### Supported versions
 `Java` 8+
 
-`Spring Boot` 2.1.0+, 3.x
+`Spring Boot` 2.4+, 3.x
 
 `TestNG` 7.0.0+
 

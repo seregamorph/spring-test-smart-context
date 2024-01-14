@@ -23,6 +23,7 @@
 
     <modules>
         <module>demo-junit-platform-testng-boot32</module>
+        <module>demo-testng-boot24</module>
     </modules>
 
     <dependencyManagement>

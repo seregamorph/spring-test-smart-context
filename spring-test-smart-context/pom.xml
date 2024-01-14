@@ -18,7 +18,7 @@
     </description>
 
     <properties>
-        <spring.version>5.3.29</spring.version>
+        <spring.version>5.3.3</spring.version>
         <testng.version>7.8.0</testng.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
     </properties>

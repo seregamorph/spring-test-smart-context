@@ -12,7 +12,7 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class SpringContextEventTestLogger implements InitializingBean, DisposableBean {
 
-    private static final Log LOGGER = LogFactory.getLog(SpringContextEventTestLogger.class);
+    private static final Log LOG = LogFactory.getLog(SpringContextEventTestLogger.class);
 
     private static final ThreadLocal<Class<?>> currentAfterClass = new ThreadLocal<>();
 
@@ -26,7 +26,7 @@ public class SpringContextEventTestLogger implements InitializingBean, Disposabl
 
     @Override
     public void afterPropertiesSet() {
-        LOGGER.info("Creating context for " + CurrentTestContext.getCurrentTestClass());
+        LOG.info("Creating context for " + CurrentTestContext.getCurrentTestClass());
     }
 
     @Override
@@ -34,11 +34,11 @@ public class SpringContextEventTestLogger implements InitializingBean, Disposabl
         Class<?> afterClass = currentAfterClass.get();
         if (afterClass == null) {
             // system shutdown hook
-            LOGGER.info("Destroying context (hook)");
+            LOG.info("Destroying context (hook)");
         } else {
             // triggered from IntegrationTestRunner.springTestContextAfterTestClass via
             // SmartDirtiesContextTestExecutionListener or spring DirtiesContextTestExecutionListener
-            LOGGER.info("Destroying context for " + afterClass);
+            LOG.info("Destroying context for " + afterClass);
         }
     }
 }

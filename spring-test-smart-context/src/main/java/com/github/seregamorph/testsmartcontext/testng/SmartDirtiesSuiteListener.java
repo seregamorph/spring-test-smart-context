@@ -38,7 +38,7 @@ import org.testng.xml.XmlSuite;
 @SuppressWarnings("CodeBlock2Expr")
 public class SmartDirtiesSuiteListener implements IAlterSuiteListener, IMethodInterceptor {
 
-    private static final Log LOGGER = LogFactory.getLog(SmartDirtiesSuiteListener.class);
+    private static final Log LOG = LogFactory.getLog(SmartDirtiesSuiteListener.class);
 
     @Override
     public void alter(List<XmlSuite> suites) {
@@ -125,7 +125,7 @@ public class SmartDirtiesSuiteListener implements IAlterSuiteListener, IMethodIn
         PrintWriter pw = new PrintWriter(sw, true);
         pw.println("Running suite of tests (" + itClasses.size() + ")");
         itClasses.forEach(pw::println);
-        LOGGER.info(sw.toString());
+        LOG.info(sw.toString());
     }
 
     private static void printSuiteTestsPerConfig(Map<MergedContextConfiguration, TestClasses> configToTests) {
@@ -139,6 +139,6 @@ public class SmartDirtiesSuiteListener implements IAlterSuiteListener, IMethodIn
             }
             pw.println("------");
         });
-        LOGGER.info(sw.toString());
+        LOG.info(sw.toString());
     }
 }

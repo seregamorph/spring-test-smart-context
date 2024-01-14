@@ -18,7 +18,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  */
 public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecutionListener {
 
-    private static final Log LOGGER = LogFactory.getLog(SmartDirtiesContextTestExecutionListener.class);
+    private static final Log LOG = LogFactory.getLog(SmartDirtiesContextTestExecutionListener.class);
 
     @Override
     public int getOrder() {
@@ -31,7 +31,7 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
     public void afterTestClass(TestContext testContext) {
         Class<?> testClass = testContext.getTestClass();
         if (SmartDirtiesTestsHolder.isLastClassPerConfig(testClass)) {
-            LOGGER.info("markDirty " + testClass.getName());
+            LOG.info("markDirty " + testClass.getName());
             testContext.markApplicationContextDirty(null);
         }
     }

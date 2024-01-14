@@ -22,6 +22,8 @@ and eager context cleanup.
 
 `JUnit 5 Jupiter` TODO (work in progress)
 
+`Gradle Enterprise Maven Extension` (test execution caching) correctly supports changed behaviour
+
 ### Limitations
 At the moment only single thread test execution per module is supported.
 

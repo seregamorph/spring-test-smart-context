@@ -21,6 +21,7 @@
     </properties>
 
     <modules>
+        <module>demo</module>
         <module>spring-test-smart-context</module>
     </modules>
 

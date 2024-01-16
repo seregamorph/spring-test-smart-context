@@ -10,12 +10,13 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>demo-testng-boot24</artifactId>
+    <artifactId>demo-maven-junit-platform-testng-boot32</artifactId>
 
-    <description>Demo project with tests launched via TestNG</description>
+    <description>Demo project with tests launched via Maven junit-platform testng-engine</description>
 
     <properties>
-        <spring-boot.version>2.4.2</spring-boot.version>
+        <spring-boot.version>3.2.1</spring-boot.version>
+        <testng-engine.version>1.0.5</testng-engine.version>
     </properties>
 
     <build>
@@ -26,7 +27,7 @@
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-testng</artifactId>
+                        <artifactId>surefire-junit-platform</artifactId>
                         <version>${maven-surefire.version}</version>
                     </dependency>
                 </dependencies>
@@ -55,21 +56,25 @@
         </dependency>
 
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.0.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-junit-jupiter</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.support</groupId>
+            <artifactId>testng-engine</artifactId>
+            <version>${testng-engine.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

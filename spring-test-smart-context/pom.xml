@@ -13,9 +13,10 @@
     <artifactId>spring-test-smart-context</artifactId>
 
     <description>
-        Improving Spring Boot test efficiency. See the readme at
-        https://github.com/seregamorph/spring-test-smart-context
+        Improving Spring Boot test efficiency. See the readme at GitHub page.
     </description>
+
+    <url>https://github.com/seregamorph/spring-test-smart-context</url>
 
     <properties>
         <spring.version>5.3.3</spring.version>
@@ -30,12 +31,6 @@
             <email>serega.morph[at]gmail.com</email>
         </developer>
     </developers>
-
-    <scm>
-        <url>https://github.com/seregamorph/spring-test-smart-context</url>
-        <connection>scm:git:git@github.com:seregamorph/spring-test-smart-context.git</connection>
-        <developerConnection>scm:git:git@github.com:seregamorph/spring-test-smart-context.git</developerConnection>
-    </scm>
 
     <licenses>
         <license>

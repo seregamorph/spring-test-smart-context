@@ -14,6 +14,10 @@ public class SmartDirtiesTestsHolder {
         return lastClassPerConfig.contains(testClass);
     }
 
+    public static boolean isLastClassPerConfigDefined() {
+        return lastClassPerConfig != null;
+    }
+
     public static void setLastClassPerConfig(Set<Class<?>> lastClassPerConfig) {
         SmartDirtiesTestsHolder.lastClassPerConfig = new HashSet<>(lastClassPerConfig);
     }

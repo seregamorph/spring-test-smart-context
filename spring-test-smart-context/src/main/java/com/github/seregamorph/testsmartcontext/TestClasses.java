@@ -1,4 +1,4 @@
-package com.github.seregamorph.testsmartcontext.testng;
+package com.github.seregamorph.testsmartcontext;
 
 import java.util.Set;
 

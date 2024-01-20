@@ -15,7 +15,7 @@
     <description>Demo project with tests launched via Maven junit-platform testng-engine</description>
 
     <properties>
-        <spring-boot.version>3.2.1</spring-boot.version>
+        <spring-boot.version>3.2.2</spring-boot.version>
         <testng-engine.version>1.0.5</testng-engine.version>
     </properties>
 

@@ -1,7 +1,7 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.Test;
 
 @ContextConfiguration(classes = {
     Integration2Test.Configuration.class

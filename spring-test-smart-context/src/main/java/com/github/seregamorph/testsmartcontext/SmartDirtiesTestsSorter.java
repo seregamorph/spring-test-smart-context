@@ -28,7 +28,6 @@ import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.context.TestContextBootstrapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.ClassUtils;
 
 @SuppressWarnings("CodeBlock2Expr")
 public class SmartDirtiesTestsSorter {
@@ -36,12 +35,6 @@ public class SmartDirtiesTestsSorter {
     private final Log log = LogFactory.getLog(getClass());
 
     private static final SmartDirtiesTestsSorter instance = initInstance();
-
-    private static final boolean JUNIT4_PRESENT = ClassUtils.isPresent("org.junit.runner.RunWith",
-        SmartDirtiesTestsSorter.class.getClassLoader());
-
-    private static final boolean JUNIT5_JUPITER_PRESENT = ClassUtils.isPresent(
-        "org.junit.jupiter.api.extension.ExtendWith", SmartDirtiesTestsSorter.class.getClassLoader());
 
     private static SmartDirtiesTestsSorter initInstance() {
         // subtypes can override methods for customization
@@ -62,13 +55,26 @@ public class SmartDirtiesTestsSorter {
     protected SmartDirtiesTestsSorter() {
     }
 
+    /**
+     * Returns sorted tests, all tests are sequentially grouped by {@link MergedContextConfiguration} calculated
+     * per each test class.
+     * Has side effect: saves static lastClassPerConfig in SmartDirtiesTestsHolder.
+     *
+     * @param testItems
+     * @param testClassExtractor
+     * @param <T>
+     * @return
+     */
     public <T> List<T> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         List<T> initialSorted = initialSorted(testItems, testClassExtractor);
 
-        Set<Class<?>> itClasses = initialSorted.stream()
-            .map(testClassExtractor::getTestClass)
-            .filter(this::isReorderTest)
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<Class<?>> itClasses = new LinkedHashSet<>();
+        for (T t : initialSorted) {
+            Class<?> testClass = testClassExtractor.getTestClass(t);
+            if (!itClasses.contains(testClass) && isReorderTest(testClass)) {
+                itClasses.add(testClass);
+            }
+        }
         if (!itClasses.isEmpty()) {
             printSuiteTests(initialSorted.size(), itClasses);
         }
@@ -91,6 +97,7 @@ public class SmartDirtiesTestsSorter {
                     return testClasses.order();
                 } else {
                     // all non-IT tests go first (other returned values are non-zero)
+                    // this logic can be changed via override
                     return getNonItOrder();
                 }
             }))
@@ -144,12 +151,12 @@ public class SmartDirtiesTestsSorter {
             return true;
         }
 
-        if (JUNIT4_PRESENT && isReorderTestJUnit4(testClass)) {
+        if (JUnitPlatformSupport.isJunit4Present() && isReorderTestJUnit4(testClass)) {
             return true;
         }
 
         //noinspection RedundantIfStatement
-        if (JUNIT5_JUPITER_PRESENT && isReorderTestJUnit5Jupiter(testClass)) {
+        if (JUnitPlatformSupport.isJunit5JupiterApiPresent() && isReorderTestJUnit5Jupiter(testClass)) {
             return true;
         }
 
@@ -171,7 +178,7 @@ public class SmartDirtiesTestsSorter {
     }
 
     /**
-     * This method should be only called if JUnit5 Jupiter is on the classpath
+     * This method should be only called if JUnit5 Jupiter API is on the classpath
      */
     protected boolean isReorderTestJUnit5Jupiter(Class<?> testClass) {
         // can be inherited, can be meta-annotation e.g. via @SpringBootTest

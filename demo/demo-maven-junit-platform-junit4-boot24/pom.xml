@@ -10,13 +10,12 @@
         <version>0.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>demo-maven-junit-platform-testng-boot32</artifactId>
+    <artifactId>demo-maven-junit-platform-junit4-boot24</artifactId>
 
-    <description>Demo project with tests launched via Maven junit-platform testng-engine</description>
+    <description>Demo project with tests launched via Maven junit-platform junit4 vintage engine</description>
 
     <properties>
-        <spring-boot.version>3.2.2</spring-boot.version>
-        <testng-engine.version>1.0.5</testng-engine.version>
+        <spring-boot.version>2.4.2</spring-boot.version>
     </properties>
 
     <build>
@@ -69,16 +68,29 @@
                     <groupId>org.junit.jupiter</groupId>
                     <artifactId>junit-jupiter</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-junit-jupiter</artifactId>
-                </exclusion>
+                <!--
+                TODO IDEA needs junit-jupiter-api to run via JUnit5 platform-launcher,
+                if the dependency is excluded, runs via bare org.junit.runner.JUnitCore
+
+                Related logic can be found in https://github.com/JetBrains/intellij-community classes
+                    com.intellij.rt.junit.JUnitStarter
+                    com.intellij.execution.junit.TestObject
+                    com.intellij.execution.junit.JUnitUtil
+                -->
+<!--                <exclusion>-->
+<!--                    <groupId>org.junit.jupiter</groupId>-->
+<!--                    <artifactId>junit-jupiter-api</artifactId>-->
+<!--                </exclusion>-->
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.junit.support</groupId>
-            <artifactId>testng-engine</artifactId>
-            <version>${testng-engine.version}</version>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

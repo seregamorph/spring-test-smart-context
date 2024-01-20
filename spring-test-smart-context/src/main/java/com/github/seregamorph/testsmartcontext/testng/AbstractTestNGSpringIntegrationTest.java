@@ -10,7 +10,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 
 /**
- * Base class for integration tests that create spring context. Supports
+ * Base class for TestNG integration tests that create spring context. Supports
  * {@link SmartDirtiesContextTestExecutionListener} semantics to optimize IT suite execution.
  *
  * @see SmartDirtiesContextTestExecutionListener

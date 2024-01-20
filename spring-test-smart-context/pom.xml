@@ -20,9 +20,12 @@
 
     <properties>
         <spring.version>5.3.3</spring.version>
-        <junit4.version>4.13.2</junit4.version>
+<!--        <junit4.version>4.13.2</junit4.version>-->
         <testng.version>7.8.0</testng.version>
+        <junit-platform-launcher.version>1.10.0</junit-platform-launcher.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <junit-vintage.version>5.8.2</junit-vintage.version>
+        <testng-engine.version>1.0.5</testng-engine.version>
     </properties>
 
     <developers>
@@ -50,29 +53,27 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit4.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testng.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit-jupiter.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>${junit-vintage.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.support</groupId>
+            <artifactId>testng-engine</artifactId>
+            <version>${testng-engine.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit-platform-launcher.version}</version>
             <scope>provided</scope>
         </dependency>
 

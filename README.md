@@ -20,7 +20,9 @@ and eager context cleanup.
 
 `TestNG` 7.0.0+
 
-`JUnit 5 Jupiter` TODO (work in progress)
+`JUnit 4` (via JUnit 5 junit-vintage-engine)
+
+`JUnit 5 Jupiter`
 
 `Gradle Enterprise Maven Extension` (test execution caching) correctly supports changed behaviour
 
@@ -33,7 +35,7 @@ Add maven dependency (not yet available in maven central):
 <dependency>
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version> (0.1 supports only TestNG)
     <scope>test</scope>
 </dependency>
 ```

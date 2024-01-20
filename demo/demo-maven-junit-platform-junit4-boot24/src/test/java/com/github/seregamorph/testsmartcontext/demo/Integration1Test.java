@@ -1,12 +1,14 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.Test;
+import org.springframework.test.context.web.WebAppConfiguration;
 
+@WebAppConfiguration
 @ContextConfiguration(classes = {
-    Integration2Test.Configuration.class
+    Integration1Test.Configuration.class
 })
-public class Integration2Test extends AbstractIntegrationTest {
+public class Integration1Test extends AbstractIntegrationTest {
 
     @Test
     public void test() {

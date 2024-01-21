@@ -56,8 +56,8 @@ public class SmartDirtiesTestsSorter {
     }
 
     /**
-     * Returns sorted tests, all tests are sequentially grouped by {@link MergedContextConfiguration} calculated
-     * per each test class.
+     * Returns sorted tests, all tests are sequentially grouped by {@link MergedContextConfiguration} calculated per
+     * each test class.
      *
      * @param testItems
      * @param testClassExtractor
@@ -67,6 +67,53 @@ public class SmartDirtiesTestsSorter {
     public <T> SortResult<T> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         List<T> initialSorted = initialSorted(testItems, testClassExtractor);
 
+        Set<Class<?>> itClasses = filterAndLogItClasses(initialSorted, testClassExtractor);
+
+        Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
+        Map<Class<?>, Integer> classToOrder = new LinkedHashMap<>();
+        for (Class<?> itClass : itClasses) {
+            TestContextBootstrapper bootstrapper = BootstrapUtilsHelper.resolveTestContextBootstrapper(itClass);
+            MergedContextConfiguration mergedContextConfiguration = bootstrapper.buildMergedContextConfiguration();
+            // Sequentially each unique mergedContextConfiguration will have own order
+            // via configToTests current size
+            TestClasses testClasses = configToTests.computeIfAbsent(mergedContextConfiguration,
+                $ -> new TestClasses(configToTests.size() + 1, new LinkedHashSet<>()));
+            testClasses.classes.add(itClass);
+            classToOrder.put(itClass, testClasses.order);
+        }
+        if (!configToTests.isEmpty()) {
+            printSuiteTestsPerConfig(configToTests);
+        }
+
+        List<T> reordered = initialSorted.stream()
+            .sorted(comparing(testItem -> {
+                Class<?> realClass = testClassExtractor.getTestClass(testItem);
+                Integer order = classToOrder.get(realClass);
+                if (order == null) {
+                    // all non-IT tests go first (other returned values are non-zero)
+                    // this logic can be changed via override
+                    return getNonItOrder();
+                } else {
+                    // this sorting is stable - most of the tests will preserve alphabetical ordering where possible
+                    return order;
+                }
+            }))
+            .collect(Collectors.toList());
+
+        Map<Class<?>, Boolean> lastClassPerConfig = new LinkedHashMap<>();
+        configToTests.values().forEach(testClasses -> {
+            Iterator<Class<?>> iterator = testClasses.classes.iterator();
+            while (iterator.hasNext()) {
+                Class<?> testClass = iterator.next();
+                boolean isLast = !iterator.hasNext();
+                lastClassPerConfig.put(testClass, isLast);
+            }
+        });
+
+        return new SortResult<>(reordered, lastClassPerConfig);
+    }
+
+    private <T> Set<Class<?>> filterAndLogItClasses(List<T> initialSorted, TestClassExtractor<T> testClassExtractor) {
         Set<Class<?>> itClasses = new LinkedHashSet<>();
         for (T t : initialSorted) {
             Class<?> testClass = testClassExtractor.getTestClass(t);
@@ -77,46 +124,7 @@ public class SmartDirtiesTestsSorter {
         if (!itClasses.isEmpty()) {
             printSuiteTests(initialSorted.size(), itClasses);
         }
-
-        Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
-        List<T> reordered = initialSorted.stream()
-            .sorted(comparing(testItem -> {
-                Class<?> realClass = testClassExtractor.getTestClass(testItem);
-                if (itClasses.contains(realClass)) {
-                    TestContextBootstrapper bootstrapper =
-                        BootstrapUtilsHelper.resolveTestContextBootstrapper(realClass);
-                    MergedContextConfiguration mergedContextConfiguration =
-                        bootstrapper.buildMergedContextConfiguration();
-                    // Sequentially each unique mergedContextConfiguration will have own order
-                    // via configToTests current size
-                    TestClasses testClasses = configToTests.computeIfAbsent(mergedContextConfiguration,
-                        $ -> new TestClasses(configToTests.size() + 1, new LinkedHashSet<>()));
-                    testClasses.classes().add(realClass);
-                    // this sorting is stable - most of the tests will preserve alphabetical ordering where possible
-                    return testClasses.order();
-                } else {
-                    // all non-IT tests go first (other returned values are non-zero)
-                    // this logic can be changed via override
-                    return getNonItOrder();
-                }
-            }))
-            .collect(Collectors.toList());
-
-        if (!configToTests.isEmpty()) {
-            printSuiteTestsPerConfig(configToTests);
-        }
-
-        Map<Class<?>, Boolean> lastClassPerConfig = new LinkedHashMap<>();
-        configToTests.values().forEach(testClasses -> {
-            Iterator<Class<?>> iterator = testClasses.classes().iterator();
-            while (iterator.hasNext()) {
-                Class<?> testClass = iterator.next();
-                boolean isLast = !iterator.hasNext();
-                lastClassPerConfig.put(testClass, isLast);
-            }
-        });
-
-        return new SortResult<>(reordered, lastClassPerConfig);
+        return itClasses;
     }
 
     /**
@@ -133,15 +141,6 @@ public class SmartDirtiesTestsSorter {
                 return testClassExtractor.getTestClass(testItem).getName();
             }))
             .collect(Collectors.toList());
-    }
-
-    private static <T> T getLast(Iterable<T> iterable) {
-        Iterator<T> iterator = iterable.iterator();
-        T elem = iterator.next();
-        while (iterator.hasNext()) {
-            elem = iterator.next();
-        }
-        return elem;
     }
 
     protected boolean isReorderTest(Class<?> testClass) {
@@ -211,7 +210,7 @@ public class SmartDirtiesTestsSorter {
             "(" + configToTests.size() + "):");
         pw.println("------");
         configToTests.values().forEach(itClasses -> {
-            for (Class<?> itClass : itClasses.classes()) {
+            for (Class<?> itClass : itClasses.classes) {
                 pw.println(itClass.getName());
             }
             pw.println("------");
@@ -240,6 +239,17 @@ public class SmartDirtiesTestsSorter {
 
         public Map<Class<?>, Boolean> getLastClassPerConfig() {
             return lastClassPerConfig;
+        }
+    }
+
+    private static final class TestClasses {
+
+        private final int order;
+        private final Set<Class<?>> classes;
+
+        private TestClasses(int order, Set<Class<?>> classes) {
+            this.order = order;
+            this.classes = classes;
         }
     }
 }

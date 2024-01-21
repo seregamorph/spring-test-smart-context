@@ -71,6 +71,7 @@
                 <!--
                 TODO IDEA needs junit-jupiter-api to run via JUnit5 platform-launcher,
                 if the dependency is excluded, runs via bare org.junit.runner.JUnitCore
+                https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default
 
                 Related logic can be found in https://github.com/JetBrains/intellij-community classes
                     com.intellij.rt.junit.JUnitStarter
@@ -86,11 +87,6 @@
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

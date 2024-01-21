@@ -3,7 +3,6 @@ package com.github.seregamorph.testsmartcontext.demo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,15 +23,10 @@ import org.springframework.web.context.WebApplicationContext;
 @TestPropertySource(properties = {
     "parameter = value"
 })
-public class SampleIntegrationTest {
+public class SampleIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    public void beforeMethod() {
-        System.out.println("Running " + getClass());
-    }
 
     @Test
     public void test404() throws Exception {

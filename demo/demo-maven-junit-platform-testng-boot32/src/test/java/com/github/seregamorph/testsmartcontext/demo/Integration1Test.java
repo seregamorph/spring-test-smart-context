@@ -1,6 +1,10 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import static org.testng.Assert.assertEquals;
+
 import com.github.seregamorph.testsmartcontext.testng.AbstractTestNGSpringIntegrationTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
@@ -9,11 +13,19 @@ import org.testng.annotations.Test;
 })
 public class Integration1Test extends AbstractTestNGSpringIntegrationTest {
 
+    @Autowired
+    private String string;
+
     @Test
     public void test() {
+        assertEquals(string, "value1");
     }
 
     public static class Configuration {
 
+        @Bean
+        public String string() {
+            return "value1";
+        }
     }
 }

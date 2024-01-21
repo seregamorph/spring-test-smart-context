@@ -31,9 +31,12 @@ public class SmartDirtiesDiscoveryFilter implements PostDiscoveryFilter {
         childrenToReorder.forEach(testDescriptor::removeChild);
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        List<TestDescriptor> sortedList = sorter.sort(childrenToReorder, this::getTestClass);
+        SmartDirtiesTestsSorter.SortResult<TestDescriptor> sortResult = sorter.sort(childrenToReorder, this::getTestClass);
 
-        sortedList.forEach(testDescriptor::addChild);
+        sortResult.getTestItems().forEach(testDescriptor::addChild);
+
+        SmartDirtiesTestsHolder.setLastClassPerConfig(sortResult.getLastClassPerConfig());
+
         return FilterResult.included("sorted");
     }
 

@@ -58,14 +58,13 @@ public class SmartDirtiesTestsSorter {
     /**
      * Returns sorted tests, all tests are sequentially grouped by {@link MergedContextConfiguration} calculated
      * per each test class.
-     * Has side effect: saves static lastClassPerConfig in SmartDirtiesTestsHolder.
      *
      * @param testItems
      * @param testClassExtractor
      * @param <T>
      * @return
      */
-    public <T> List<T> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+    public <T> SortResult<T> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         List<T> initialSorted = initialSorted(testItems, testClassExtractor);
 
         Set<Class<?>> itClasses = new LinkedHashSet<>();
@@ -107,12 +106,17 @@ public class SmartDirtiesTestsSorter {
             printSuiteTestsPerConfig(configToTests);
         }
 
-        Set<Class<?>> lastClassPerConfig = configToTests.values().stream()
-            .map(testClasses -> getLast(testClasses.classes()))
-            .collect(Collectors.toSet());
-        SmartDirtiesTestsHolder.setLastClassPerConfig(lastClassPerConfig);
+        Map<Class<?>, Boolean> lastClassPerConfig = new LinkedHashMap<>();
+        configToTests.values().forEach(testClasses -> {
+            Iterator<Class<?>> iterator = testClasses.classes().iterator();
+            while (iterator.hasNext()) {
+                Class<?> testClass = iterator.next();
+                boolean isLast = !iterator.hasNext();
+                lastClassPerConfig.put(testClass, isLast);
+            }
+        });
 
-        return reordered;
+        return new SortResult<>(reordered, lastClassPerConfig);
     }
 
     /**
@@ -218,5 +222,24 @@ public class SmartDirtiesTestsSorter {
     @FunctionalInterface
     public interface TestClassExtractor<T> {
         Class<?> getTestClass(T test);
+    }
+
+    public static class SortResult<T> {
+
+        private final List<T> testItems;
+        private final Map<Class<?>, Boolean> lastClassPerConfig;
+
+        SortResult(List<T> testItems, Map<Class<?>, Boolean> lastClassPerConfig) {
+            this.testItems = testItems;
+            this.lastClassPerConfig = lastClassPerConfig;
+        }
+
+        public List<T> getTestItems() {
+            return testItems;
+        }
+
+        public Map<Class<?>, Boolean> getLastClassPerConfig() {
+            return lastClassPerConfig;
+        }
     }
 }

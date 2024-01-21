@@ -1,8 +1,10 @@
 package com.github.seregamorph.testsmartcontext;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.engine.descriptor.ClassTestDescriptor;
+import org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor;
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.launcher.PostDiscoveryFilter;
@@ -24,8 +26,19 @@ public class SmartDirtiesDiscoveryFilter implements PostDiscoveryFilter {
             return FilterResult.included("Empty list");
         }
 
-        if (SmartDirtiesTestsHolder.isLastClassPerConfigDefined()) {
-            return FilterResult.included("already sorted");
+        if (childrenToReorder.size() == 1) {
+            // This filter is executed several times during discover and execute phases and
+            // it's not possible to distinguish them here. Sometimes per single test is sent as argument,
+            // sometimes - the whole suite. If it's a suite more than 1, we can save it and never update.
+            // If it's 1 - we should also distinguish single test execution.
+            if (SmartDirtiesTestsHolder.lastClassPerConfigSize() <= 1) {
+                Class<?> testClass = getTestClass(childrenToReorder.get(0));
+                SmartDirtiesTestsHolder.setLastClassPerConfig(Collections.singletonMap(testClass, true));
+            }
+
+            // the logic here may differ for JUnit 4 via Maven vs IntelliJ:
+            // Maven calls this filter several times (first per each test, then with all tests)
+            return FilterResult.included("Skipping single element");
         }
 
         childrenToReorder.forEach(testDescriptor::removeChild);
@@ -77,6 +90,10 @@ public class SmartDirtiesDiscoveryFilter implements PostDiscoveryFilter {
         if (testDescriptor instanceof ClassTestDescriptor) {
             ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
             return classTestDescriptor.getTestClass();
+        }
+        if (testDescriptor instanceof TestMethodTestDescriptor) {
+            TestMethodTestDescriptor testMethodTestDescriptor = (TestMethodTestDescriptor) testDescriptor;
+            return testMethodTestDescriptor.getTestClass();
         }
         return null;
     }

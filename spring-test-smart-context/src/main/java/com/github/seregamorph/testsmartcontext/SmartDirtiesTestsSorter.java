@@ -38,10 +38,10 @@ public class SmartDirtiesTestsSorter {
     private static final SmartDirtiesTestsSorter instance = initInstance();
 
     private static final boolean JUNIT4_PRESENT = ClassUtils.isPresent("org.junit.runner.RunWith",
-            SmartDirtiesTestsSorter.class.getClassLoader());
-
-    private static final boolean JUNIT5_JUPITER_PRESENT = ClassUtils.isPresent("org.junit.jupiter.api.extension.ExtendWith",
         SmartDirtiesTestsSorter.class.getClassLoader());
+
+    private static final boolean JUNIT5_JUPITER_PRESENT = ClassUtils.isPresent(
+        "org.junit.jupiter.api.extension.ExtendWith", SmartDirtiesTestsSorter.class.getClassLoader());
 
     private static SmartDirtiesTestsSorter initInstance() {
         // subtypes can override methods for customization
@@ -70,7 +70,7 @@ public class SmartDirtiesTestsSorter {
             .filter(this::isReorderTest)
             .collect(Collectors.toCollection(LinkedHashSet::new));
         if (!itClasses.isEmpty()) {
-            printSuiteTests(itClasses);
+            printSuiteTests(initialSorted.size(), itClasses);
         }
 
         Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
@@ -109,8 +109,8 @@ public class SmartDirtiesTestsSorter {
     }
 
     /**
-     * Get the order of non-integration test execution (bigger is later).
-     * Can be either first or last. 0 (first) by default.
+     * Get the order of non-integration test execution (bigger is later). Can be either first or last. 0 (first) by
+     * default.
      */
     protected int getNonItOrder() {
         return 0;
@@ -184,10 +184,11 @@ public class SmartDirtiesTestsSorter {
             .anyMatch(SpringExtension.class::isAssignableFrom);
     }
 
-    private void printSuiteTests(Collection<Class<?>> itClasses) {
+    private void printSuiteTests(int totalTests, Collection<Class<?>> itClasses) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        pw.println("Running suite of tests (" + itClasses.size() + ")");
+        pw.println("Running suite of " + totalTests + " tests. Integration test classes " +
+            "(" + itClasses.size() + "):");
         itClasses.forEach(pw::println);
         log.info(sw.toString());
     }
@@ -195,7 +196,8 @@ public class SmartDirtiesTestsSorter {
     private void printSuiteTestsPerConfig(Map<MergedContextConfiguration, TestClasses> configToTests) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        pw.println("Tests grouped and reordered by MergedContextConfiguration (" + configToTests.size() + ")");
+        pw.println("Integration test classes grouped and reordered by MergedContextConfiguration " +
+            "(" + configToTests.size() + "):");
         pw.println("------");
         configToTests.values().forEach(itClasses -> {
             for (Class<?> itClass : itClasses.classes()) {

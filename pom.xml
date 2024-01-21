@@ -8,7 +8,7 @@
     <artifactId>spring-test-smart-context-parent</artifactId>
     <version>0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>spring-test-smart-context</name>
+    <name>spring-test-smart-context parent</name>
     <description>
         Improving Spring Boot test efficiency. See the readme at GitHub page.
     </description>

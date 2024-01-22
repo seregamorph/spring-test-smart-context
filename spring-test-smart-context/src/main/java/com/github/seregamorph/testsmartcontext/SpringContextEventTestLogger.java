@@ -16,17 +16,17 @@ public class SpringContextEventTestLogger implements InitializingBean, Disposabl
 
     private static final ThreadLocal<Class<?>> currentAfterClass = new ThreadLocal<>();
 
-    public static void setCurrentAfterClass(Class<?> testClass) {
+    static void setCurrentAfterClass(Class<?> testClass) {
         currentAfterClass.set(testClass);
     }
 
-    public static void resetCurrentAfterClass() {
+    static void resetCurrentAfterClass() {
         currentAfterClass.remove();
     }
 
     @Override
     public void afterPropertiesSet() {
-        LOG.info("Creating context for " + CurrentTestContext.getCurrentTestClass());
+        LOG.info("Creating context for " + CurrentTestContext.getCurrentTestClassIdentifier());
     }
 
     @Override

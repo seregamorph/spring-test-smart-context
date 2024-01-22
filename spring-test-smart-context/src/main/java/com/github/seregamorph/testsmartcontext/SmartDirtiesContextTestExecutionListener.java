@@ -32,7 +32,12 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
         Class<?> testClass = testContext.getTestClass();
         if (SmartDirtiesTestsHolder.isLastClassPerConfig(testClass)) {
             LOG.info("markDirty " + testClass.getName());
-            testContext.markApplicationContextDirty(null);
+            SpringContextEventTestLogger.setCurrentAfterClass(testContext.getTestClass());
+            try {
+                testContext.markApplicationContextDirty(null);
+            } finally {
+                SpringContextEventTestLogger.resetCurrentAfterClass();
+            }
         }
     }
 }

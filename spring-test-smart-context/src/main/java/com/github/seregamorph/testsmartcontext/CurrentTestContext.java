@@ -2,17 +2,17 @@ package com.github.seregamorph.testsmartcontext;
 
 public abstract class CurrentTestContext {
 
-    private static final ThreadLocal<Class<?>> currentTestClass = new ThreadLocal<>();
+    private static final ThreadLocal<String> currentTestClassIdentifier = new ThreadLocal<>();
 
-    public static Class<?> getCurrentTestClass() {
-        return currentTestClass.get();
+    public static String getCurrentTestClassIdentifier() {
+        return currentTestClassIdentifier.get();
     }
 
-    protected static void setCurrentTestClass(Class<?> testClass) {
-        currentTestClass.set(testClass);
+    protected static void setCurrentTestClassIdentifier(String testClassIdentifier) {
+        currentTestClassIdentifier.set(testClassIdentifier);
     }
 
-    protected static void resetCurrentTestClass() {
-        currentTestClass.remove();
+    protected static void resetCurrentTestClassIdentifier() {
+        currentTestClassIdentifier.remove();
     }
 }

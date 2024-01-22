@@ -9,11 +9,11 @@ public class CurrentTestListener extends CurrentTestContext implements IClassLis
     @Override
     public void onBeforeClass(ITestClass testClass) {
         Class<?> realTestClass = testClass.getRealClass();
-        setCurrentTestClass(realTestClass);
+        setCurrentTestClassIdentifier(realTestClass.getName());
     }
 
     @Override
     public void onAfterClass(ITestClass testClass) {
-        resetCurrentTestClass();
+        resetCurrentTestClassIdentifier();
     }
 }

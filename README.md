@@ -35,13 +35,13 @@ Add maven dependency (not yet available in maven central):
 <dependency>
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context</artifactId>
-    <version>0.2-SNAPSHOT</version> (0.1 supports only TestNG)
+    <version>0.2-SNAPSHOT</version>
     <scope>test</scope>
 </dependency>
 ```
 Or Gradle dependency:
 ```groovy
-testImplementation("com.github.seregamorph:spring-test-smart-context:0.1-SNAPSHOT")
+testImplementation("com.github.seregamorph:spring-test-smart-context:0.2-SNAPSHOT")
 ```
 For projects with TestNG tests this will automatically setup
 [SmartDirtiesSuiteListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/testng/SmartDirtiesSuiteListener.java) 

@@ -20,7 +20,6 @@
 
     <properties>
         <spring.version>5.3.3</spring.version>
-<!--        <junit4.version>4.13.2</junit4.version>-->
         <testng.version>7.8.0</testng.version>
         <junit-platform-launcher.version>1.10.0</junit-platform-launcher.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>

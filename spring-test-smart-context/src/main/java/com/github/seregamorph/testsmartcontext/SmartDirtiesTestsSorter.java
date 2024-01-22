@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -136,11 +137,15 @@ public class SmartDirtiesTestsSorter {
     }
 
     protected <T> List<T> initialSorted(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
-        return testItems.stream()
+        List<T> list = testItems.stream()
             .sorted(comparing(testItem -> {
                 return testClassExtractor.getTestClass(testItem).getName();
             }))
             .collect(Collectors.toList());
+        if (Boolean.getBoolean("testsmartcontext.reverse")) {
+            Collections.reverse(list);
+        }
+        return list;
     }
 
     protected boolean isReorderTest(Class<?> testClass) {

@@ -1,9 +1,9 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
-import com.github.seregamorph.testsmartcontext.junit4.AbstractJUnit4SpringIntegrationTest;
 import org.junit.Before;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-public abstract class AbstractIntegrationTest extends AbstractJUnit4SpringIntegrationTest {
+public abstract class AbstractIntegrationTest extends AbstractJUnit4SpringContextTests {
 
     @Before
     public void beforeMethod() {

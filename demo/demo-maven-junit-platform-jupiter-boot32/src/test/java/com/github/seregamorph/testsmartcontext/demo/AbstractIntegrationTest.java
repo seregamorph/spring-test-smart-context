@@ -1,9 +1,11 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
-import com.github.seregamorph.testsmartcontext.jupiter.AbstractJUnitSpringIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-public abstract class AbstractIntegrationTest extends AbstractJUnitSpringIntegrationTest {
+@ExtendWith(SpringExtension.class)
+public abstract class AbstractIntegrationTest {
 
     @BeforeEach
     public void beforeMethod() {

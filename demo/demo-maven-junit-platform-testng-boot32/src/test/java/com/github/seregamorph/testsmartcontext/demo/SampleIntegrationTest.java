@@ -3,13 +3,13 @@ package com.github.seregamorph.testsmartcontext.demo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.seregamorph.testsmartcontext.testng.AbstractTestNGSpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 @TestPropertySource(properties = {
     "parameter = value"
 })
-public class SampleIntegrationTest extends AbstractTestNGSpringIntegrationTest {
+public class SampleIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private MockMvc mockMvc;

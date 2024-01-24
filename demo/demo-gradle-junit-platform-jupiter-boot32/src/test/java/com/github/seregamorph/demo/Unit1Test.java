@@ -1,8 +1,8 @@
-package com.github.seregamorph.testsmartcontext.demo;
+package com.github.seregamorph.demo;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class Unit1Test {
 

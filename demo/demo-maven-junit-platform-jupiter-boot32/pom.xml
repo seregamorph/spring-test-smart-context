@@ -12,7 +12,7 @@
 
     <artifactId>demo-maven-junit-platform-jupiter-boot32</artifactId>
 
-    <description>Demo project with tests launched via Maven junit-platform testng-engine</description>
+    <description>Demo project with tests launched via Maven junit-platform jupiter</description>
 
     <properties>
         <spring-boot.version>3.2.2</spring-boot.version>

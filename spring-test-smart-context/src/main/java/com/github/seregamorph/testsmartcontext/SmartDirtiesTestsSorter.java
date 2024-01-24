@@ -203,7 +203,7 @@ public class SmartDirtiesTestsSorter {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
         pw.println("Running suite of " + totalTests + " tests. Integration test classes " +
-            "(" + itClasses.size() + "):");
+            "(" + itClasses.size() + " classes):");
         itClasses.forEach(pw::println);
         log.info(sw.toString());
     }
@@ -212,7 +212,7 @@ public class SmartDirtiesTestsSorter {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
         pw.println("Integration test classes grouped and reordered by MergedContextConfiguration " +
-            "(" + configToTests.size() + "):");
+            "(" + configToTests.size() + " groups):");
         pw.println("------");
         configToTests.values().forEach(itClasses -> {
             for (Class<?> itClass : itClasses.classes) {

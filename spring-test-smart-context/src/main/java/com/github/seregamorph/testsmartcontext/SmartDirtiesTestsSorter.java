@@ -30,7 +30,11 @@ import org.springframework.test.context.TestContextBootstrapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@SuppressWarnings("CodeBlock2Expr")
+/**
+ * The logic of this class can be customized via
+ * META-INF/services/com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter
+ * defining subtype of this class overriding methods.
+ */
 public class SmartDirtiesTestsSorter {
 
     private final Log log = LogFactory.getLog(getClass());
@@ -138,9 +142,7 @@ public class SmartDirtiesTestsSorter {
 
     protected <T> List<T> initialSorted(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         List<T> list = testItems.stream()
-            .sorted(comparing(testItem -> {
-                return testClassExtractor.getTestClass(testItem).getName();
-            }))
+            .sorted(comparing(testItem -> testClassExtractor.getTestClass(testItem).getName()))
             .collect(Collectors.toList());
         if (Boolean.getBoolean("testsmartcontext.reverse")) {
             Collections.reverse(list);

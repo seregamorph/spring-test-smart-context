@@ -2,6 +2,7 @@ package com.github.seregamorph.testsmartcontext;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.engine.descriptor.ClassTestDescriptor;
 import org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor;
@@ -12,6 +13,7 @@ import org.junit.support.testng.engine.ClassDescriptorHelper;
 import org.junit.support.testng.engine.MethodDescriptorHelper;
 import org.junit.vintage.engine.descriptor.RunnerTestDescriptor;
 import org.junit.vintage.engine.descriptor.VintageTestDescriptor;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 public class SmartDirtiesDiscoveryFilter implements PostDiscoveryFilter {
@@ -21,12 +23,15 @@ public class SmartDirtiesDiscoveryFilter implements PostDiscoveryFilter {
         List<TestDescriptor> childrenToReorder = testDescriptor.getChildren().stream()
             .filter(this::isReorder)
             .collect(Collectors.toList());
+        Set<Class<?>> uniqueClasses = childrenToReorder.stream()
+            .map(this::getTestClass)
+            .collect(Collectors.toSet());
 
         if (childrenToReorder.isEmpty()) {
             return FilterResult.included("Empty list");
         }
 
-        if (childrenToReorder.size() == 1) {
+        if (uniqueClasses.size() == 1) {
             // This filter is executed several times during discover and execute phases and
             // it's not possible to distinguish them here. Sometimes per single test is sent as argument,
             // sometimes - the whole suite. If it's a suite more than 1, we can save it and never update.
@@ -63,10 +68,11 @@ public class SmartDirtiesDiscoveryFilter implements PostDiscoveryFilter {
             }
         }
 
-        return true;
+        return getTestClassOrNull(testDescriptor) != null;
     }
 
-    private Class<?> getTestClass(TestDescriptor testDescriptor) {
+    @Nullable
+    private Class<?> getTestClassOrNull(TestDescriptor testDescriptor) {
         if (JUnitPlatformSupport.isJUnitJupiterEnginePresent()) {
             Class<?> testClass = getTestClassJUnitJupiterEngine(testDescriptor);
             if (testClass != null) {
@@ -81,8 +87,17 @@ public class SmartDirtiesDiscoveryFilter implements PostDiscoveryFilter {
             }
         }
 
-        throw new UnsupportedOperationException("Unsupported TestDescriptor type " + testDescriptor.getClass()
-            + ", failed to obtain test class");
+        return null;
+    }
+
+    @NonNull
+    private Class<?> getTestClass(TestDescriptor testDescriptor) {
+        Class<?> testClass = getTestClassOrNull(testDescriptor);
+        if (testClass == null) {
+            throw new UnsupportedOperationException("Unsupported TestDescriptor type " + testDescriptor.getClass()
+                + ", failed to obtain test class");
+        }
+        return testClass;
     }
 
     @Nullable

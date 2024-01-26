@@ -5,7 +5,6 @@ plugins {
 }
 
 group = 'com.github.seregamorph'
-version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
@@ -20,7 +19,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter"
     implementation "org.springframework.boot:spring-boot-starter-web"
 
-    testImplementation "com.github.seregamorph:spring-test-smart-context:0.2-SNAPSHOT"
+    testImplementation "com.github.seregamorph:spring-test-smart-context:0.3-SNAPSHOT"
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 

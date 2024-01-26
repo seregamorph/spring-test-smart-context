@@ -7,7 +7,7 @@ public class SmartDirtiesTestsHolder {
 
     private static Map<Class<?>, Boolean> lastClassPerConfig;
 
-    static int lastClassPerConfigSize() {
+    public static int lastClassPerConfigSize() {
         return lastClassPerConfig == null ? 0 : lastClassPerConfig.size();
     }
 
@@ -24,7 +24,7 @@ public class SmartDirtiesTestsHolder {
         return isLastClassPerConfig;
     }
 
-    public static void setLastClassPerConfig(Map<Class<?>, Boolean> lastClassPerConfig) {
+    protected static void setLastClassPerConfig(Map<Class<?>, Boolean> lastClassPerConfig) {
         SmartDirtiesTestsHolder.lastClassPerConfig = new LinkedHashMap<>(lastClassPerConfig);
     }
 }

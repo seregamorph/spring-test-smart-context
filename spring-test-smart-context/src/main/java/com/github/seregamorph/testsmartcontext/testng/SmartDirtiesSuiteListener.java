@@ -19,7 +19,8 @@ import org.testng.xml.XmlSuite;
  * contexts.
  */
 @SuppressWarnings("CodeBlock2Expr")
-public class SmartDirtiesSuiteListener implements IAlterSuiteListener, IMethodInterceptor {
+public class SmartDirtiesSuiteListener extends SmartDirtiesTestsHolder
+    implements IAlterSuiteListener, IMethodInterceptor {
 
     @Override
     public void alter(List<XmlSuite> suites) {

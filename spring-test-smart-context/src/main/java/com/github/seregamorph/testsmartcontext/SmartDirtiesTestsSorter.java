@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,13 +65,12 @@ public class SmartDirtiesTestsSorter {
      *
      * @param testItems
      * @param testClassExtractor
-     * @param <T>
-     * @return
+     * @return lastClassPerConfig
      */
-    public <T> SortResult<T> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
-        List<T> initialSorted = initialSorted(testItems, testClassExtractor);
+    public <T> Map<Class<?>, Boolean> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+        initialSort(testItems, testClassExtractor);
 
-        Set<Class<?>> itClasses = filterAndLogItClasses(initialSorted, testClassExtractor);
+        Set<Class<?>> itClasses = filterAndLogItClasses(testItems, testClassExtractor);
 
         Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
         Map<Class<?>, Integer> classToOrder = new LinkedHashMap<>();
@@ -90,20 +88,18 @@ public class SmartDirtiesTestsSorter {
             printSuiteTestsPerConfig(configToTests);
         }
 
-        List<T> reordered = initialSorted.stream()
-            .sorted(comparing(testItem -> {
-                Class<?> realClass = testClassExtractor.getTestClass(testItem);
-                Integer order = classToOrder.get(realClass);
-                if (order == null) {
-                    // all non-IT tests go first (other returned values are non-zero)
-                    // this logic can be changed via override
-                    return getNonItOrder();
-                } else {
-                    // this sorting is stable - most of the tests will preserve alphabetical ordering where possible
-                    return order;
-                }
-            }))
-            .collect(Collectors.toList());
+        testItems.sort(comparing(testItem -> {
+            Class<?> realClass = testClassExtractor.getTestClass(testItem);
+            Integer order = classToOrder.get(realClass);
+            if (order == null) {
+                // all non-IT tests go first (other returned values are non-zero)
+                // this logic can be changed via override
+                return getNonItOrder();
+            } else {
+                // this sorting is stable - most of the tests will preserve alphabetical ordering where possible
+                return order;
+            }
+        }));
 
         Map<Class<?>, Boolean> lastClassPerConfig = new LinkedHashMap<>();
         configToTests.values().forEach(testClasses -> {
@@ -115,19 +111,19 @@ public class SmartDirtiesTestsSorter {
             }
         });
 
-        return new SortResult<>(reordered, lastClassPerConfig);
+        return lastClassPerConfig;
     }
 
-    private <T> Set<Class<?>> filterAndLogItClasses(List<T> initialSorted, TestClassExtractor<T> testClassExtractor) {
+    private <T> Set<Class<?>> filterAndLogItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         Set<Class<?>> itClasses = new LinkedHashSet<>();
-        for (T t : initialSorted) {
+        for (T t : testItems) {
             Class<?> testClass = testClassExtractor.getTestClass(t);
             if (!itClasses.contains(testClass) && isReorderTest(testClass)) {
                 itClasses.add(testClass);
             }
         }
         if (!itClasses.isEmpty()) {
-            printSuiteTests(initialSorted.size(), itClasses);
+            printSuiteTests(testItems.size(), itClasses);
         }
         return itClasses;
     }
@@ -140,14 +136,11 @@ public class SmartDirtiesTestsSorter {
         return 0;
     }
 
-    protected <T> List<T> initialSorted(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
-        List<T> list = testItems.stream()
-            .sorted(comparing(testItem -> testClassExtractor.getTestClass(testItem).getName()))
-            .collect(Collectors.toList());
+    protected <T> void initialSort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+        testItems.sort(comparing(testItem -> testClassExtractor.getTestClass(testItem).getName()));
         if (Boolean.getBoolean("testsmartcontext.reverse")) {
-            Collections.reverse(list);
+            Collections.reverse(testItems);
         }
-        return list;
     }
 
     protected boolean isReorderTest(Class<?> testClass) {
@@ -228,25 +221,6 @@ public class SmartDirtiesTestsSorter {
     @FunctionalInterface
     public interface TestClassExtractor<T> {
         Class<?> getTestClass(T test);
-    }
-
-    public static class SortResult<T> {
-
-        private final List<T> testItems;
-        private final Map<Class<?>, Boolean> lastClassPerConfig;
-
-        SortResult(List<T> testItems, Map<Class<?>, Boolean> lastClassPerConfig) {
-            this.testItems = testItems;
-            this.lastClassPerConfig = lastClassPerConfig;
-        }
-
-        public List<T> getTestItems() {
-            return testItems;
-        }
-
-        public Map<Class<?>, Boolean> getLastClassPerConfig() {
-            return lastClassPerConfig;
-        }
     }
 
     private static final class TestClasses {

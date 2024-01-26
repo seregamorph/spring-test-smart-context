@@ -2,6 +2,7 @@ package com.github.seregamorph.testsmartcontext;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.engine.descriptor.ClassTestDescriptor;
@@ -49,11 +50,11 @@ public class SmartDirtiesDiscoveryFilter implements PostDiscoveryFilter {
         childrenToReorder.forEach(testDescriptor::removeChild);
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        SmartDirtiesTestsSorter.SortResult<TestDescriptor> sortResult = sorter.sort(childrenToReorder, this::getTestClass);
+        Map<Class<?>, Boolean> lastClassPerConfig = sorter.sort(childrenToReorder, this::getTestClass);
 
-        sortResult.getTestItems().forEach(testDescriptor::addChild);
+        childrenToReorder.forEach(testDescriptor::addChild);
 
-        SmartDirtiesTestsHolder.setLastClassPerConfig(sortResult.getLastClassPerConfig());
+        SmartDirtiesTestsHolder.setLastClassPerConfig(lastClassPerConfig);
 
         return FilterResult.included("sorted");
     }

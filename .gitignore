@@ -1,6 +1,8 @@
 .idea
 .mvn/.gradle-enterprise/gradle-enterprise-workspace-id
 target
+build
+.gradle
 dep*.txt
 
 # Compiled class file

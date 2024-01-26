@@ -13,6 +13,17 @@ public class SmartDirtiesTestsHolder {
 
     static boolean isLastClassPerConfig(Class<?> testClass) {
         if (lastClassPerConfig == null) {
+            if (JUnitPlatformSupport.isJUnit4IdeaTestRunnerPresent()) {
+                System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), " +
+                    "the Smart DirtiesContext behaviour is disabled.");
+                if (!JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
+                    System.err.println("If you add org.junit.jupiter:junit-jupiter-api test dependency, \n" +
+                        "it will allow to run packages/modules with tests with Smart DirtiesContext semantics via IDEA. See \n" +
+                        "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default\n" +
+                        "for details.");
+                }
+                return false;
+            }
             throw new IllegalStateException("lastClassPerConfig is not initialized");
         }
         Boolean isLastClassPerConfig = lastClassPerConfig.get(testClass);

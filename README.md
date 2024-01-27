@@ -72,12 +72,14 @@ It's recommended to check [Demo projects](demo).
 
 ### How it works
 
-#### JUnit 5 Jupiter
+<details>
+  <summary>JUnit 5 Jupiter</summary>
+
 For projects with JUnit Jupiter it will automatically setup
 [SmartDirtiesClassOrderer](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/jupiter/SmartDirtiesClassOrderer.java)
 which will reorder test classes and prepare the list of last test class per context configuration.
 Then this test execution listener
-[SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java):
+[SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java)
 will be auto-discovered via [spring.factories](spring-test-smart-context/src/main/resources/META-INF/spring.factories).
 Alternatively it can be defined explicitly
 ```java
@@ -85,8 +87,11 @@ Alternatively it can be defined explicitly
 ```
 or even inherited from
 [AbstractJUnitSpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/jupiter/AbstractJUnitSpringIntegrationTest.java)
+</details>
 
-#### TestNG
+<details>
+  <summary>TestNG</summary>
+
 For projects with TestNG tests this will automatically setup
 [SmartDirtiesSuiteListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/testng/SmartDirtiesSuiteListener.java)
 which will reorder test classes and prepare the list of last test class per context configuration.
@@ -98,8 +103,11 @@ The integration test classes should add
 Note: the annotation is inherited, so it makes sense to annotate the base test class or use
 [AbstractTestNGSpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/testng/AbstractTestNGSpringIntegrationTest.java)
 parent.
+</details>
 
-#### JUnit 4
+<details>
+  <summary>JUnit 4</summary>
+
 The JUnit 4 does not provide standard way to reorder test class execution, but it's still possible via
 [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running).
 This dependency should be added to test scope of the module:
@@ -148,6 +156,7 @@ Alternatively it can be defined explicitly
 ```
 or even inherited from
 [AbstractJUnit4SpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/junit4/AbstractJUnit4SpringIntegrationTest.java)
+</details>
 
 ### Additional materials
 See the online presentation of the project https://www.youtube.com/watch?v=_Vci_5nr8R0 hosted by 

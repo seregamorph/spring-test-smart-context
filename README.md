@@ -29,7 +29,7 @@ As a result, in a suite of single module there will always be not more than 1 ac
 <img src="doc/reorder-and-smart-dirties-context.png" alt="Reordered suite with smart DirtiesContext" width="600"/>
 
 This chart is done via calculating the number of active docker containers while executing a suite of 120 integration
-test classes that actively uses TestContainers for databases and other services:
+test classes that actively uses TestContainers for databases (several datasources simultaneously) and other services:
 
 <img src="doc/active-docker-containers.png" alt="Number of active docker containers" width="600"/>
 
@@ -39,6 +39,8 @@ will be reduced, hence tests are executed faster.
 
 ### Limitations
 At the moment only single thread test execution per module is supported. Parallel test execution is work in progress.
+Also there can be problems with Jupiter
+[Nested](https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested) test classes.
 
 ### Supported versions
 `Java` 8+ (`Java` 17+ for spring-boot 3.x projects)
@@ -146,6 +148,10 @@ Alternatively it can be defined explicitly
 ```
 or even inherited from
 [AbstractJUnit4SpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/junit4/AbstractJUnit4SpringIntegrationTest.java)
+
+### Additional materials
+See the online presentation of the project https://www.youtube.com/watch?v=_Vci_5nr8R0 hosted by 
+[AtomicJar](https://www.atomicjar.com/), the creators of [TestContainers](https://testcontainers.com/) framework.
 
 ### Known projects using library
 <img src="doc/miro-logo.png" alt="Miro" width="120"/>

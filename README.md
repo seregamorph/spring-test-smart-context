@@ -12,7 +12,7 @@ and eager context cleanup.
 
 Consider a sample test suite of 8 classes that use 4 different configurations, classes that have the same configuration
 are marked with the same colour:
-<img src="doc/sample-test-suite.png" alt="Sample test suite" width="600"/>
+<img src="doc/sample-test-suite.png" alt="Sample test suite" width="700"/>
 
 In a large test suites as well as in shared CI/CD environments with lots of test pipelines
 working simultaneously this may eventually lead to out of memory errors
@@ -29,12 +29,12 @@ will be automatically closed (it's called `Smart DirtiesContext`) and the beans 
 
 As a result, in a suite of single module there will always be not more than 1 active spring contexts:
 
-<img src="doc/reorder-and-smart-dirties-context.png" alt="Reordered suite with smart DirtiesContext" width="600"/>
+<img src="doc/reorder-and-smart-dirties-context.png" alt="Reordered suite with smart DirtiesContext" width="700"/>
 
 This chart is done via calculating the number of active docker containers while executing a suite of 120 integration
 test classes that actively uses TestContainers for databases (several datasources simultaneously) and other services:
 
-<img src="doc/active-docker-containers.png" alt="Number of active docker containers" width="600"/>
+<img src="doc/active-docker-containers.png" alt="Number of active docker containers" width="700"/>
 
 As shown on the chart, the suite just fails with OOM without the optimization.
 As an advantage, the total test execution time will also become less, because resource consumption (especially memory)

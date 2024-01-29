@@ -175,8 +175,9 @@ or even inherited from
 </details>
 
 ### Additional materials
-See the online presentation of the project https://www.youtube.com/watch?v=_Vci_5nr8R0 hosted by 
+* See the online presentation of the project https://www.youtube.com/watch?v=_Vci_5nr8R0 hosted by 
 [AtomicJar](https://www.atomicjar.com/), the creators of [TestContainers](https://testcontainers.com/) framework.
+* Presentation slides: [Miro board](https://miro.com/app/board/uXjVN3KJeCI=/?share_link_id=309027962805)
 
 ### Known projects using library
 <img src="doc/miro-logo.png" alt="Miro" width="120"/>

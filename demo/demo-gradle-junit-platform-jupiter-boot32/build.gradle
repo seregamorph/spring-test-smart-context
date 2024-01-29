@@ -19,7 +19,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter"
     implementation "org.springframework.boot:spring-boot-starter-web"
 
-    testImplementation "com.github.seregamorph:spring-test-smart-context:0.3-SNAPSHOT"
+    testImplementation "com.github.seregamorph:spring-test-smart-context:0.4-SNAPSHOT"
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 

@@ -11,6 +11,14 @@ import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
 
+/**
+ * Auto-discovered Jupiter {@link ClassOrderer} which reorders and groups the integration test classes per their
+ * configuration. Also stores information about last integration class per configuration, which is used by
+ * {@link com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener}.
+ * <p>
+ * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, for
+ * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
+ */
 public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements ClassOrderer {
 
     @Override

@@ -15,8 +15,11 @@ import org.testng.xml.XmlSuite;
 /**
  * See description in {@link SmartDirtiesContextTestExecutionListener}.
  * <p>
- * Reorders tests in suite grouping ITs with the same context configuration to minimize number of parallel existing
- * contexts.
+ * Reorders TestNG test classes in suite grouping ITs with the same context configuration to minimize number of parallel
+ * existing contexts.
+ * <p>
+ * For Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}, for
+ * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
  */
 @SuppressWarnings("CodeBlock2Expr")
 public class SmartDirtiesSuiteListener extends SmartDirtiesTestsHolder

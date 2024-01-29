@@ -13,6 +13,14 @@ import org.junit.vintage.engine.descriptor.VintageTestDescriptor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+/**
+ * Auto-discovered JUnit platform {@link PostDiscoveryFilter} which reorders and groups integration test classes
+ * according to their configuration. Note: this class sorts only JUnit 4 tests executed via
+ * <a href="https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running">vintage-engine</a>.
+ * <p>
+ * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, For
+ * Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer},
+ */
 public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
 
     @Override

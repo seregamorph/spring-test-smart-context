@@ -1,6 +1,6 @@
 ## Improving Spring Boot Test efficiency
 
-### Problem statement and solution
+### Problem statement
 Spring test framework creates an application context according to test class configuration.
 The context is cached and reused for all subsequent tests. If there is an existing context
 with the same configuration, it will be reused. Otherwise, the new context will be created.
@@ -17,8 +17,11 @@ are marked with the same colour:
 In a large test suites as well as in shared CI/CD environments with lots of test pipelines
 working simultaneously this may eventually lead to out of memory errors
 in Java process or Docker host.
-It's recommended to optimize reusing same configuration between tests e.g. via common test super-classes,
-but additionally this library makes two optimizations:
+
+### Proposed solution
+It's recommended to use statically-defined TestContainers beans, optimize reusing same configuration between tests 
+e.g. via common test super-classes.
+But additionally this library makes two optimizations:
 * test class execution is reordered to group tests with the same context configuration so they
 can be executed sequentially
 * the order of tests is known, so if current test class is last per current configuration, the spring context
@@ -128,6 +131,19 @@ Also the `surefire`/`failsafe` plugins should be configured to use junit-platfor
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-surefire-plugin</artifactId>
+    <version>${maven-surefire.version}</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit-platform</artifactId>
+            <version>${maven-surefire.version}</version>
+        </dependency>
+    </dependencies>
+</plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <version>${maven-surefire.version}</version>
     <dependencies>
         <dependency>
             <groupId>org.apache.maven.surefire</groupId>

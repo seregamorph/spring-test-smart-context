@@ -12,6 +12,7 @@ and eager context cleanup.
 
 Consider a sample test suite of 8 classes that use 4 different configurations, classes that have the same configuration
 are marked with the same colour:
+
 <img src="doc/sample-test-suite.png" alt="Sample test suite" width="700"/>
 
 In a large test suites as well as in shared CI/CD environments with lots of test pipelines

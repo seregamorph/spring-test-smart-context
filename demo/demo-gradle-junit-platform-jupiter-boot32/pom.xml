@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.seregamorph</groupId>
+        <artifactId>demo-parent</artifactId>
+        <version>0.4-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>demo-gradle-junit-platform-jupiter-boot32</artifactId>
+
+    <description>Demo project with tests launched via Gradle junit-platform jupiter</description>
+
+    <properties>
+        <!-- Delegate to Gradle -->
+        <maven.main.skip>true</maven.main.skip>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>gradle</id>
+                        <phase>install</phase>
+                        <configuration>
+                            <executable>./gradlew</executable>
+                            <arguments>
+                                <argument>--no-daemon</argument>
+                                <argument>clean</argument>
+                                <argument>build</argument>
+                                <argument>-i</argument>
+                            </arguments>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

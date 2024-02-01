@@ -46,6 +46,7 @@
         <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <exec-maven-plugin.version>3.1.1</exec-maven-plugin.version>
     </properties>
 
     <modules>

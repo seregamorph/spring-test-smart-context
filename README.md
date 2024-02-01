@@ -79,9 +79,9 @@ It's recommended to check [Demo projects](demo).
 <details>
   <summary>JUnit 5 Jupiter</summary>
 
-For projects with JUnit Jupiter it will automatically setup
+Add the dependency to the library in test scope, it will automatically setup
 [SmartDirtiesClassOrderer](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/jupiter/SmartDirtiesClassOrderer.java)
-which will reorder test classes and prepare the list of last test class per context configuration.
+which will reorder test classes on each execution and prepare the list of last test class per context configuration.
 Then this test execution listener
 [SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java)
 will be auto-discovered via [spring.factories](spring-test-smart-context/src/main/resources/META-INF/spring.factories).
@@ -96,9 +96,9 @@ or even inherited from
 <details>
   <summary>TestNG</summary>
 
-For projects with TestNG tests this will automatically setup
+Add the dependency to the library in test scope, it will automatically setup
 [SmartDirtiesSuiteListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/testng/SmartDirtiesSuiteListener.java)
-which will reorder test classes and prepare the list of last test class per context configuration.
+which will reorder test classes on each execution and prepare the list of last test class per context configuration.
 The integration test classes should add
 [SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java)
 ```java

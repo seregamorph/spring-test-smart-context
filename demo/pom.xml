@@ -24,12 +24,20 @@
     </properties>
 
     <modules>
-        <module>demo-gradle-junit-platform-jupiter-boot32</module>
         <module>demo-maven-junit-platform-junit4-boot24</module>
         <module>demo-maven-junit-platform-jupiter-boot32</module>
         <module>demo-maven-junit-platform-testng-boot32</module>
         <module>demo-maven-testng-boot24</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>include-gradle-build</id>
+            <modules>
+                <module>demo-gradle-junit-platform-jupiter-boot32</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>

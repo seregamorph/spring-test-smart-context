@@ -9,7 +9,9 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
  * {@link SmartDirtiesContextTestExecutionListener} semantics to optimize IT suite execution.
  *
  * @see SmartDirtiesContextTestExecutionListener
+ * @deprecated support of JUnit 4 will be removed in 1.0 release
  */
+@Deprecated
 @TestExecutionListeners(listeners = {
     SmartDirtiesContextTestExecutionListener.class,
 }, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)

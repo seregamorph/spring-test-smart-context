@@ -18,9 +18,12 @@ import org.springframework.lang.Nullable;
  * according to their configuration. Note: this class sorts only JUnit 4 tests executed via
  * <a href="https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running">vintage-engine</a>.
  * <p>
- * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, For
- * Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer},
+ * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, for
+ * Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}.
+ *
+ * @deprecated support of JUnit 4 will be removed in 1.0 release
  */
+@Deprecated
 public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
 
     @Override

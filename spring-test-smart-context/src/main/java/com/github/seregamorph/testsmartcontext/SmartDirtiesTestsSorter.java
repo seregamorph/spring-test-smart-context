@@ -31,7 +31,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * The logic of this class can be customized via
+ * <pre>
  * META-INF/services/com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter
+ * </pre>
  * defining subtype of this class overriding methods.
  */
 public class SmartDirtiesTestsSorter {

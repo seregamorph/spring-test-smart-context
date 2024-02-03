@@ -54,7 +54,7 @@ Also there can be problems with Jupiter
 Supported test frameworks:
 * `JUnit 4` (via JUnit 5 [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running))
 * `JUnit 5 Jupiter`
-* `TestNG` 7.0.0+ (both bare TestNG and JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
+* `TestNG` (both bare TestNG and JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
 
 `Gradle Enterprise Maven Extension` (test execution caching) correctly supports changed behaviour
 
@@ -111,6 +111,8 @@ parent.
 
 <details>
   <summary>JUnit 4</summary>
+
+Note: support of JUnit 4 is planned to be removed in version 1.0 (will stay available in 0.x versions).
 
 The JUnit 4 does not provide standard way to reorder test class execution, but it's still possible via
 [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running).

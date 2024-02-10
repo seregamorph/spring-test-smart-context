@@ -27,6 +27,8 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsHolder
 
     @Override
     public void alter(List<XmlSuite> suites) {
+        // dryRun is only true when called via junit5 testng-engine on discovery phase, there will be subsequent
+        // call of this method with dryRun=false on execution phase
         if (RuntimeBehavior.isDryRun()) {
             // the list of test classes is wrong, listener is called per each class as single in suite
             return;
@@ -41,6 +43,8 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsHolder
 
     @Override
     public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
+        // dryRun is only true when called via junit5 testng-engine on discovery phase, there will be subsequent
+        // call of this method with dryRun=false on execution phase
         if (RuntimeBehavior.isDryRun()) {
             // the list of test classes is wrong, listener is called per each class as single in suite
             return methods;

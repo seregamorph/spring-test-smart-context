@@ -21,7 +21,7 @@ public class CurrentTestContextExecutionListener implements TestExecutionListene
     private static String getTestClassName(TestIdentifier testIdentifier) {
         return testIdentifier.getSource()
             .map(CurrentTestContextExecutionListener::getTestClassName)
-            .map(Object::toString).orElse("undefined");
+            .orElse("undefined");
     }
 
     private static String getTestClassName(TestSource source) {

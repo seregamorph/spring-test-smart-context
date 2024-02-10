@@ -13,10 +13,9 @@
     <artifactId>spring-test-smart-context</artifactId>
 
     <description>
-        Improving Spring Boot test efficiency. See the readme at GitHub page.
+        Improving Spring Boot test efficiency. See the readme at
+        https://github.com/seregamorph/spring-test-smart-context
     </description>
-
-    <url>https://github.com/seregamorph/spring-test-smart-context</url>
 
     <properties>
         <spring.version>5.3.3</spring.version>
@@ -42,6 +41,8 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <url>https://github.com/seregamorph/spring-test-smart-context</url>
 
     <scm>
         <url>https://github.com/seregamorph/spring-test-smart-context</url>

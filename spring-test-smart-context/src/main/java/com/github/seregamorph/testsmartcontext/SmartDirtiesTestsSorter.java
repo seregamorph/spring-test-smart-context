@@ -62,8 +62,8 @@ public class SmartDirtiesTestsSorter {
     }
 
     /**
-     * Returns sorted tests, all tests are sequentially grouped by {@link MergedContextConfiguration} calculated per
-     * each test class.
+     * Sorts passed testItems, all tests are sequentially grouped by {@link MergedContextConfiguration}
+     * calculated per each test class.
      *
      * @param testItems
      * @param testClassExtractor

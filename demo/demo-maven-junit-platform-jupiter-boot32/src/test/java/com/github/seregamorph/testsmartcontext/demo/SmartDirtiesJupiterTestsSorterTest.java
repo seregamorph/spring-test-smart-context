@@ -1,13 +1,8 @@
-package com.github.seregamorph.testsmartcontext;
+package com.github.seregamorph.testsmartcontext.demo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.github.seregamorph.testsmartcontext.demo.Integration1Test;
-import com.github.seregamorph.testsmartcontext.demo.Integration2Test;
-import com.github.seregamorph.testsmartcontext.demo.NoBaseClass1IntegrationTest;
-import com.github.seregamorph.testsmartcontext.demo.NoBaseClass2IntegrationTest;
-import com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest;
-import com.github.seregamorph.testsmartcontext.demo.Unit1Test;
+import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -20,7 +15,7 @@ public class SmartDirtiesJupiterTestsSorterTest {
 
     @Test
     public void shouldSortAlphabeticallyAndGroupSameConfigurations() {
-        SmartDirtiesTestsSorter sorter = new SmartDirtiesTestsSorter();
+        SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         System.out.println(">>>shouldSortAlphabeticallyAndGroupSameConfigurations>>>");
         List<TestItem> testItems = Arrays.asList(
             new TestItem(Integration2Test.class),

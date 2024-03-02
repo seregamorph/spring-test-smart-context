@@ -5,15 +5,16 @@ import static java.util.Comparator.comparing;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,9 +68,9 @@ public class SmartDirtiesTestsSorter {
      *
      * @param testItems
      * @param testClassExtractor
-     * @return lastClassPerConfig
+     * @return integration test classes lists grouped by config (non-integration tests classes not included)
      */
-    public <T> Map<Class<?>, Boolean> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+    public <T> List<List<Class<?>>> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         initialSort(testItems, testClassExtractor);
 
         Set<Class<?>> itClasses = filterAndLogItClasses(testItems, testClassExtractor);
@@ -103,17 +104,9 @@ public class SmartDirtiesTestsSorter {
             }
         }));
 
-        Map<Class<?>, Boolean> lastClassPerConfig = new LinkedHashMap<>();
-        configToTests.values().forEach(testClasses -> {
-            Iterator<Class<?>> iterator = testClasses.classes.iterator();
-            while (iterator.hasNext()) {
-                Class<?> testClass = iterator.next();
-                boolean isLast = !iterator.hasNext();
-                lastClassPerConfig.put(testClass, isLast);
-            }
-        });
-
-        return lastClassPerConfig;
+        return configToTests.values().stream()
+            .map(testClasses -> new ArrayList<>(testClasses.classes))
+            .collect(Collectors.toList());
     }
 
     private <T> Set<Class<?>> filterAndLogItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {

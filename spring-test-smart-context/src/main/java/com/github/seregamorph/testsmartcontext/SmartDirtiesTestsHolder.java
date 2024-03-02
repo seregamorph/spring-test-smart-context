@@ -1,6 +1,8 @@
 package com.github.seregamorph.testsmartcontext;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SmartDirtiesTestsHolder {
@@ -35,7 +37,16 @@ public class SmartDirtiesTestsHolder {
         return isLastClassPerConfig;
     }
 
-    protected static void setLastClassPerConfig(Map<Class<?>, Boolean> lastClassPerConfig) {
-        SmartDirtiesTestsHolder.lastClassPerConfig = new LinkedHashMap<>(lastClassPerConfig);
+    protected static void setTestClassesLists(List<List<Class<?>>> testClassesLists) {
+        Map<Class<?>, Boolean> lastClassPerConfig = new LinkedHashMap<>();
+        for (List<Class<?>> testClasses : testClassesLists) {
+            Iterator<Class<?>> iterator = testClasses.iterator();
+            while (iterator.hasNext()) {
+                Class<?> testClass = iterator.next();
+                boolean isLast = !iterator.hasNext();
+                lastClassPerConfig.put(testClass, isLast);
+            }
+        }
+        SmartDirtiesTestsHolder.lastClassPerConfig = lastClassPerConfig;
     }
 }

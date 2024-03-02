@@ -1,10 +1,10 @@
 package com.github.seregamorph.testsmartcontext.jupiter;
 
+import static java.util.Collections.singletonList;
+
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsHolder;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.ClassDescriptor;
@@ -38,14 +38,14 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
             // If it's 1 - we should also distinguish single test execution.
             if (SmartDirtiesTestsHolder.lastClassPerConfigSize() <= 1) {
                 Class<?> testClass = classDescriptors.get(0).getTestClass();
-                SmartDirtiesTestsHolder.setLastClassPerConfig(Collections.singletonMap(testClass, true));
+                SmartDirtiesTestsHolder.setTestClassesLists(singletonList(singletonList(testClass)));
             }
             return;
         }
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        Map<Class<?>, Boolean> lastClassPerConfig = sorter.sort(classDescriptors, ClassDescriptor::getTestClass);
+        List<List<Class<?>>> testClassesLists = sorter.sort(classDescriptors, ClassDescriptor::getTestClass);
 
-        SmartDirtiesTestsHolder.setLastClassPerConfig(lastClassPerConfig);
+        SmartDirtiesTestsHolder.setTestClassesLists(testClassesLists);
     }
 }

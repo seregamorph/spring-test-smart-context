@@ -1,8 +1,8 @@
 package com.github.seregamorph.testsmartcontext;
 
-import java.util.Collections;
+import static java.util.Collections.singletonList;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.platform.engine.FilterResult;
@@ -52,7 +52,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
             // If it's 1 - we should also distinguish single test execution.
             if (SmartDirtiesTestsHolder.lastClassPerConfigSize() <= 1) {
                 Class<?> testClass = getTestClass(childrenToReorder.get(0));
-                SmartDirtiesTestsHolder.setLastClassPerConfig(Collections.singletonMap(testClass, true));
+                SmartDirtiesTestsHolder.setTestClassesLists(singletonList(singletonList(testClass)));
             }
 
             // the logic here may differ for JUnit 4 via Maven vs IntelliJ:
@@ -63,11 +63,11 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
         childrenToReorder.forEach(testDescriptor::removeChild);
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        Map<Class<?>, Boolean> lastClassPerConfig = sorter.sort(childrenToReorder, this::getTestClass);
+        List<List<Class<?>>> testClassesLists = sorter.sort(childrenToReorder, this::getTestClass);
 
         childrenToReorder.forEach(testDescriptor::addChild);
 
-        SmartDirtiesTestsHolder.setLastClassPerConfig(lastClassPerConfig);
+        SmartDirtiesTestsHolder.setTestClassesLists(testClassesLists);
 
         return FilterResult.included("sorted");
     }

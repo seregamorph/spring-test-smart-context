@@ -4,7 +4,6 @@ import com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionL
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsHolder;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import java.util.List;
-import java.util.Map;
 import org.testng.IAlterSuiteListener;
 import org.testng.IMethodInstance;
 import org.testng.IMethodInterceptor;
@@ -52,11 +51,11 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsHolder
 
         // this intercept method is executed by TestNG before running the suite (both IDEA and maven)
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        Map<Class<?>, Boolean> lastClassPerConfig = sorter.sort(methods, methodInstance -> {
+        List<List<Class<?>>> testClassesLists = sorter.sort(methods, methodInstance -> {
             return methodInstance.getMethod().getTestClass().getRealClass();
         });
 
-        SmartDirtiesTestsHolder.setLastClassPerConfig(lastClassPerConfig);
+        SmartDirtiesTestsHolder.setTestClassesLists(testClassesLists);
 
         return methods;
     }

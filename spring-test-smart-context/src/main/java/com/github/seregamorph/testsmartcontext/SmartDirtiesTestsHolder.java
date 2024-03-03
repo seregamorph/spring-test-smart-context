@@ -4,17 +4,39 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 
 public class SmartDirtiesTestsHolder {
 
-    private static Map<Class<?>, Boolean> lastClassPerConfig;
+    private static Map<Class<?>, ClassOrderState> classOrderStateMap;
 
-    public static int lastClassPerConfigSize() {
-        return lastClassPerConfig == null ? 0 : lastClassPerConfig.size();
+    private static class ClassOrderState {
+        private final boolean isFirst;
+        private final boolean isLast;
+
+        private ClassOrderState(boolean isFirst, boolean isLast) {
+            this.isFirst = isFirst;
+            this.isLast = isLast;
+        }
+    }
+
+    public static int classOrderStateMapSize() {
+        return classOrderStateMap == null ? 0 : classOrderStateMap.size();
+    }
+
+    static boolean isFirstClassPerConfig(Class<?> testClass) {
+        ClassOrderState classOrderState = getOrderState(testClass);
+        return classOrderState != null && classOrderState.isFirst;
     }
 
     static boolean isLastClassPerConfig(Class<?> testClass) {
-        if (lastClassPerConfig == null) {
+        ClassOrderState classOrderState = getOrderState(testClass);
+        return classOrderState != null && classOrderState.isLast;
+    }
+
+    @Nullable
+    private static ClassOrderState getOrderState(Class<?> testClass) {
+        if (classOrderStateMap == null) {
             if (JUnitPlatformSupport.isJUnit4IdeaTestRunnerPresent()) {
                 System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), " +
                     "the Smart DirtiesContext behaviour is disabled.");
@@ -24,29 +46,30 @@ public class SmartDirtiesTestsHolder {
                         "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default\n" +
                         "for details.");
                 }
-                return false;
+                return null;
             }
             throw new IllegalStateException("lastClassPerConfig is not initialized");
         }
-        Boolean isLastClassPerConfig = lastClassPerConfig.get(testClass);
-        if (isLastClassPerConfig == null) {
-            throw new IllegalStateException("lastClassPerConfig is not defined for class "
+        ClassOrderState classOrderState = classOrderStateMap.get(testClass);
+        if (classOrderState == null) {
+            throw new IllegalStateException("classOrderStateMap is not defined for class "
                 + testClass + ", it means that it was skipped on initial analysis. " +
-                "Discovered classes: " + lastClassPerConfig.keySet());
+                "Discovered classes: " + classOrderStateMap.keySet());
         }
-        return isLastClassPerConfig;
+        return classOrderState;
     }
 
     protected static void setTestClassesLists(List<List<Class<?>>> testClassesLists) {
-        Map<Class<?>, Boolean> lastClassPerConfig = new LinkedHashMap<>();
+        Map<Class<?>, ClassOrderState> classOrderStateMap = new LinkedHashMap<>();
         for (List<Class<?>> testClasses : testClassesLists) {
             Iterator<Class<?>> iterator = testClasses.iterator();
+            boolean isFirst = true;
             while (iterator.hasNext()) {
                 Class<?> testClass = iterator.next();
-                boolean isLast = !iterator.hasNext();
-                lastClassPerConfig.put(testClass, isLast);
+                classOrderStateMap.put(testClass, new ClassOrderState(isFirst, !iterator.hasNext()));
+                isFirst = false;
             }
         }
-        SmartDirtiesTestsHolder.lastClassPerConfig = lastClassPerConfig;
+        SmartDirtiesTestsHolder.classOrderStateMap = classOrderStateMap;
     }
 }

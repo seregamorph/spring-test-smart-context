@@ -50,7 +50,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
             // it's not possible to distinguish them here. Sometimes per single test is sent as argument,
             // sometimes - the whole suite. If it's a suite more than 1, we can save it and never update.
             // If it's 1 - we should also distinguish single test execution.
-            if (SmartDirtiesTestsHolder.lastClassPerConfigSize() <= 1) {
+            if (SmartDirtiesTestsHolder.classOrderStateMapSize() <= 1) {
                 Class<?> testClass = getTestClass(childrenToReorder.get(0));
                 SmartDirtiesTestsHolder.setTestClassesLists(singletonList(singletonList(testClass)));
             }

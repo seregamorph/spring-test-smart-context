@@ -13,17 +13,32 @@ public class SmartDirtiesJupiterTestsSorterTest {
     public void shouldSortAlphabeticallyAndGroupSameConfigurations() {
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         System.out.println(">>>shouldSortAlphabeticallyAndGroupSameConfigurations>>>");
-        List<TestItem> testItems = Arrays.asList(
-            new TestItem(Integration2Test.class),
-            new TestItem(SampleIntegrationTest.class),
-            new TestItem(Integration1Test.class),
-            new TestItem(Unit1Test.class),
-            new TestItem(NoBaseClass2IntegrationTest.class),
-            new TestItem(NoBaseClass1IntegrationTest.class),
-            new TestItem(SmartDirtiesJupiterTestsSorterTest.class)
+        var testItems = Arrays.asList(
+            Integration2Test.class,
+            SampleIntegrationTest.class,
+            Integration1Test.class,
+            Unit1Test.class,
+            NoBaseClass2IntegrationTest.class,
+            NoBaseClass1IntegrationTest.class,
+            SmartDirtiesJupiterTestsSorterTest.class
         );
-        var itClassesLists = sorter.sort(testItems, testItem -> testItem.testClass);
+        var itClassesLists = sorter.sort(testItems, testClass -> testClass);
         System.out.println("<<<shouldSortAlphabeticallyAndGroupSameConfigurations<<<");
+
+        assertEquals(Arrays.asList(
+            // UT
+            SmartDirtiesJupiterTestsSorterTest.class,
+            Unit1Test.class,
+            // IT 1
+            Integration1Test.class,
+            // IT 2
+            Integration2Test.class,
+            // IT 3
+            NoBaseClass1IntegrationTest.class,
+            NoBaseClass2IntegrationTest.class,
+            // IT 4
+            SampleIntegrationTest.class
+        ), testItems);
 
         assertEquals(List.of(
             List.of(Integration1Test.class),
@@ -31,8 +46,5 @@ public class SmartDirtiesJupiterTestsSorterTest {
             List.of(NoBaseClass1IntegrationTest.class, NoBaseClass2IntegrationTest.class),
             List.of(SampleIntegrationTest.class)
         ), itClassesLists);
-    }
-
-    private record TestItem(Class<?> testClass) {
     }
 }

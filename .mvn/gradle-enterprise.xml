@@ -1,0 +1,15 @@
+<gradleEnterprise>
+    <!--
+    https://docs.gradle.com/enterprise/maven-extension/
+    -->
+    <server>
+        <url>https://scans.gradle.com/</url>
+    </server>
+    <buildScan>
+        <termsOfService>
+            <url>https://gradle.com/terms-of-service</url>
+            <accept>true</accept>
+        </termsOfService>
+        <publish>ALWAYS</publish>
+    </buildScan>
+</gradleEnterprise>

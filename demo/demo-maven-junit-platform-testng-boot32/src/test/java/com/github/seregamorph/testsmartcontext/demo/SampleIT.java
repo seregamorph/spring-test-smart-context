@@ -19,13 +19,13 @@ import org.testng.annotations.Test;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ContextConfiguration(classes = {
-    SampleIntegrationTest.Configuration.class
+    SampleIT.Configuration.class
 })
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
     "parameter = value"
 })
-public class SampleIntegrationTest extends AbstractTestNGSpringIntegrationTest {
+public class SampleIT extends AbstractTestNGSpringIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

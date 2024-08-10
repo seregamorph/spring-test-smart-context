@@ -4,9 +4,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
 @ContextConfiguration(classes = {
-    Integration2Test.Configuration.class
+    Integration2IT.Configuration.class
 })
-public class Integration2Test extends AbstractIntegrationTest {
+public class Integration2IT extends AbstractIT {
 
     @Test
     public void test() {

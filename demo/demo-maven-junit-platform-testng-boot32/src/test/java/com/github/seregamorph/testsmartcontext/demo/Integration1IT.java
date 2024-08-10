@@ -8,9 +8,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
 @ContextConfiguration(classes = {
-    Integration1Test.Configuration.class
+    Integration1IT.Configuration.class
 })
-public class Integration1Test extends AbstractIntegrationTest {
+public class Integration1IT extends AbstractIT {
 
     @Autowired
     private String string;

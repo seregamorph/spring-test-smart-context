@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extensions>
-    <!--
-    https://docs.gradle.com/enterprise/maven-extension/
-    This extension is used for maven build optimization and enhanced caching.
-    Config: gradle-enterprise.xml
-    Use "-Dgradle.cache.local.enabled=false" to disable optimizations.
-    -->
     <extension>
-        <groupId>com.gradle</groupId>
-        <artifactId>gradle-enterprise-maven-extension</artifactId>
-        <version>1.20.1</version>
+        <!--https://maven.apache.org/extensions/maven-build-cache-extension/index.html-->
+        <groupId>org.apache.maven.extensions</groupId>
+        <artifactId>maven-build-cache-extension</artifactId>
+        <version>1.2.1-SNAPSHOT</version>
     </extension>
 </extensions>

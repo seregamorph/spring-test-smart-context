@@ -21,8 +21,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+                <groupId>com.github.seregamorph</groupId>
+                <artifactId>surefire-cached-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>

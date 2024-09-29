@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extensions>
     <!--
-    https://docs.gradle.com/enterprise/maven-extension/
+    https://docs.gradle.com/develocity/maven-extension/current/
     This extension is used for maven build optimization and enhanced caching.
-    Config: gradle-enterprise.xml
+    Config: develocity.xml
     Use "-Dgradle.cache.local.enabled=false" to disable optimizations.
     -->
     <extension>
         <groupId>com.gradle</groupId>
-        <artifactId>gradle-enterprise-maven-extension</artifactId>
-        <version>1.20.1</version>
+        <artifactId>develocity-maven-extension</artifactId>
+        <version>1.22.1</version>
     </extension>
 </extensions>

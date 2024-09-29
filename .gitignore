@@ -1,5 +1,5 @@
 .idea
-.mvn/.gradle-enterprise/gradle-enterprise-workspace-id
+.mvn/.develocity
 target
 build
 .gradle

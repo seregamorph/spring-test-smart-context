@@ -41,6 +41,13 @@ As shown on the chart, the suite just fails with OOM without the optimization.
 As an advantage, the total test execution time will also become less, because resource consumption (especially memory)
 will be reduced, hence tests are executed faster.
 
+### References
+This idea was submitted to the Spring Framework team as a feature request:
+* https://github.com/spring-projects/spring-framework/issues/32289
+
+Public presentation with AtomicJar (TestContainers creators):
+* https://www.youtube.com/watch?v=_Vci_5nr8R0
+
 ### Limitations
 At the moment only single thread test execution per module is supported. Parallel test execution is work in progress.
 Also there can be problems with Jupiter

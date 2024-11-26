@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -180,12 +181,12 @@ public class SmartDirtiesTestsSorter {
      */
     protected boolean isReorderTestJUnit5Jupiter(Class<?> testClass) {
         // can be inherited, can be meta-annotation e.g. via @SpringBootTest
-        ExtendWith extendWith = AnnotatedElementUtils.findMergedAnnotation(testClass, ExtendWith.class);
-        if (extendWith == null) {
+        Set<ExtendWith> extendWith = AnnotatedElementUtils.findAllMergedAnnotations(testClass, ExtendWith.class);
+        if (extendWith.isEmpty()) {
             return false;
         }
-        Class<? extends Extension>[] extensions = extendWith.value();
-        return Stream.of(extensions)
+
+        return extendWith.stream().map(ExtendWith::value).flatMap(Arrays::stream)
             .anyMatch(SpringExtension.class::isAssignableFrom);
     }
 

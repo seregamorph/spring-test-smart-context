@@ -7,6 +7,7 @@ import static org.junit.platform.engine.discovery.ClassNameFilter.excludeClassNa
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
 import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
 
+import com.github.seregamorph.testsmartcontext.demo.ExtendWithTest;
 import com.github.seregamorph.testsmartcontext.demo.Integration1Test;
 import com.github.seregamorph.testsmartcontext.demo.Integration2Test;
 import com.github.seregamorph.testsmartcontext.demo.NoBaseClass1IntegrationTest;
@@ -25,24 +26,26 @@ public class SmartDirtiesJupiterEngineTest {
                 .build())
             .containerEvents();
 
-        // 8 = 5 ITs + 2 UTs + 1 suite
+        // 8 = 6 ITs + 2 UTs + 1 suite
         events.assertStatistics(stats -> stats
-            .started(8)
-            .succeeded(8)
-            .finished(8)
+            .started(9)
+            .succeeded(9)
+            .finished(9)
             .aborted(0)
             .failed(0));
 
-        assertEquals(5, SmartDirtiesTestsHolder.classOrderStateMapSize());
+        assertEquals(6, SmartDirtiesTestsHolder.classOrderStateMapSize());
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass1IntegrationTest.class));
+        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(ExtendWithTest.class));
+        assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass1IntegrationTest.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass2IntegrationTest.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleIntegrationTest.class));
 
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration1Test.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2Test.class));
+        assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(ExtendWithTest.class));
         assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(NoBaseClass1IntegrationTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(NoBaseClass2IntegrationTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleIntegrationTest.class));

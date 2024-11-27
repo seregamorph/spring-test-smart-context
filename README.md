@@ -63,7 +63,7 @@ Supported test frameworks:
 * `JUnit 5 Jupiter`
 * `TestNG` (both bare TestNG and JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
 
-`Gradle Enterprise Maven Extension` (test execution caching) correctly supports changed behaviour
+`Develocity Maven Extension` (test execution caching) correctly supports changed behaviour
 
 ### How to use
 Add maven dependency (available in maven central):
@@ -71,13 +71,13 @@ Add maven dependency (available in maven central):
 <dependency>
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
     <scope>test</scope>
 </dependency>
 ```
 Or Gradle dependency:
 ```groovy
-testImplementation("com.github.seregamorph:spring-test-smart-context:0.3")
+testImplementation("com.github.seregamorph:spring-test-smart-context:0.4")
 ```
 It's recommended to check [Demo projects](demo).
 

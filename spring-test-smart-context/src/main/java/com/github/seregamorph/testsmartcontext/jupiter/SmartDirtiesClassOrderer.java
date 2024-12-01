@@ -28,8 +28,10 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
             return;
         }
 
+        // hint: enclosingClass method is used for the case when there are @Nested test classes
         Set<Class<?>> uniqueClasses = classDescriptors.stream()
             .map(ClassDescriptor::getTestClass)
+            .map(SmartDirtiesClassOrderer::enclosingClass)
             .collect(Collectors.toSet());
         if (uniqueClasses.size() == 1) {
             // This filter is executed several times during discover and execute phases and
@@ -47,5 +49,10 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
         List<List<Class<?>>> testClassesLists = sorter.sort(classDescriptors, ClassDescriptor::getTestClass);
 
         SmartDirtiesTestsHolder.setTestClassesLists(testClassesLists);
+    }
+
+    private static Class<?> enclosingClass(Class<?> testClass) {
+        Class<?> enclosingClass = testClass.getEnclosingClass();
+        return enclosingClass == null ? testClass : enclosingClass;
     }
 }

@@ -28,15 +28,16 @@ public class SmartDirtiesJupiterEngineTest {
 
         // 8 = 6 ITs + 2 UTs + 1 suite
         events.assertStatistics(stats -> stats
-            .started(9)
-            .succeeded(9)
-            .finished(9)
+            .started(10)
+            .succeeded(10)
+            .finished(10)
             .aborted(0)
             .failed(0));
 
         assertEquals(6, SmartDirtiesTestsHolder.classOrderStateMapSize());
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
+        assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.NestedTest.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(ExtendWithTest.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass1IntegrationTest.class));
@@ -44,6 +45,7 @@ public class SmartDirtiesJupiterEngineTest {
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleIntegrationTest.class));
 
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration1Test.class));
+        assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.NestedTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2Test.class));
         assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(ExtendWithTest.class));
         assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(NoBaseClass1IntegrationTest.class));

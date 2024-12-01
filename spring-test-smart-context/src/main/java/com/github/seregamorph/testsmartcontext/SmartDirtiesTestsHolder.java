@@ -25,13 +25,23 @@ public class SmartDirtiesTestsHolder {
     }
 
     static boolean isFirstClassPerConfig(Class<?> testClass) {
-        ClassOrderState classOrderState = getOrderState(testClass);
-        return classOrderState != null && classOrderState.isFirst;
+        if (testClass.getEnclosingClass() == null) {
+            ClassOrderState classOrderState = getOrderState(testClass);
+            return classOrderState != null && classOrderState.isFirst;
+        } else {
+            // to support @Nested classes
+            return false;
+        }
     }
 
     static boolean isLastClassPerConfig(Class<?> testClass) {
-        ClassOrderState classOrderState = getOrderState(testClass);
-        return classOrderState != null && classOrderState.isLast;
+        if (testClass.getEnclosingClass() == null) {
+            ClassOrderState classOrderState = getOrderState(testClass);
+            return classOrderState != null && classOrderState.isLast;
+        } else {
+            // to support @Nested classes
+            return false;
+        }
     }
 
     @Nullable

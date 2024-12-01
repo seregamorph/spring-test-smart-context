@@ -50,7 +50,7 @@ Public presentation with AtomicJar (TestContainers creators):
 
 ### Limitations
 At the moment only single thread test execution per module is supported. Parallel test execution is work in progress.
-Also there can be problems with Jupiter
+Also there is an experimental support of Jupiter
 [Nested](https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested) test classes.
 
 ### Supported versions

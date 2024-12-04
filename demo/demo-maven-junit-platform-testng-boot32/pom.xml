@@ -22,8 +22,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+                <groupId>com.github.seregamorph</groupId>
+                <artifactId>surefire-cached-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>
@@ -33,8 +33,8 @@
                 </dependencies>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
+                <groupId>com.github.seregamorph</groupId>
+                <artifactId>failsafe-cached-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>

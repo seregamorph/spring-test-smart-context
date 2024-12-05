@@ -10,40 +10,46 @@ import org.junit.jupiter.api.Test;
 public class SmartDirtiesJupiterTestsSorterTest {
 
     @Test
-    public void shouldSortAlphabeticallyAndGroupSameConfigurations() {
+    public void shouldSortMostlyAlphabeticallyAndGroupSameConfigurations() {
+        // mostly: @DirtiesContext should go last.
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        System.out.println(">>>shouldSortAlphabeticallyAndGroupSameConfigurations>>>");
+        System.out.println(">>>shouldSortMostlyAlphabeticallyAndGroupSameConfigurations>>>");
         var testItems = Arrays.asList(
             Integration2Test.class,
             SampleIntegrationTest.class,
             Integration1Test.class,
             Unit1Test.class,
+            DirtiesContextTest.class,
             NoBaseClass2IntegrationTest.class,
             NoBaseClass1IntegrationTest.class,
+            ExtendWithTest.class,
             SmartDirtiesJupiterTestsSorterTest.class
         );
         var itClassesLists = sorter.sort(testItems, testClass -> testClass);
-        System.out.println("<<<shouldSortAlphabeticallyAndGroupSameConfigurations<<<");
+        System.out.println("<<<shouldSortMostlyAlphabeticallyAndGroupSameConfigurations<<<");
 
         assertEquals(Arrays.asList(
             // UT
             SmartDirtiesJupiterTestsSorterTest.class,
             Unit1Test.class,
             // IT 1
-            Integration1Test.class,
-            // IT 2
-            Integration2Test.class,
-            // IT 3
+            ExtendWithTest.class,
             NoBaseClass1IntegrationTest.class,
             NoBaseClass2IntegrationTest.class,
+            DirtiesContextTest.class,
+            // IT 2
+            Integration1Test.class,
+            // IT 3
+            Integration2Test.class,
             // IT 4
             SampleIntegrationTest.class
         ), testItems);
 
         assertEquals(List.of(
+            List.of(ExtendWithTest.class, NoBaseClass1IntegrationTest.class, NoBaseClass2IntegrationTest.class,
+                DirtiesContextTest.class),
             List.of(Integration1Test.class),
             List.of(Integration2Test.class),
-            List.of(NoBaseClass1IntegrationTest.class, NoBaseClass2IntegrationTest.class),
             List.of(SampleIntegrationTest.class)
         ), itClassesLists);
     }

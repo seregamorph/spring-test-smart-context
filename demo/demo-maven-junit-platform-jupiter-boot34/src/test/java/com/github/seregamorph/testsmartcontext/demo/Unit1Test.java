@@ -8,7 +8,7 @@ public class Unit1Test {
 
     @Test
     public void test() {
-        System.out.println("Running Unit1Test");
+        System.out.println("Running " + getClass() + ".test");
         assertTrue(true);
     }
 }

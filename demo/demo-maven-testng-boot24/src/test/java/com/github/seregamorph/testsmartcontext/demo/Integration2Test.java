@@ -11,6 +11,7 @@ public class Integration2Test extends AbstractTestNGSpringIntegrationTest {
 
     @Test
     public void test() {
+        System.out.println("Running " + getClass());
     }
 
     public static class Configuration {

@@ -72,4 +72,9 @@ public class SmartDirtiesTestsHolder {
         }
         SmartDirtiesTestsHolder.classOrderStateMap = classOrderStateMap;
     }
+
+    //@TestOnly
+    static void reset() {
+        classOrderStateMap = null;
+    }
 }

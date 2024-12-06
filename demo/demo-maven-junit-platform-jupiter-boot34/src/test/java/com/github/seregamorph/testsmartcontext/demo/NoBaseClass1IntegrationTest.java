@@ -5,7 +5,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = SampleIntegrationTest.Configuration.class)
 public class NoBaseClass1IntegrationTest {
+
     @Test
     public void test() {
+        System.out.println("Running " + getClass() + ".test");
     }
 }

@@ -7,7 +7,9 @@ import org.springframework.test.annotation.DirtiesContext;
 @SpringBootTest(classes = SampleIntegrationTest.Configuration.class)
 @DirtiesContext
 public class DirtiesContextTest {
+
     @Test
     public void test() {
+        System.out.println("Running " + getClass() + ".test");
     }
 }

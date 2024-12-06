@@ -21,6 +21,11 @@ public class SmartDirtiesJupiterEngineTest {
 
     @Test
     public void testSuite() {
+        // to avoid confusion of duplicated test execution output
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        System.out.println(">>>EngineTestKit duplicating the suite>>>");
+        SmartDirtiesTestsHolder.reset();
+
         var events = EngineTestKit.execute("junit-jupiter", request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))
                 .filters(excludeClassNamePatterns(getClass().getName()))
@@ -52,5 +57,7 @@ public class SmartDirtiesJupiterEngineTest {
         assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(NoBaseClass2IntegrationTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(DirtiesContextTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleIntegrationTest.class));
+        System.out.println("<<<EngineTestKit duplicating the suite<<<");
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
     }
 }

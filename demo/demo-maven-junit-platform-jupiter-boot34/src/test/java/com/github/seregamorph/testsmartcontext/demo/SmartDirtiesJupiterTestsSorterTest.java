@@ -53,4 +53,9 @@ public class SmartDirtiesJupiterTestsSorterTest {
             List.of(SampleIntegrationTest.class)
         ), itClassesLists);
     }
+
+    @Test
+    public void test() {
+        System.out.println("Running " + getClass() + ".test");
+    }
 }

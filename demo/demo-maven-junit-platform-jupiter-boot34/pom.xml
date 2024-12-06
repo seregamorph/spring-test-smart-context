@@ -10,12 +10,12 @@
         <version>0.6-SNAPSHOT</version>
     </parent>
 
-    <artifactId>demo-maven-junit-platform-jupiter-boot32</artifactId>
+    <artifactId>demo-maven-junit-platform-jupiter-boot34</artifactId>
 
     <description>Demo project with tests launched via Maven junit-platform jupiter</description>
 
     <properties>
-        <spring-boot.version>3.2.2</spring-boot.version>
+        <spring-boot.version>3.4.0</spring-boot.version>
     </properties>
 
     <build>

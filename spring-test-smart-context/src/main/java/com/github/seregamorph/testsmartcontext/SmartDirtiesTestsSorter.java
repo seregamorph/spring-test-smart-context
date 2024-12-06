@@ -5,7 +5,6 @@ import static java.util.Comparator.comparing;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,16 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.Extension;
 import org.junit.runner.RunWith;
 import org.junit.runner.Runner;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.context.TestContextBootstrapper;
@@ -64,8 +63,8 @@ public class SmartDirtiesTestsSorter {
     }
 
     /**
-     * Sorts passed testItems, all tests are sequentially grouped by {@link MergedContextConfiguration}
-     * calculated per each test class.
+     * Sorts passed testItems, all tests are sequentially grouped by {@link MergedContextConfiguration} calculated per
+     * each test class.
      *
      * @param testItems
      * @param testClassExtractor
@@ -78,13 +77,15 @@ public class SmartDirtiesTestsSorter {
 
         Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
         Map<Class<?>, Integer> classToOrder = new LinkedHashMap<>();
+        AtomicInteger orderCounter = new AtomicInteger();
         for (Class<?> itClass : itClasses) {
             TestContextBootstrapper bootstrapper = BootstrapUtilsHelper.resolveTestContextBootstrapper(itClass);
             MergedContextConfiguration mergedContextConfiguration = bootstrapper.buildMergedContextConfiguration();
             // Sequentially each unique mergedContextConfiguration will have own order
-            // via configToTests current size
+            // via orderCounter. initial order values all have a gap to allow for moving
+            // @DirtiesContext annotated classes to the back later.
             TestClasses testClasses = configToTests.computeIfAbsent(mergedContextConfiguration,
-                $ -> new TestClasses(configToTests.size() + 1, new LinkedHashSet<>()));
+                $ -> new TestClasses(orderCounter.addAndGet(2), new LinkedHashSet<>()));
             testClasses.classes.add(itClass);
             classToOrder.put(itClass, testClasses.order);
         }
@@ -101,12 +102,15 @@ public class SmartDirtiesTestsSorter {
                 return getNonItOrder();
             } else {
                 // this sorting is stable - most of the tests will preserve alphabetical ordering where possible
-                return order;
+                // we only sort classes that shut down the context to the end.
+                return isDirtiesContextAfterClass(realClass) ? order + 1 : order;
             }
         }));
 
         return configToTests.values().stream()
-            .map(testClasses -> new ArrayList<>(testClasses.classes))
+            .map(testClasses -> testClasses.classes.stream()
+                .sorted(comparing(testItem -> isDirtiesContextAfterClass(testItem) ? 1 : 0))
+                .collect(Collectors.toList()))
             .collect(Collectors.toList());
     }
 
@@ -188,6 +192,17 @@ public class SmartDirtiesTestsSorter {
 
         return extendWith.stream().map(ExtendWith::value).flatMap(Arrays::stream)
             .anyMatch(SpringExtension.class::isAssignableFrom);
+    }
+
+    protected boolean isDirtiesContextAfterClass(Class<?> testClass) {
+        Set<DirtiesContext> dirtiesContexts = AnnotatedElementUtils.findAllMergedAnnotations(testClass,
+            DirtiesContext.class);
+        if (dirtiesContexts.isEmpty()) {
+            return false;
+        }
+
+        return dirtiesContexts.stream().map(DirtiesContext::classMode)
+            .anyMatch(t -> DirtiesContext.ClassMode.AFTER_CLASS == t);
     }
 
     private void printSuiteTests(int totalTests, Collection<Class<?>> itClasses) {

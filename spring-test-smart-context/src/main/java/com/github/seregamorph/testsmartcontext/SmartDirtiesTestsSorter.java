@@ -89,9 +89,6 @@ public class SmartDirtiesTestsSorter {
             testClasses.classes.add(itClass);
             classToOrder.put(itClass, testClasses.order);
         }
-        if (!configToTests.isEmpty()) {
-            printSuiteTestsPerConfig(configToTests);
-        }
 
         testItems.sort(comparing(testItem -> {
             Class<?> realClass = testClassExtractor.getTestClass(testItem);
@@ -107,11 +104,17 @@ public class SmartDirtiesTestsSorter {
             }
         }));
 
-        return configToTests.values().stream()
+        List<List<Class<?>>> sortedConfigToTests = configToTests.values().stream()
             .map(testClasses -> testClasses.classes.stream()
                 .sorted(comparing(testItem -> isDirtiesContextAfterClass(testItem) ? 1 : 0))
                 .collect(Collectors.toList()))
             .collect(Collectors.toList());
+
+        if (!sortedConfigToTests.isEmpty()) {
+            printSuiteTestsPerConfig(sortedConfigToTests);
+        }
+
+        return sortedConfigToTests;
     }
 
     private <T> Set<Class<?>> filterAndLogItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
@@ -214,14 +217,14 @@ public class SmartDirtiesTestsSorter {
         log.info(sw.toString());
     }
 
-    private void printSuiteTestsPerConfig(Map<MergedContextConfiguration, TestClasses> configToTests) {
+    private void printSuiteTestsPerConfig(List<List<Class<?>>> sortedConfigToTests) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
         pw.println("Integration test classes grouped and reordered by MergedContextConfiguration " +
-            "(" + configToTests.size() + " groups):");
+            "(" + sortedConfigToTests.size() + " groups):");
         pw.println("------");
-        configToTests.values().forEach(itClasses -> {
-            for (Class<?> itClass : itClasses.classes) {
+        sortedConfigToTests.forEach(itClasses -> {
+            for (Class<?> itClass : itClasses) {
                 pw.println(itClass.getName());
             }
             pw.println("------");

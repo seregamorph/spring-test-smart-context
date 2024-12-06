@@ -6,7 +6,7 @@
 
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context-parent</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>spring-test-smart-context parent</name>
     <description>

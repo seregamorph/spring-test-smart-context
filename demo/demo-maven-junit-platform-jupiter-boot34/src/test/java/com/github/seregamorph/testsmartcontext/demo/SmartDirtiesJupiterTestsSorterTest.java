@@ -19,7 +19,8 @@ public class SmartDirtiesJupiterTestsSorterTest {
             SampleIntegrationTest.class,
             Integration1Test.class,
             Unit1Test.class,
-            DirtiesContextTest.class,
+            SampleDirtiesContextAfterClassTest.class,
+            SampleDirtiesContextBeforeClassTest.class,
             NoBaseClass2IntegrationTest.class,
             NoBaseClass1IntegrationTest.class,
             ExtendWithTest.class,
@@ -33,10 +34,11 @@ public class SmartDirtiesJupiterTestsSorterTest {
             SmartDirtiesJupiterTestsSorterTest.class,
             Unit1Test.class,
             // IT 1
+            SampleDirtiesContextBeforeClassTest.class,
             ExtendWithTest.class,
             NoBaseClass1IntegrationTest.class,
             NoBaseClass2IntegrationTest.class,
-            DirtiesContextTest.class,
+            SampleDirtiesContextAfterClassTest.class,
             // IT 2
             Integration1Test.class,
             // IT 3
@@ -46,8 +48,9 @@ public class SmartDirtiesJupiterTestsSorterTest {
         ), testItems);
 
         assertEquals(List.of(
-            List.of(ExtendWithTest.class, NoBaseClass1IntegrationTest.class, NoBaseClass2IntegrationTest.class,
-                DirtiesContextTest.class),
+            List.of(SampleDirtiesContextBeforeClassTest.class, ExtendWithTest.class,
+                NoBaseClass1IntegrationTest.class, NoBaseClass2IntegrationTest.class,
+                SampleDirtiesContextAfterClassTest.class),
             List.of(Integration1Test.class),
             List.of(Integration2Test.class),
             List.of(SampleIntegrationTest.class)

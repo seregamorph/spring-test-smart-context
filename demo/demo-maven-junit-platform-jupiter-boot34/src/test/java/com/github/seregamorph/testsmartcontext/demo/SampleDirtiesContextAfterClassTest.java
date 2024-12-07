@@ -6,7 +6,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 @SpringBootTest(classes = SampleIntegrationTest.Configuration.class)
 @DirtiesContext
-public class DirtiesContextTest {
+public class SampleDirtiesContextAfterClassTest {
 
     @Test
     public void test() {

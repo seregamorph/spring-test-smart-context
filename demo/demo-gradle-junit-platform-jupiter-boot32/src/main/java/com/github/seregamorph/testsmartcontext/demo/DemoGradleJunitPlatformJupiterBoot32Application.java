@@ -1,4 +1,4 @@
-package com.github.seregamorph.demo;
+package com.github.seregamorph.testsmartcontext.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

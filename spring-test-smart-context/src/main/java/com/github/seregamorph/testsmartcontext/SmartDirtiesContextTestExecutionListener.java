@@ -41,6 +41,8 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
             } finally {
                 SpringContextEventTestLogger.resetCurrentAfterClass();
             }
+        } else {
+            LOG.debug("Non-dirty " + testClass.getName());
         }
     }
 }

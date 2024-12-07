@@ -1,4 +1,4 @@
-package com.github.seregamorph.demo;
+package com.github.seregamorph.testsmartcontext.demo;
 
 import com.github.seregamorph.testsmartcontext.jupiter.AbstractJUnitSpringIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;

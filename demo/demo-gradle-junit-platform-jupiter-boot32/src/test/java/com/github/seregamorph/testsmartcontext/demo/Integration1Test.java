@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -18,6 +19,18 @@ public class Integration1Test extends AbstractIntegrationTest {
     @Test
     public void test() {
         System.out.println("Integration1Test.test " + rootBean);
+    }
+
+    @Nested
+    public class NestedTest {
+
+        @Autowired
+        private SampleBean nestedBean;
+
+        @Test
+        public void nested() {
+            System.out.println("Integration1Test.NestedTest.test " + nestedBean);
+        }
     }
 
     @Import(SampleBean.class)

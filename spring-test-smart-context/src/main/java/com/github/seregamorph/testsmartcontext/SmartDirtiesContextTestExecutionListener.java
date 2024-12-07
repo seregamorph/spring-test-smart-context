@@ -1,5 +1,7 @@
 package com.github.seregamorph.testsmartcontext;
 
+import static com.github.seregamorph.testsmartcontext.SmartDirtiesTestsHolder.isInnerClass;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.test.context.TestContext;
@@ -28,6 +30,14 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
         // DirtiesContextTestExecutionListener.getOrder() + 1
         //noinspection MagicNumber
         return 3001;
+    }
+
+    @Override
+    public void beforeTestClass(TestContext testContext) {
+        Class<?> testClass = testContext.getTestClass();
+        if (isInnerClass(testClass)) {
+            SmartDirtiesTestsHolder.verifyInnerClass(testClass);
+        }
     }
 
     @Override

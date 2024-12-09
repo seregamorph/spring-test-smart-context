@@ -1,10 +1,13 @@
 package com.github.seregamorph.testsmartcontext;
 
+import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.Nullable;
+import org.springframework.test.context.BootstrapUtilsHelper;
+import org.springframework.test.context.MergedContextConfiguration;
 
 public class SmartDirtiesTestsHolder {
 
@@ -25,11 +28,19 @@ public class SmartDirtiesTestsHolder {
     }
 
     static boolean isFirstClassPerConfig(Class<?> testClass) {
+        if (isInnerClass(testClass)) {
+            // to support @Nested classes (without own context configuration)
+            return false;
+        }
         ClassOrderState classOrderState = getOrderState(testClass);
         return classOrderState != null && classOrderState.isFirst;
     }
 
     static boolean isLastClassPerConfig(Class<?> testClass) {
+        if (isInnerClass(testClass)) {
+            // to support @Nested classes (without own context configuration)
+            return false;
+        }
         ClassOrderState classOrderState = getOrderState(testClass);
         return classOrderState != null && classOrderState.isLast;
     }
@@ -71,6 +82,41 @@ public class SmartDirtiesTestsHolder {
             }
         }
         SmartDirtiesTestsHolder.classOrderStateMap = classOrderStateMap;
+    }
+
+    protected static void verifyInnerClass(Class<?> innerTestClass) {
+        // @ContextConfiguration, @Import, etc. on Nested class will lead to creation of separate spring context.
+        // We can order enclosing classes, but tests of Nested test classes will always go sequentially is scope
+        // of their enclosing class. And the spring context may be shared between these inner Nested classes of
+        // different tests.
+        Class<?> enclosingClass = getEnclosingClass(innerTestClass);
+        MergedContextConfiguration enclosingContextConfiguration =
+            BootstrapUtilsHelper.resolveTestContextBootstrapper(enclosingClass).buildMergedContextConfiguration();
+        MergedContextConfiguration innerContextConfiguration =
+            BootstrapUtilsHelper.resolveTestContextBootstrapper(innerTestClass).buildMergedContextConfiguration();
+
+        // TODO find compromising solution for @Nested classes
+        if (!enclosingContextConfiguration.equals(innerContextConfiguration)) {
+            throw new IllegalStateException("Nested inner " + innerTestClass + " declares custom context " +
+                "configuration which differs from enclosing " + enclosingClass + ". " +
+                "This is not properly supported by the spring-test-smart-context ordering because of framework " +
+                "limitations. Please extract inner test class to upper level.");
+        }
+    }
+
+    protected static boolean isInnerClass(Class<?> clazz) {
+        return !isStatic(clazz) && clazz.isMemberClass();
+    }
+
+    private static boolean isStatic(Class<?> clazz) {
+        return Modifier.isStatic(clazz.getModifiers());
+    }
+
+    private static Class<?> getEnclosingClass(Class<?> clazz) {
+        Class<?> enclosingClass = clazz.getEnclosingClass();
+        // it can be deeply nesting - with recursion avoid possible infinite cycle
+        // (see org.junit.platform.commons.util.ReflectionUtils.detectInnerClassCycle)
+        return enclosingClass == null ? clazz : getEnclosingClass(enclosingClass);
     }
 
     //@TestOnly

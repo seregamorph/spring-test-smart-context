@@ -51,7 +51,8 @@ Public presentation with AtomicJar (TestContainers creators):
 ### Limitations
 At the moment only single thread test execution per module is supported. Parallel test execution is work in progress.
 Also there can be problems with Jupiter
-[Nested](https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested) test classes.
+[Nested](https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested) test classes if they declare
+own `@ContextConfiguration` or `@Import` of spring beans.
 
 ### Supported versions
 `Java` 8+ (`Java` 17+ for spring-boot 3.x projects)

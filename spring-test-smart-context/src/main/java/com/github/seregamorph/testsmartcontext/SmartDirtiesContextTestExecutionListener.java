@@ -34,6 +34,8 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     @Override
     public void beforeTestClass(TestContext testContext) {
+        // stack Nested classes
+        CurrentTestContext.pushCurrentTestClass(testContext.getTestClass());
         Class<?> testClass = testContext.getTestClass();
         if (isInnerClass(testClass)) {
             SmartDirtiesTestsHolder.verifyInnerClass(testClass);
@@ -42,17 +44,17 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     @Override
     public void afterTestClass(TestContext testContext) {
-        Class<?> testClass = testContext.getTestClass();
-        if (SmartDirtiesTestsHolder.isLastClassPerConfig(testClass)) {
-            LOG.info("markDirty " + testClass.getName());
-            SpringContextEventTestLogger.setCurrentAfterClass(testContext.getTestClass());
-            try {
+        try {
+            Class<?> testClass = testContext.getTestClass();
+            if (SmartDirtiesTestsHolder.isLastClassPerConfig(testClass)) {
+                LOG.info("markDirty " + testClass.getName());
                 testContext.markApplicationContextDirty(null);
-            } finally {
-                SpringContextEventTestLogger.resetCurrentAfterClass();
+            } else {
+                LOG.debug("Non-dirty " + testClass.getName());
             }
-        } else {
-            LOG.debug("Non-dirty " + testClass.getName());
+        } finally {
+            // pop Nested classes
+            CurrentTestContext.popCurrentTestClass();
         }
     }
 }

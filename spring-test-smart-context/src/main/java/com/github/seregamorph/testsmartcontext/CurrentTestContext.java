@@ -1,18 +1,37 @@
 package com.github.seregamorph.testsmartcontext;
 
-public abstract class CurrentTestContext {
+import java.util.Stack;
+import org.springframework.lang.Nullable;
 
-    private static final ThreadLocal<String> currentTestClassIdentifier = new ThreadLocal<>();
+public class CurrentTestContext {
 
-    public static String getCurrentTestClassIdentifier() {
-        return currentTestClassIdentifier.get();
+    private static final ThreadLocal<Stack<Class<?>>> currentTestClassIdentifier = new ThreadLocal<>();
+
+    @Nullable
+    public static String getCurrentTestClassName() {
+        Stack<Class<?>> stack = currentTestClassIdentifier.get();
+        return stack == null ? null : stack.peek().getName();
     }
 
-    protected static void setCurrentTestClassIdentifier(String testClassIdentifier) {
-        currentTestClassIdentifier.set(testClassIdentifier);
+    static void pushCurrentTestClass(Class<?> testClass) {
+        Stack<Class<?>> stack = currentTestClassIdentifier.get();
+        if (stack == null) {
+            stack = new Stack<>();
+            currentTestClassIdentifier.set(stack);
+        }
+        stack.push(testClass);
     }
 
-    protected static void resetCurrentTestClassIdentifier() {
-        currentTestClassIdentifier.remove();
+    static void popCurrentTestClass() {
+        Stack<Class<?>> stack = currentTestClassIdentifier.get();
+        if (stack != null) {
+            stack.pop();
+            if (stack.isEmpty()) {
+                currentTestClassIdentifier.remove();
+            }
+        }
+    }
+
+    private CurrentTestContext() {
     }
 }

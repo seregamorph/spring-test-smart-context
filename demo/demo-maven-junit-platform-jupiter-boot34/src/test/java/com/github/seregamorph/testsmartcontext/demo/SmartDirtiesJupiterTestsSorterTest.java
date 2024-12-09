@@ -3,6 +3,7 @@ package com.github.seregamorph.testsmartcontext.demo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -11,9 +12,10 @@ public class SmartDirtiesJupiterTestsSorterTest {
 
     @Test
     public void shouldSortMostlyAlphabeticallyAndGroupSameConfigurations() {
+        TestEventTracker.trackEvent("Started " + getClass().getSimpleName() +
+            ".shouldSortMostlyAlphabeticallyAndGroupSameConfigurations");
         // mostly: @DirtiesContext should go last.
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        System.out.println(">>>shouldSortMostlyAlphabeticallyAndGroupSameConfigurations>>>");
         var testItems = Arrays.asList(
             Integration2Test.class,
             SampleIntegrationTest.class,
@@ -27,7 +29,6 @@ public class SmartDirtiesJupiterTestsSorterTest {
             SmartDirtiesJupiterTestsSorterTest.class
         );
         var itClassesLists = sorter.sort(testItems, testClass -> testClass);
-        System.out.println("<<<shouldSortMostlyAlphabeticallyAndGroupSameConfigurations<<<");
 
         assertEquals(Arrays.asList(
             // UT
@@ -55,10 +56,8 @@ public class SmartDirtiesJupiterTestsSorterTest {
             List.of(Integration2Test.class),
             List.of(SampleIntegrationTest.class)
         ), itClassesLists);
-    }
 
-    @Test
-    public void test() {
-        System.out.println("Running " + getClass() + ".test");
+        TestEventTracker.trackEvent("Finished " + getClass().getSimpleName() +
+            ".shouldSortMostlyAlphabeticallyAndGroupSameConfigurations");
     }
 }

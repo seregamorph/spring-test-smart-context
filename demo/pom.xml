@@ -29,6 +29,7 @@
         <module>demo-maven-junit-platform-jupiter-boot34</module>
         <module>demo-maven-junit-platform-testng-boot32</module>
         <module>demo-maven-testng-boot24</module>
+        <module>demo-testkit</module>
     </modules>
 
     <profiles>
@@ -45,6 +46,12 @@
             <dependency>
                 <groupId>com.github.seregamorph</groupId>
                 <artifactId>spring-test-smart-context</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.seregamorph</groupId>
+                <artifactId>demo-testkit</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

@@ -10,6 +10,6 @@ public class SampleDirtiesContextAfterClassTest {
 
     @Test
     public void test() {
-        System.out.println("Running " + getClass() + ".test");
+        System.out.println("Running " + getClass().getName() + ".test");
     }
 }

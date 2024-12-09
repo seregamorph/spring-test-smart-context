@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -10,6 +11,6 @@ public class SampleDirtiesContextBeforeClassTest {
 
     @Test
     public void test() {
-        System.out.println("Running " + getClass() + ".test");
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName() + ".test");
     }
 }

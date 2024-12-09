@@ -2,13 +2,14 @@ package com.github.seregamorph.testsmartcontext.demo;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import org.junit.jupiter.api.Test;
 
 public class Unit1Test {
 
     @Test
     public void test() {
-        System.out.println("Running " + getClass() + ".test");
+        TestEventTracker.trackEvent("Running " + getClass().getName() + ".test");
         assertTrue(true);
     }
 }

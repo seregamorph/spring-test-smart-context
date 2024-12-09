@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.seregamorph</groupId>
         <artifactId>demo-parent</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>demo-gradle-junit-platform-jupiter-boot32</artifactId>

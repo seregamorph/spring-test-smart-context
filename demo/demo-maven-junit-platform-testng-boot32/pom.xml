@@ -87,9 +87,24 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.support</groupId>
             <artifactId>testng-engine</artifactId>
             <version>${testng-engine.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-testkit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.seregamorph</groupId>
+            <artifactId>demo-testkit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

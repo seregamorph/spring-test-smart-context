@@ -3,6 +3,7 @@ package com.github.seregamorph.testsmartcontext.demo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import com.github.seregamorph.testsmartcontext.testng.AbstractTestNGSpringIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +33,7 @@ public class SampleIT extends AbstractTestNGSpringIntegrationTest {
 
     @BeforeMethod
     public void beforeMethod() {
-        System.out.println("Running " + getClass());
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName());
     }
 
     @Test

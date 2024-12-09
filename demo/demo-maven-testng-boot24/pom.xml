@@ -76,5 +76,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.github.seregamorph</groupId>
+            <artifactId>demo-testkit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

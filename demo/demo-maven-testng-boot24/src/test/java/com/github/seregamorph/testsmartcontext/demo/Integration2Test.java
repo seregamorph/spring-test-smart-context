@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import com.github.seregamorph.testsmartcontext.testng.AbstractTestNGSpringIntegrationTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
@@ -11,7 +12,7 @@ public class Integration2Test extends AbstractTestNGSpringIntegrationTest {
 
     @Test
     public void test() {
-        System.out.println("Running " + getClass());
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName());
     }
 
     public static class Configuration {

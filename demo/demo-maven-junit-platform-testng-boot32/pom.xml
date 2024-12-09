@@ -17,6 +17,7 @@
     <properties>
         <spring-boot.version>3.2.2</spring-boot.version>
         <testng-engine.version>1.0.5</testng-engine.version>
+        <maven.install.skip>true</maven.install.skip>
     </properties>
 
     <build>

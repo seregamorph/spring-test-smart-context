@@ -18,6 +18,7 @@
         <!-- Delegate to Gradle -->
         <maven.main.skip>true</maven.main.skip>
         <maven.test.skip>true</maven.test.skip>
+        <maven.install.skip>true</maven.install.skip>
     </properties>
 
     <build>

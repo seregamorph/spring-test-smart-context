@@ -16,6 +16,7 @@
 
     <properties>
         <spring-boot.version>2.4.2</spring-boot.version>
+        <maven.install.skip>true</maven.install.skip>
     </properties>
 
     <build>

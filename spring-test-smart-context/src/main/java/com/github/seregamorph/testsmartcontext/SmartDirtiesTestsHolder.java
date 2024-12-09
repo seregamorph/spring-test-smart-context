@@ -23,7 +23,7 @@ public class SmartDirtiesTestsHolder {
         }
     }
 
-    public static int classOrderStateMapSize() {
+    protected static int classOrderStateMapSize() {
         return classOrderStateMap == null ? 0 : classOrderStateMap.size();
     }
 

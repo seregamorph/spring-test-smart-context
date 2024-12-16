@@ -19,10 +19,9 @@
 
     <properties>
         <spring.version>5.3.39</spring.version>
-        <testng.version>7.8.0</testng.version>
-        <junit-platform-launcher.version>1.10.0</junit-platform-launcher.version>
-        <junit-jupiter.version>5.8.2</junit-jupiter.version>
-        <junit-vintage.version>5.8.2</junit-vintage.version>
+        <testng.version>7.10.2</testng.version>
+        <junit-platform-launcher.version>1.11.3</junit-platform-launcher.version>
+        <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <testng-engine.version>1.0.5</testng-engine.version>
     </properties>
 
@@ -73,7 +72,7 @@
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit-vintage.version}</version>
+            <version>${junit-jupiter.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

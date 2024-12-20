@@ -50,6 +50,7 @@
     </properties>
 
     <modules>
+        <module>spring-test-distribution-maven-plugin</module>
         <module>spring-test-smart-context</module>
     </modules>
 

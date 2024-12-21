@@ -1,10 +1,7 @@
 package com.github.seregamorph.testsmartcontext;
 
 import java.util.List;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.RootBeanDefinition;
+import java.util.ServiceLoader;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.test.context.ContextConfigurationAttributes;
@@ -26,14 +23,7 @@ public class SmartDirtiesContextTestExecutionContextCustomizerFactory implements
 
         @Override
         public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
-            ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-            if (beanFactory instanceof BeanDefinitionRegistry) {
-                RootBeanDefinition bd = new RootBeanDefinition(SpringContextEventTestLogger.class);
-                bd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-                bd.setResourceDescription("registered by " + this.getClass().getSimpleName());
-                ((BeanDefinitionRegistry) beanFactory).registerBeanDefinition(
-                    SpringContextEventTestLogger.class.getName(), bd);
-            }
+            context.addApplicationListener(getSpringContextEventLoggerListener());
         }
 
         @Override
@@ -46,6 +36,18 @@ public class SmartDirtiesContextTestExecutionContextCustomizerFactory implements
         @Override
         public int hashCode() {
             return 0;
+        }
+    }
+
+    private static SpringContextEventLoggerListener getSpringContextEventLoggerListener() {
+        // overridden logic in demo-test-kit
+        ServiceLoader<SpringContextEventLoggerListener> loader = ServiceLoader.load(SpringContextEventLoggerListener.class,
+            SmartDirtiesTestsSorter.class.getClassLoader());
+
+        if (loader.iterator().hasNext()) {
+            return loader.iterator().next();
+        } else {
+            return new SpringContextEventLoggerListener();
         }
     }
 }

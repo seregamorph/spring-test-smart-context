@@ -1,2 +1,0 @@
-org.springframework.test.context.ContextCustomizerFactory = \
-    com.github.seregamorph.testsmartcontext.testkit.ContextEventTrackingContextCustomizerFactory

@@ -20,7 +20,10 @@ public class TestEventTracker {
     public static void trackEvent(String event) {
         var testEventTracker = currentEventTracker.get();
         if (testEventTracker != null) {
-            testEventTracker.addEvent(event);
+            System.out.println("Tracked event: " + event);
+            testEventTracker.events.add(event);
+        } else {
+            System.out.println("Event: " + event);
         }
     }
 
@@ -44,11 +47,6 @@ public class TestEventTracker {
         if (!testEventTracker.events.isEmpty()) {
             throw new AssertionError("Expected empty, but found leftover events: " + testEventTracker.events);
         }
-    }
-
-    private void addEvent(String event) {
-        System.out.println("Event: " + event);
-        events.add(event);
     }
 
     private TestEventTracker() {

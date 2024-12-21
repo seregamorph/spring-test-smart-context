@@ -1,18 +1,25 @@
 package com.github.seregamorph.testsmartcontext.testkit;
 
 import com.github.seregamorph.testsmartcontext.CurrentTestContext;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
+import com.github.seregamorph.testsmartcontext.SpringContextEventLoggerListener;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 
-public class ContextEventTracker implements InitializingBean, DisposableBean {
+public class TestContextEventTrackerListener extends SpringContextEventLoggerListener {
 
     @Override
-    public void afterPropertiesSet() {
+    protected void onCreated() {
         TestEventTracker.trackEvent("Creating context for " + CurrentTestContext.getCurrentTestClassName());
     }
 
     @Override
-    public void destroy() {
+    protected void onContextRefreshedEvent(ContextRefreshedEvent event) {
+        super.onContextRefreshedEvent(event);
+        TestEventTracker.trackEvent("Created context for " + CurrentTestContext.getCurrentTestClassName());
+    }
+
+    @Override
+    protected void onContextClosedEvent(ContextClosedEvent event) {
         String currentTestClass = CurrentTestContext.getCurrentTestClassName();
         if (currentTestClass == null) {
             // system shutdown hook

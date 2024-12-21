@@ -19,7 +19,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  *
  * @see com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
  * @see com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener
- * @see SpringContextEventTestLogger
+ * @see SpringContextEventLoggerListener
  */
 public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecutionListener {
 

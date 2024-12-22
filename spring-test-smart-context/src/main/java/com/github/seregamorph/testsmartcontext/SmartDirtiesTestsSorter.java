@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -226,8 +227,14 @@ public class SmartDirtiesTestsSorter {
             "(" + sortedConfigToTests.size() + " groups):");
         pw.println("------");
         sortedConfigToTests.forEach(itClasses -> {
-            for (Class<?> itClass : itClasses) {
-                pw.println(itClass.getName());
+            boolean isFirst = true;
+            for (Iterator<Class<?>> it = itClasses.iterator(); it.hasNext(); ) {
+                Class<?> itClass = it.next();
+                boolean isLast = !it.hasNext();
+                String suffix = isFirst && isLast ? " (creates and closes context)"
+                    : isFirst ? " (creates context)" : isLast ? " (closes context)" : "";
+                pw.println(itClass.getName() + suffix);
+                isFirst = false;
             }
             pw.println("------");
         });

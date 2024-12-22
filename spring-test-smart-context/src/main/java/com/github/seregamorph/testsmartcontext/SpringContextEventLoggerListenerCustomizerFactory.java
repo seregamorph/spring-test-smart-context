@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.ContextCustomizerFactory;
 import org.springframework.test.context.MergedContextConfiguration;
 
-public class SmartDirtiesContextTestExecutionContextCustomizerFactory implements ContextCustomizerFactory {
+public class SpringContextEventLoggerListenerCustomizerFactory implements ContextCustomizerFactory {
 
     @Override
     public ContextCustomizer createContextCustomizer(

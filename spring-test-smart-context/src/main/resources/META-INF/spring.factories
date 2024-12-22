@@ -2,4 +2,4 @@ org.springframework.test.context.TestExecutionListener = \
     com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener
 
 org.springframework.test.context.ContextCustomizerFactory = \
-    com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionContextCustomizerFactory
+    com.github.seregamorph.testsmartcontext.SpringContextEventLoggerListenerCustomizerFactory

@@ -42,7 +42,7 @@ public class SpringContextEventLoggerListenerCustomizerFactory implements Contex
     private static SpringContextEventLoggerListener getSpringContextEventLoggerListener() {
         // overridden logic in demo-test-kit
         ServiceLoader<SpringContextEventLoggerListener> loader = ServiceLoader.load(SpringContextEventLoggerListener.class,
-            SmartDirtiesTestsSorter.class.getClassLoader());
+            SpringContextEventLoggerListenerCustomizerFactory.class.getClassLoader());
 
         if (loader.iterator().hasNext()) {
             return loader.iterator().next();

@@ -48,7 +48,7 @@ public class SmartDirtiesTestsHolder {
     @Nullable
     private static ClassOrderState getOrderState(Class<?> testClass) {
         if (classOrderStateMap == null) {
-            if (JUnitPlatformSupport.isJUnit4IdeaTestRunnerPresent()) {
+            if (JUnitPlatformSupport.isJunit4Present() && JUnitPlatformSupport.isJUnit4IdeaTestRunnerPresent()) {
                 System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), " +
                     "the Smart DirtiesContext behaviour is disabled.");
                 if (!JUnitPlatformSupport.isJunit5JupiterApiPresent()) {

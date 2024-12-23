@@ -1,10 +1,18 @@
 package com.github.seregamorph.testsmartcontext;
 
+import com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import org.junit.jupiter.api.ClassOrderer;
 import org.springframework.lang.Nullable;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
@@ -48,6 +56,37 @@ public class SmartDirtiesTestsHolder {
     @Nullable
     private static ClassOrderState getOrderState(Class<?> testClass) {
         if (classOrderStateMap == null) {
+            if (JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
+                try {
+                    ClassLoader classLoader = SmartDirtiesTestsHolder.class.getClassLoader();
+                    List<URL> junitPlatformConfigUrls = Collections.list(classLoader.getResources(
+                        "junit-platform.properties"));
+                    for (URL junitPlatformConfigUrl : junitPlatformConfigUrls) {
+                        Properties properties = new Properties();
+                        try (InputStream in = junitPlatformConfigUrl.openStream()) {
+                            properties.load(in);
+                        }
+                        String configClassOrderer = properties.getProperty(ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME);
+                        if (!SmartDirtiesClassOrderer.class.getName().equals(configClassOrderer)) {
+                            throw new IllegalStateException("classOrderStateMap is not initialized, because more than "
+                                + "one junit-platform.properties was found in the classpath: " + junitPlatformConfigUrls
+                                + ". JUnit 5 supports only one configuration file https://github.com/junit-team/junit5/issues/2794\n" +
+                                "The " + junitPlatformConfigUrl + " " + (configClassOrderer == null ?
+                                "does not declare the " + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + " property"
+                                : "declares\n" + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + "=" + configClassOrderer +
+                                    "\n")
+                                + " (should have value " + SmartDirtiesClassOrderer.class.getName()
+                                + " to address the issue)");
+                        }
+                        // Pass via system property -Djunit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
+                        // (don't forget about Maven/Gradle and IDEA default configuration)
+                        // or add line to your junit-platform.properties
+                        // junit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
             if (JUnitPlatformSupport.isJunit4Present() && JUnitPlatformSupport.isJUnit4IdeaTestRunnerPresent()) {
                 System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), " +
                     "the Smart DirtiesContext behaviour is disabled.");
@@ -59,7 +98,7 @@ public class SmartDirtiesTestsHolder {
                 }
                 return null;
             }
-            throw new IllegalStateException("lastClassPerConfig is not initialized");
+            throw new IllegalStateException("classOrderStateMap is not initialized");
         }
         ClassOrderState classOrderState = classOrderStateMap.get(testClass);
         if (classOrderState == null) {

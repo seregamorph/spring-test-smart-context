@@ -32,6 +32,7 @@ final class JUnitPlatformSupport {
         return JUNIT5_JUPITER_API_PRESENT;
     }
 
+    @Deprecated
     static boolean isJUnit4IdeaTestRunnerPresent() {
         return JUNIT4_IDEA_TEST_RUNNER_PRESENT;
     }

@@ -17,6 +17,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  * which will release resources as well (like Docker containers defined as spring beans). See detailed explanation <a
  * href="https://github.com/seregamorph/spring-test-smart-context/blob/master/README.md">README</a>.
  *
+ * @author Sergey Chernov
  * @see com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
  * @see com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener
  * @see SpringContextEventLoggerListener

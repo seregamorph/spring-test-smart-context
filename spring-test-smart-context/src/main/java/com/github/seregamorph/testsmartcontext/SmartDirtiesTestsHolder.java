@@ -17,6 +17,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
 
+/**
+ * @author Sergey Chernov
+ */
 public class SmartDirtiesTestsHolder {
 
     private static Map<Class<?>, ClassOrderState> classOrderStateMap;

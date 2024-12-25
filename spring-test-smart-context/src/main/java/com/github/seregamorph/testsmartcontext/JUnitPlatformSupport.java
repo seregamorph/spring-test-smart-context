@@ -2,6 +2,9 @@ package com.github.seregamorph.testsmartcontext;
 
 import org.springframework.util.ClassUtils;
 
+/**
+ * @author Sergey Chernov
+ */
 final class JUnitPlatformSupport {
 
     @Deprecated

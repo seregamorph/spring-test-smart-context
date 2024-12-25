@@ -19,6 +19,8 @@ import org.testng.xml.XmlSuite;
  * <p>
  * For Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}, for
  * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
+ *
+ * @author Sergey Chernov
  */
 @SuppressWarnings("CodeBlock2Expr")
 public class SmartDirtiesSuiteListener extends SmartDirtiesTestsHolder

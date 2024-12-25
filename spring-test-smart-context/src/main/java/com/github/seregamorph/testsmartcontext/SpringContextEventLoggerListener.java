@@ -12,6 +12,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 /**
  * Helper bean that logs spring bootstrap and shutdown events.
  *
+ * @author Sergey Chernov
  * @see SmartDirtiesContextTestExecutionListener
  */
 public class SpringContextEventLoggerListener implements ApplicationListener<ApplicationContextEvent> {

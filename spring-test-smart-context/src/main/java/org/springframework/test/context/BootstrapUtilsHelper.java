@@ -2,6 +2,8 @@ package org.springframework.test.context;
 
 /**
  * Accessor of spring-boot package visible utility
+ *
+ * @author Sergey Chernov
  */
 public final class BootstrapUtilsHelper {
 

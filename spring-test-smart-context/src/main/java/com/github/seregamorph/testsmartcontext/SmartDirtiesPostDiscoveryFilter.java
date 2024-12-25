@@ -21,6 +21,7 @@ import org.springframework.lang.Nullable;
  * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, for
  * Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}.
  *
+ * @author Sergey Chernov
  * @deprecated support of JUnit 4 will be removed in 1.0 release
  */
 @Deprecated

@@ -20,6 +20,8 @@ import org.springframework.core.annotation.AnnotationUtils;
  * <p>
  * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, for
  * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
+ *
+ * @author Sergey Chernov
  */
 public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements ClassOrderer {
 
@@ -66,7 +68,7 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
             // The enclosing classes are already in the SmartDirtiesTestsHolder from previous call
             if (SmartDirtiesTestsHolder.classOrderStateMapSize() == 0) {
                 throw new IllegalStateException("orderClasses is called with inner classes list " + classDescriptors
-                  + " before being called with enclosing class list");
+                    + " before being called with enclosing class list");
             }
             return;
         }

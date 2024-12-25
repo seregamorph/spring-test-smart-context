@@ -24,6 +24,8 @@ import org.springframework.lang.Nullable;
  *         });
  *     }
  * }</pre>
+ *
+ * @author Sergey Chernov
  */
 public class LateInitDataSource extends DelegatingDataSource {
 

@@ -8,6 +8,7 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
  * Base class for JUnit 4 integration tests that create spring context. Supports
  * {@link SmartDirtiesContextTestExecutionListener} semantics to optimize IT suite execution.
  *
+ * @author Sergey Chernov
  * @see SmartDirtiesContextTestExecutionListener
  * @deprecated support of JUnit 4 will be removed in 1.0 release
  */

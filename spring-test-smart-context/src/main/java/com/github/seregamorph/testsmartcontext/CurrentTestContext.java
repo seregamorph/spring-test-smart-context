@@ -3,6 +3,14 @@ package com.github.seregamorph.testsmartcontext;
 import java.util.Stack;
 import org.springframework.lang.Nullable;
 
+/**
+ * Utility class to obtain current integration test class (executed by
+ * {@link org.springframework.test.context.junit.jupiter.SpringExtension},
+ * {@link org.springframework.test.context.junit4.SpringJUnit4ClassRunner} or extending
+ * {@link org.springframework.test.context.testng.AbstractTestNGSpringContextTests} depending on test framework).
+ *
+ * @author Sergey Chernov
+ */
 public class CurrentTestContext {
 
     private static final ThreadLocal<Stack<Class<?>>> currentTestClassIdentifier = new ThreadLocal<>();

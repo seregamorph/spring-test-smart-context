@@ -25,6 +25,8 @@ import org.springframework.core.annotation.AnnotationUtils;
  */
 public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements ClassOrderer {
 
+    private static final String ENGINE = "junit-jupiter";
+
     @Override
     public void orderClasses(ClassOrdererContext context) {
         List<? extends ClassDescriptor> classDescriptors = context.getClassDescriptors();
@@ -66,7 +68,7 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
         if (uniqueClasses.isEmpty()) {
             // All are internal (@Nested), we do not reorder them.
             // The enclosing classes are already in the SmartDirtiesTestsHolder from previous call
-            if (SmartDirtiesTestsHolder.classOrderStateMapSize() == 0) {
+            if (SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE) == 0) {
                 throw new IllegalStateException("orderClasses is called with inner classes list " + classDescriptors
                     + " before being called with enclosing class list");
             }
@@ -78,9 +80,9 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
             // it's not possible to distinguish them here. Sometimes per single test is sent as argument,
             // sometimes - the whole suite. If it's a suite more than 1, we can save it and never update.
             // If it's 1 - we should also distinguish single test execution.
-            if (SmartDirtiesTestsHolder.classOrderStateMapSize() <= 1) {
+            if (SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE) <= 1) {
                 Class<?> testClass = classDescriptors.get(0).getTestClass();
-                SmartDirtiesTestsHolder.setTestClassesLists(singletonList(singletonList(testClass)));
+                SmartDirtiesTestsHolder.setTestClassesLists(ENGINE, singletonList(singletonList(testClass)));
             }
             return;
         }
@@ -88,6 +90,6 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         List<List<Class<?>>> testClassesLists = sorter.sort(classDescriptors, ClassDescriptor::getTestClass);
 
-        SmartDirtiesTestsHolder.setTestClassesLists(testClassesLists);
+        SmartDirtiesTestsHolder.setTestClassesLists(ENGINE, testClassesLists);
     }
 }

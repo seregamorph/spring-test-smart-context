@@ -18,6 +18,8 @@ import org.testng.annotations.Test;
 
 public class SmartDirtiesTestngEngineTest {
 
+    private static final String ENGINE = "testng";
+
     @BeforeMethod
     public void before() {
         TestEventTracker.startTracking();
@@ -33,9 +35,9 @@ public class SmartDirtiesTestngEngineTest {
         // to avoid confusion of duplicated test execution output
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println(">>>EngineTestKit duplicating the suite>>>");
-        SmartDirtiesTestsHolder.reset();
+        SmartDirtiesTestsHolder.reset(ENGINE);
 
-        var events = EngineTestKit.execute("testng", request()
+        var events = EngineTestKit.execute(ENGINE, request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))
                 .build())
             .containerEvents();
@@ -48,7 +50,7 @@ public class SmartDirtiesTestngEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(4, SmartDirtiesTestsHolder.classOrderStateMapSize());
+        assertEquals(4, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1SecondIT.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1IT.class));

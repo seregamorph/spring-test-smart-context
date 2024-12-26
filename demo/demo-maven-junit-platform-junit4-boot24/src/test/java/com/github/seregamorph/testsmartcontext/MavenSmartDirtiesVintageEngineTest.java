@@ -33,7 +33,7 @@ public class MavenSmartDirtiesVintageEngineTest {
         // to avoid confusion of duplicated test execution output
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println(">>>EngineTestKit duplicating the suite>>>");
-        SmartDirtiesTestsHolder.reset();
+        SmartDirtiesTestsHolder.reset(ENGINE);
 
         var events = EngineTestKit.execute(ENGINE, request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))
@@ -49,7 +49,7 @@ public class MavenSmartDirtiesVintageEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(3, SmartDirtiesTestsHolder.classOrderStateMapSize());
+        assertEquals(3, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));

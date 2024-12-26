@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.ClassOrderer;
 import org.springframework.lang.Nullable;
 import org.springframework.test.context.BootstrapUtilsHelper;
@@ -22,7 +23,10 @@ import org.springframework.test.context.MergedContextConfiguration;
  */
 public class SmartDirtiesTestsHolder {
 
-    private static Map<Class<?>, ClassOrderState> classOrderStateMap;
+    /**
+     * engine -> test class -> ClassOrderState
+     */
+    private static Map<String, Map<Class<?>, ClassOrderState>> engineClassOrderStateMap;
 
     private static class ClassOrderState {
         private final boolean isFirst;
@@ -34,10 +38,13 @@ public class SmartDirtiesTestsHolder {
         }
     }
 
-    protected static int classOrderStateMapSize() {
+    protected static int classOrderStateMapSize(String engine) {
+        Map<Class<?>, ClassOrderState> classOrderStateMap = engineClassOrderStateMap == null ? null
+            : engineClassOrderStateMap.get(engine);
         return classOrderStateMap == null ? 0 : classOrderStateMap.size();
     }
 
+    //@TestOnly
     static boolean isFirstClassPerConfig(Class<?> testClass) {
         if (isInnerClass(testClass)) {
             // to support @Nested classes (without own context configuration)
@@ -58,7 +65,7 @@ public class SmartDirtiesTestsHolder {
 
     @Nullable
     private static ClassOrderState getOrderState(Class<?> testClass) {
-        if (classOrderStateMap == null) {
+        if (engineClassOrderStateMap == null) {
             if (JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
                 try {
                     ClassLoader classLoader = SmartDirtiesTestsHolder.class.getClassLoader();
@@ -103,16 +110,21 @@ public class SmartDirtiesTestsHolder {
             }
             throw new IllegalStateException("classOrderStateMap is not initialized");
         }
-        ClassOrderState classOrderState = classOrderStateMap.get(testClass);
-        if (classOrderState == null) {
-            throw new IllegalStateException("classOrderStateMap is not defined for class "
-                + testClass + ", it means that it was skipped on initial analysis. " +
-                "Discovered classes: " + classOrderStateMap.keySet());
+
+        for (Map<Class<?>, ClassOrderState> classOrderStateMap : engineClassOrderStateMap.values()) {
+            ClassOrderState classOrderState = classOrderStateMap.get(testClass);
+            if (classOrderState != null) {
+                return classOrderState;
+            }
         }
-        return classOrderState;
+        throw new IllegalStateException("engineClassOrderStateMap is not defined for class "
+            + testClass + ", it means that it was skipped on initial analysis. "
+            + "Discovered classes: " + engineClassOrderStateMap.entrySet().stream()
+                .map(entry -> entry.getKey() + ": " + entry.getValue().keySet())
+                .collect(Collectors.toList()));
     }
 
-    protected static void setTestClassesLists(List<List<Class<?>>> testClassesLists) {
+    protected static void setTestClassesLists(String engine, List<List<Class<?>>> testClassesLists) {
         Map<Class<?>, ClassOrderState> classOrderStateMap = new LinkedHashMap<>();
         for (List<Class<?>> testClasses : testClassesLists) {
             Iterator<Class<?>> iterator = testClasses.iterator();
@@ -123,7 +135,10 @@ public class SmartDirtiesTestsHolder {
                 isFirst = false;
             }
         }
-        SmartDirtiesTestsHolder.classOrderStateMap = classOrderStateMap;
+        if (SmartDirtiesTestsHolder.engineClassOrderStateMap == null) {
+            SmartDirtiesTestsHolder.engineClassOrderStateMap = new LinkedHashMap<>();
+        }
+        SmartDirtiesTestsHolder.engineClassOrderStateMap.put(engine, classOrderStateMap);
     }
 
     protected static void verifyInnerClass(Class<?> innerTestClass) {
@@ -162,7 +177,9 @@ public class SmartDirtiesTestsHolder {
     }
 
     //@TestOnly
-    static void reset() {
-        classOrderStateMap = null;
+    static void reset(String engine) {
+        if (engineClassOrderStateMap != null) {
+            engineClassOrderStateMap.remove(engine);
+        }
     }
 }

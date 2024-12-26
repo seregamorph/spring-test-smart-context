@@ -27,6 +27,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.springframework.test.context.TestContextAnnotationUtils;
 import org.springframework.test.context.TestContextBootstrapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -201,9 +202,8 @@ public class SmartDirtiesTestsSorter {
     }
 
     private static int getDirtiesContextBeforeAfterOrder(Class<?> testClass) {
-        Set<DirtiesContext> dirtiesContexts = AnnotatedElementUtils.findAllMergedAnnotations(testClass,
-            DirtiesContext.class);
-        for (DirtiesContext dirtiesContext : dirtiesContexts) {
+        DirtiesContext dirtiesContext = TestContextAnnotationUtils.findMergedAnnotation(testClass, DirtiesContext.class);
+        if (dirtiesContext != null) {
             if (dirtiesContext.classMode() == DirtiesContext.ClassMode.BEFORE_CLASS) {
                 return -1;
             } else if (dirtiesContext.classMode() == DirtiesContext.ClassMode.AFTER_CLASS) {

@@ -1,14 +1,12 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
-import static org.junit.Assert.assertTrue;
-
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import org.junit.Test;
 
 public class Unit1Test {
 
     @Test
     public void test() {
-        System.out.println("Running Unit1Test");
-        assertTrue(true);
+        TestEventTracker.trackEvent("Running Unit1Test");
     }
 }

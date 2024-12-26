@@ -77,7 +77,10 @@ public class SmartDirtiesTestsSorter {
     public <T> List<List<Class<?>>> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         initialSort(testItems, testClassExtractor);
 
-        Set<Class<?>> itClasses = filterAndLogItClasses(testItems, testClassExtractor);
+        Set<Class<?>> itClasses = filterItClasses(testItems, testClassExtractor);
+        if (!itClasses.isEmpty()) {
+            printSuiteTests(testItems.size(), itClasses);
+        }
 
         Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
         Map<Class<?>, Integer> classToOrder = new LinkedHashMap<>();
@@ -115,22 +118,19 @@ public class SmartDirtiesTestsSorter {
             .collect(Collectors.toList());
 
         if (!sortedConfigToTests.isEmpty()) {
-            printSuiteTestsPerConfig(sortedConfigToTests);
+            printSuiteTestsPerConfig(itClasses.size(), sortedConfigToTests);
         }
 
         return sortedConfigToTests;
     }
 
-    private <T> Set<Class<?>> filterAndLogItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+    private <T> Set<Class<?>> filterItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         Set<Class<?>> itClasses = new LinkedHashSet<>();
         for (T t : testItems) {
             Class<?> testClass = testClassExtractor.getTestClass(t);
             if (!itClasses.contains(testClass) && isReorderTest(testClass)) {
                 itClasses.add(testClass);
             }
-        }
-        if (!itClasses.isEmpty()) {
-            printSuiteTests(testItems.size(), itClasses);
         }
         return itClasses;
     }
@@ -219,26 +219,33 @@ public class SmartDirtiesTestsSorter {
         pw.println("Running suite of " + totalTests + " tests. Integration test classes " +
             "(" + itClasses.size() + " classes):");
         itClasses.forEach(pw::println);
-        log.info(sw.toString());
+        log.debug(sw.toString());
     }
 
-    private void printSuiteTestsPerConfig(List<List<Class<?>>> sortedConfigToTests) {
+    private void printSuiteTestsPerConfig(int itClassesSize, List<List<Class<?>>> sortedConfigToTests) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        pw.println("Integration test classes grouped and reordered by MergedContextConfiguration " +
-            "(" + sortedConfigToTests.size() + " groups):");
-        pw.println("------");
+        pw.println(itClassesSize + " integration test classes grouped and reordered by MergedContextConfiguration "
+            + "(" + sortedConfigToTests.size() + " groups):");
         sortedConfigToTests.forEach(itClasses -> {
+            pw.println("---");
             boolean isFirst = true;
             for (Iterator<Class<?>> it = itClasses.iterator(); it.hasNext(); ) {
                 Class<?> itClass = it.next();
                 boolean isLast = !it.hasNext();
-                String suffix = isFirst && isLast ? " (creates and closes context)"
-                    : isFirst ? " (creates context)" : isLast ? " (closes context)" : "";
-                pw.println(itClass.getName() + suffix);
+                String suffix1 = isFirst && isLast ? "creates and closes context"
+                    : isFirst ? "creates context" : isLast ? "closes context" : null;
+                DirtiesContext dirtiesContext = AnnotatedElementUtils.findMergedAnnotation(itClass, DirtiesContext.class);
+                String suffix2 = dirtiesContext == null ? null :
+                    "marked @DirtiesContext(" + dirtiesContext.classMode().name() + ")";
+                pw.print(itClass.getName());
+                if (suffix1 != null || suffix2 != null) {
+                    pw.print(" (" + (suffix1 == null ? "" : suffix1 + (suffix2 == null ? "" : "; "))
+                        + (suffix2 == null ? "" : suffix2) + ")");
+                }
+                pw.println();
                 isFirst = false;
             }
-            pw.println("------");
         });
         log.info(sw.toString());
     }

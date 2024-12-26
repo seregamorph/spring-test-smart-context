@@ -3,7 +3,6 @@ package com.github.seregamorph.testsmartcontext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.platform.engine.discovery.ClassNameFilter.excludeClassNamePatterns;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
 import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
 
@@ -39,7 +38,6 @@ public class GradleSmartDirtiesJupiterEngineTest {
 
         var events = EngineTestKit.execute("junit-jupiter", request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))
-                .filters(excludeClassNamePatterns(getClass().getName()))
                 .build())
             .containerEvents();
 

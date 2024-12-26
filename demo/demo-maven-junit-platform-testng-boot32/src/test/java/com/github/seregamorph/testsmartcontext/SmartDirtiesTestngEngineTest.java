@@ -1,6 +1,5 @@
 package com.github.seregamorph.testsmartcontext;
 
-import static org.junit.platform.engine.discovery.ClassNameFilter.excludeClassNamePatterns;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
 import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
 import static org.testng.AssertJUnit.assertEquals;
@@ -38,7 +37,6 @@ public class SmartDirtiesTestngEngineTest {
 
         var events = EngineTestKit.execute("testng", request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))
-                .filters(excludeClassNamePatterns(getClass().getName()))
                 .build())
             .containerEvents();
 

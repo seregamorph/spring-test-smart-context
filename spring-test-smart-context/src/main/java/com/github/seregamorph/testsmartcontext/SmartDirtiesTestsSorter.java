@@ -52,8 +52,9 @@ public class SmartDirtiesTestsSorter {
         ServiceLoader<SmartDirtiesTestsSorter> loader = ServiceLoader.load(SmartDirtiesTestsSorter.class,
             SmartDirtiesTestsSorter.class.getClassLoader());
 
-        if (loader.iterator().hasNext()) {
-            return loader.iterator().next();
+        Iterator<SmartDirtiesTestsSorter> iterator = loader.iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
         } else {
             return new SmartDirtiesTestsSorter();
         }

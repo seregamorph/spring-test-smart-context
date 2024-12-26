@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -47,8 +48,9 @@ public class SpringContextEventLoggerListenerCustomizerFactory implements Contex
         ServiceLoader<SpringContextEventLoggerListener> loader = ServiceLoader.load(SpringContextEventLoggerListener.class,
             SpringContextEventLoggerListenerCustomizerFactory.class.getClassLoader());
 
-        if (loader.iterator().hasNext()) {
-            return loader.iterator().next();
+        Iterator<SpringContextEventLoggerListener> iterator = loader.iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
         } else {
             return new SpringContextEventLoggerListener();
         }

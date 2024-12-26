@@ -27,6 +27,8 @@ import org.springframework.lang.Nullable;
 @Deprecated
 public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
 
+    private static final String ENGINE = "junit-vintage";
+
     @Override
     public FilterResult apply(TestDescriptor testDescriptor) {
         List<TestDescriptor> childrenToReorder = testDescriptor.getChildren().stream()
@@ -51,9 +53,9 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
             // it's not possible to distinguish them here. Sometimes per single test is sent as argument,
             // sometimes - the whole suite. If it's a suite more than 1, we can save it and never update.
             // If it's 1 - we should also distinguish single test execution.
-            if (SmartDirtiesTestsHolder.classOrderStateMapSize() <= 1) {
+            if (SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE) <= 1) {
                 Class<?> testClass = getTestClass(childrenToReorder.get(0));
-                SmartDirtiesTestsHolder.setTestClassesLists(singletonList(singletonList(testClass)));
+                SmartDirtiesTestsHolder.setTestClassesLists(ENGINE, singletonList(singletonList(testClass)));
             }
 
             // the logic here may differ for JUnit 4 via Maven vs IntelliJ:
@@ -68,7 +70,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
 
         childrenToReorder.forEach(testDescriptor::addChild);
 
-        SmartDirtiesTestsHolder.setTestClassesLists(testClassesLists);
+        SmartDirtiesTestsHolder.setTestClassesLists(ENGINE, testClassesLists);
 
         return FilterResult.included("sorted");
     }

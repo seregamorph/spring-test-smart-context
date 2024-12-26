@@ -23,6 +23,8 @@ import org.junit.platform.testkit.engine.EngineTestKit;
 
 public class MavenSmartDirtiesJupiterEngineTest {
 
+    private static final String ENGINE = "junit-jupiter";
+
     @BeforeEach
     public void before() {
         TestEventTracker.startTracking();
@@ -38,9 +40,9 @@ public class MavenSmartDirtiesJupiterEngineTest {
         // to avoid confusion of duplicated test execution output
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println(">>>EngineTestKit duplicating the suite>>>");
-        SmartDirtiesTestsHolder.reset();
+        SmartDirtiesTestsHolder.reset(ENGINE);
 
-        var events = EngineTestKit.execute("junit-jupiter", request()
+        var events = EngineTestKit.execute(ENGINE, request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))
                 .build())
             .containerEvents();
@@ -53,7 +55,7 @@ public class MavenSmartDirtiesJupiterEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(9, SmartDirtiesTestsHolder.classOrderStateMapSize());
+        assertEquals(9, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.NestedTest.class));

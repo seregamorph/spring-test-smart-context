@@ -19,6 +19,8 @@ import org.junit.platform.testkit.engine.EngineTestKit;
 
 public class GradleSmartDirtiesJupiterEngineTest {
 
+    private static final String ENGINE = "junit-jupiter";
+
     @BeforeEach
     public void before() {
         TestEventTracker.startTracking();
@@ -34,9 +36,9 @@ public class GradleSmartDirtiesJupiterEngineTest {
         // to avoid confusion of duplicated test execution output
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println(">>>EngineTestKit duplicating the suite>>>");
-        SmartDirtiesTestsHolder.reset();
+        SmartDirtiesTestsHolder.reset(ENGINE);
 
-        var events = EngineTestKit.execute("junit-jupiter", request()
+        var events = EngineTestKit.execute(ENGINE, request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))
                 .build())
             .containerEvents();
@@ -49,7 +51,7 @@ public class GradleSmartDirtiesJupiterEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(5, SmartDirtiesTestsHolder.classOrderStateMapSize());
+        assertEquals(5, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.NestedTest.class));

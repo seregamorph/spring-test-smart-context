@@ -4,8 +4,6 @@ import static java.util.Comparator.comparing;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,18 +17,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.junit.runner.Runner;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.context.TestContextAnnotationUtils;
 import org.springframework.test.context.TestContextBootstrapper;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * The logic of this class can be customized via
@@ -99,8 +91,8 @@ public class SmartDirtiesTestsSorter {
         }
 
         testItems.sort(comparing(testItem -> {
-            Class<?> realClass = testClassExtractor.getTestClass(testItem);
-            Integer order = classToOrder.get(realClass);
+            Class<?> testClass = testClassExtractor.getTestClass(testItem);
+            Integer order = classToOrder.get(testClass);
             if (order == null) {
                 // all non-IT tests go first (other returned values are non-zero)
                 // this logic can be changed via override
@@ -108,7 +100,7 @@ public class SmartDirtiesTestsSorter {
             } else {
                 // this sorting is stable - most of the tests will preserve alphabetical ordering where possible
                 // we only sort classes that shut down the context to the end.
-                return order + getDirtiesContextBeforeAfterOrder(realClass);
+                return order + getDirtiesContextBeforeAfterOrder(testClass);
             }
         }));
 
@@ -125,11 +117,12 @@ public class SmartDirtiesTestsSorter {
         return sortedConfigToTests;
     }
 
-    private <T> Set<Class<?>> filterItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+    private static <T> Set<Class<?>> filterItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+        IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
         Set<Class<?>> itClasses = new LinkedHashSet<>();
         for (T t : testItems) {
             Class<?> testClass = testClassExtractor.getTestClass(t);
-            if (!itClasses.contains(testClass) && isReorderTest(testClass)) {
+            if (!itClasses.contains(testClass) && integrationTestFilter.isIntegrationTest(testClass)) {
                 itClasses.add(testClass);
             }
         }
@@ -149,57 +142,6 @@ public class SmartDirtiesTestsSorter {
         if (Boolean.getBoolean("testsmartcontext.reverse")) {
             Collections.reverse(testItems);
         }
-    }
-
-    protected boolean isReorderTest(Class<?> testClass) {
-        if (Modifier.isAbstract(testClass.getModifiers())) {
-            return false;
-        }
-
-        if (ApplicationContextAware.class.isAssignableFrom(testClass)) {
-            // Subtypes of org.springframework.test.context.testng.AbstractTestNGSpringContextTests
-            // and org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests
-            return true;
-        }
-
-        if (JUnitPlatformSupport.isJunit4Present() && isReorderTestJUnit4(testClass)) {
-            return true;
-        }
-
-        //noinspection RedundantIfStatement
-        if (JUnitPlatformSupport.isJunit5JupiterApiPresent() && isReorderTestJUnit5Jupiter(testClass)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * This method should be only called if JUnit4 is on the classpath
-     */
-    protected boolean isReorderTestJUnit4(Class<?> testClass) {
-        // can be inherited, but cannot be meta-annotation
-        RunWith runWith = testClass.getAnnotation(RunWith.class);
-        if (runWith == null) {
-            return false;
-        }
-        Class<? extends Runner> runner = runWith.value();
-        // includes org.springframework.test.context.junit4.SpringRunner
-        return SpringJUnit4ClassRunner.class.isAssignableFrom(runner);
-    }
-
-    /**
-     * This method should be only called if JUnit5 Jupiter API is on the classpath
-     */
-    protected boolean isReorderTestJUnit5Jupiter(Class<?> testClass) {
-        // can be inherited, can be meta-annotation e.g. via @SpringBootTest
-        Set<ExtendWith> extendWith = AnnotatedElementUtils.findAllMergedAnnotations(testClass, ExtendWith.class);
-        if (extendWith.isEmpty()) {
-            return false;
-        }
-
-        return extendWith.stream().map(ExtendWith::value).flatMap(Arrays::stream)
-            .anyMatch(SpringExtension.class::isAssignableFrom);
     }
 
     private static int getDirtiesContextBeforeAfterOrder(Class<?> testClass) {

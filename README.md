@@ -72,14 +72,15 @@ Add maven dependency (available in maven central):
 <dependency>
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
     <scope>test</scope>
 </dependency>
 ```
 Or Gradle dependency:
 ```groovy
-testImplementation("com.github.seregamorph:spring-test-smart-context:0.7")
+testImplementation("com.github.seregamorph:spring-test-smart-context:0.8")
 ```
+Also it's recommended to configure `"INFO"` level for `com.github.seregamorph.testsmartcontext` logger.
 It's recommended to check [Demo projects](demo).
 
 ### How it works

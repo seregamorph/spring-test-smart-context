@@ -1,5 +1,7 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +38,20 @@ public class Integration1Test extends AbstractIntegrationTest {
         public class DeeplyNestedTest {
 
             @Autowired
-            private SampleBean deeplyNestedBean;
+            private SampleService sampleService;
 
             @Test
             public void deeplyNested() {
-                System.out.println("Integration1Test.NestedTest.DeeplyNestedTest.deeplyNested " + deeplyNestedBean);
+                assertEquals("default", sampleService.getValue());
+                System.out.println("Integration1Test.NestedTest.DeeplyNestedTest.deeplyNested " + sampleService);
             }
         }
     }
 
-    @Import(SampleBean.class)
+    @Import({
+        SampleBean.class,
+        SampleService.class
+    })
     public static class Configuration {
 
     }

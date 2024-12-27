@@ -20,6 +20,7 @@ public class SmartDirtiesJupiterTestsSorterTest {
             Integration2Test.class,
             SampleIntegrationTest.class,
             Integration1Test.class,
+            Integration1MockBeanTest.class,
             Unit1Test.class,
             SampleDirtiesContextAfterClassTest.class,
             SampleDirtiesContextBeforeClassTest.class,
@@ -41,10 +42,12 @@ public class SmartDirtiesJupiterTestsSorterTest {
             NoBaseClass2IntegrationTest.class,
             SampleDirtiesContextAfterClassTest.class,
             // IT 2
-            Integration1Test.class,
+            Integration1MockBeanTest.class,
             // IT 3
-            Integration2Test.class,
+            Integration1Test.class,
             // IT 4
+            Integration2Test.class,
+            // IT 5
             SampleIntegrationTest.class
         ), testItems);
 
@@ -52,6 +55,7 @@ public class SmartDirtiesJupiterTestsSorterTest {
             List.of(SampleDirtiesContextBeforeClassTest.class, ExtendWithTest.class,
                 NoBaseClass1IntegrationTest.class, NoBaseClass2IntegrationTest.class,
                 SampleDirtiesContextAfterClassTest.class),
+            List.of(Integration1MockBeanTest.class),
             List.of(Integration1Test.class),
             List.of(Integration2Test.class),
             List.of(SampleIntegrationTest.class)

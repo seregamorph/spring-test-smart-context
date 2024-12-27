@@ -43,7 +43,7 @@ public class GradleSmartDirtiesJupiterEngineTest {
                 .build())
             .containerEvents();
 
-        // 10 = 7 ITs + 2 UTs + 1 suite
+        // 9 = 5 ITs + 2 Nested + 1 UTs + 1 suite
         events.assertStatistics(stats -> stats
             .started(9)
             .succeeded(9)

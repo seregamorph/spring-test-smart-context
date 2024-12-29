@@ -1,17 +1,19 @@
 package com.github.seregamorph.testsmartcontext;
 
-import com.github.seregamorph.testsmartcontext.demo.Integration2Test;
-import com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextBeforeClassTest;
-import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.testkit.engine.EngineTestKit;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
 import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
+
+import com.github.seregamorph.testsmartcontext.demo.Integration2Test;
+import com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextBeforeClassTest;
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.testkit.engine.EngineTestKit;
 
 public class MavenSmartDirtiesVintageEngineTest {
 
@@ -48,7 +50,10 @@ public class MavenSmartDirtiesVintageEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(2, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
+        assertEquals(List.of(
+            Integration2Test.class,
+            SampleDirtiesContextBeforeClassTest.class
+        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleDirtiesContextBeforeClassTest.class));

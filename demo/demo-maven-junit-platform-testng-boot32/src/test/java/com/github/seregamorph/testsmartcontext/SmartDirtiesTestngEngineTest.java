@@ -11,6 +11,8 @@ import com.github.seregamorph.testsmartcontext.demo.Integration1SecondIT;
 import com.github.seregamorph.testsmartcontext.demo.Integration2IT;
 import com.github.seregamorph.testsmartcontext.demo.SampleIT;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.platform.testkit.engine.EngineTestKit;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -50,7 +52,12 @@ public class SmartDirtiesTestngEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(4, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
+        assertEquals(List.of(
+            Integration1SecondIT.class,
+            Integration1IT.class,
+            Integration2IT.class,
+            SampleIT.class
+        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1SecondIT.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1IT.class));

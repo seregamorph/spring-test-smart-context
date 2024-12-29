@@ -9,6 +9,8 @@ import com.github.seregamorph.testsmartcontext.demo.Integration1Test;
 import com.github.seregamorph.testsmartcontext.demo.Integration2Test;
 import com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,7 +51,11 @@ public class MavenSmartDirtiesVintageEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(3, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
+        assertEquals(List.of(
+            Integration1Test.class,
+            Integration2Test.class,
+            SampleIntegrationTest.class
+        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));

@@ -1,16 +1,24 @@
 package com.github.seregamorph.testsmartcontext;
 
-import com.github.seregamorph.testsmartcontext.demo.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.platform.engine.discovery.ClassNameFilter.excludeClassNamePatterns;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
+import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
+
+import com.github.seregamorph.testsmartcontext.demo.ExtendWithTest;
+import com.github.seregamorph.testsmartcontext.demo.Integration2SpringJUnitConfigTest;
+import com.github.seregamorph.testsmartcontext.demo.NoBaseClass1IntegrationTest;
+import com.github.seregamorph.testsmartcontext.demo.NoBaseClass2IntegrationTest;
+import com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.testkit.engine.EngineTestKit;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.platform.engine.discovery.ClassNameFilter.excludeClassNamePatterns;
-import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
-import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
 
 public class MavenSmartDirtiesJupiterEngineTest {
 
@@ -47,20 +55,26 @@ public class MavenSmartDirtiesJupiterEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(5, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
+        assertEquals(List.of(
+            ExtendWithTest.class,
+            NoBaseClass1IntegrationTest.class,
+            NoBaseClass2IntegrationTest.class,
+            Integration2SpringJUnitConfigTest.class,
+            SampleIntegrationTest.class
+        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(ExtendWithTest.class));
-        assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2SpringJUnitConfigTest.NestedTest.class));
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2SpringJUnitConfigTest.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass1IntegrationTest.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass2IntegrationTest.class));
+        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2SpringJUnitConfigTest.class));
+        assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2SpringJUnitConfigTest.NestedTest.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleIntegrationTest.class));
 
         assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(ExtendWithTest.class));
-        assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2SpringJUnitConfigTest.NestedTest.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2SpringJUnitConfigTest.class));
         assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(NoBaseClass1IntegrationTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(NoBaseClass2IntegrationTest.class));
+        assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2SpringJUnitConfigTest.NestedTest.class));
+        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2SpringJUnitConfigTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleIntegrationTest.class));
 
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.ExtendWithTest");

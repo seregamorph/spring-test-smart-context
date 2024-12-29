@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.ClassOrderer;
 import org.springframework.lang.Nullable;
@@ -38,10 +39,16 @@ public class SmartDirtiesTestsHolder {
         }
     }
 
-    protected static int classOrderStateMapSize(String engine) {
+    @Nullable
+    protected static Set<Class<?>> getTestClasses(String engine) {
         Map<Class<?>, ClassOrderState> classOrderStateMap = engineClassOrderStateMap == null ? null
             : engineClassOrderStateMap.get(engine);
-        return classOrderStateMap == null ? 0 : classOrderStateMap.size();
+        return classOrderStateMap == null ? null : classOrderStateMap.keySet();
+    }
+
+    protected static int classOrderStateMapSize(String engine) {
+        Set<Class<?>> testClasses = getTestClasses(engine);
+        return testClasses == null ? 0 : testClasses.size();
     }
 
     //@TestOnly
@@ -80,18 +87,21 @@ public class SmartDirtiesTestsHolder {
                         if (!SmartDirtiesClassOrderer.class.getName().equals(configClassOrderer)) {
                             throw new IllegalStateException("classOrderStateMap is not initialized, because more than "
                                 + "one junit-platform.properties was found in the classpath: " + junitPlatformConfigUrls
-                                + ". JUnit 5 supports only one configuration file https://github.com/junit-team/junit5/issues/2794\n" +
+                                + ". JUnit 5 supports only one configuration file https://github" +
+                                ".com/junit-team/junit5/issues/2794\n" +
                                 "The " + junitPlatformConfigUrl + " " + (configClassOrderer == null ?
                                 "does not declare the " + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + " property"
                                 : "declares\n" + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + "=" + configClassOrderer +
-                                    "\n")
+                                "\n")
                                 + " (should have value " + SmartDirtiesClassOrderer.class.getName()
                                 + " to address the issue)");
                         }
-                        // Pass via system property -Djunit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
+                        // Pass via system property -Djunit.jupiter.testclass.order.default=com.github.seregamorph
+                        // .testsmartcontext.jupiter.SmartDirtiesClassOrderer
                         // (don't forget about Maven/Gradle and IDEA default configuration)
                         // or add line to your junit-platform.properties
-                        // junit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
+                        // junit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter
+                        // .SmartDirtiesClassOrderer
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
@@ -102,8 +112,10 @@ public class SmartDirtiesTestsHolder {
                     "the Smart DirtiesContext behaviour is disabled.");
                 if (!JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
                     System.err.println("If you add org.junit.jupiter:junit-jupiter-api test dependency, \n" +
-                        "it will allow to run packages/modules with tests with Smart DirtiesContext semantics via IDEA. See \n" +
-                        "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default\n" +
+                        "it will allow to run packages/modules with tests with Smart DirtiesContext semantics via " +
+                        "IDEA. See \n" +
+                        "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by" +
+                        "-default\n" +
                         "for details.");
                 }
                 return null;
@@ -120,8 +132,8 @@ public class SmartDirtiesTestsHolder {
         throw new IllegalStateException("engineClassOrderStateMap is not defined for class "
             + testClass + ", it means that it was skipped on initial analysis. "
             + "Discovered classes: " + engineClassOrderStateMap.entrySet().stream()
-                .map(entry -> entry.getKey() + ": " + entry.getValue().keySet())
-                .collect(Collectors.toList()));
+            .map(entry -> entry.getKey() + ": " + entry.getValue().keySet())
+            .collect(Collectors.toList()));
     }
 
     protected static void setTestClassesLists(String engine, List<List<Class<?>>> testClassesLists) {

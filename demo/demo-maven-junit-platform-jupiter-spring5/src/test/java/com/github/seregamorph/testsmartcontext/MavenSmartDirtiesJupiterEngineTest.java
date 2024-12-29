@@ -12,6 +12,8 @@ import com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextAfterCla
 import com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextBeforeClassTest;
 import com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +53,13 @@ public class MavenSmartDirtiesJupiterEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(5, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
+        assertEquals(List.of(
+            Integration1Test.class,
+            Integration2Test.class,
+            SampleDirtiesContextBeforeClassTest.class,
+            SampleDirtiesContextAfterClassTest.class,
+            SampleIntegrationTest.class
+        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.NestedTest.class));
@@ -65,8 +73,8 @@ public class MavenSmartDirtiesJupiterEngineTest {
         assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration1Test.NestedTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration1Test.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleDirtiesContextAfterClassTest.class));
         assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
+        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleDirtiesContextAfterClassTest.class));
         assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleIntegrationTest.class));
 
         TestEventTracker.assertConsumedEvent("Started SmartDirtiesJupiterTestsSorterTest.shouldSortMostlyAlphabeticallyAndGroupSameConfigurations");

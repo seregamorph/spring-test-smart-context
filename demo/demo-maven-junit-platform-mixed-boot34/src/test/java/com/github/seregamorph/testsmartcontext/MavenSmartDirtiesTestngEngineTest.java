@@ -8,6 +8,8 @@ import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.r
 import com.github.seregamorph.testsmartcontext.demo.Integration1Test;
 import com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextAfterClassTest;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +49,10 @@ public class MavenSmartDirtiesTestngEngineTest {
             .aborted(0)
             .failed(0));
 
-        assertEquals(2, SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE));
+        assertEquals(List.of(
+            Integration1Test.class,
+            SampleDirtiesContextAfterClassTest.class
+        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleDirtiesContextAfterClassTest.class));

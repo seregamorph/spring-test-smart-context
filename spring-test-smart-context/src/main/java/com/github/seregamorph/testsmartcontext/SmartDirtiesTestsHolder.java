@@ -96,12 +96,15 @@ public class SmartDirtiesTestsHolder {
                                 + " (should have value " + SmartDirtiesClassOrderer.class.getName()
                                 + " to address the issue)");
                         }
-                        // Pass via system property -Djunit.jupiter.testclass.order.default=com.github.seregamorph
-                        // .testsmartcontext.jupiter.SmartDirtiesClassOrderer
+                        //@formatter:off
+
+                        // Pass via system property
+                        // -Djunit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
                         // (don't forget about Maven/Gradle and IDEA default configuration)
                         // or add line to your junit-platform.properties
-                        // junit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter
-                        // .SmartDirtiesClassOrderer
+                        // junit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
+
+                        //@formatter:on
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
@@ -111,12 +114,13 @@ public class SmartDirtiesTestsHolder {
                 System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), " +
                     "the Smart DirtiesContext behaviour is disabled.");
                 if (!JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
+                    //@formatter:off
                     System.err.println("If you add org.junit.jupiter:junit-jupiter-api test dependency, \n" +
                         "it will allow to run packages/modules with tests with Smart DirtiesContext semantics via " +
                         "IDEA. See \n" +
-                        "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by" +
-                        "-default\n" +
+                        "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default\n" +
                         "for details.");
+                    //@formatter:on
                 }
                 return null;
             }

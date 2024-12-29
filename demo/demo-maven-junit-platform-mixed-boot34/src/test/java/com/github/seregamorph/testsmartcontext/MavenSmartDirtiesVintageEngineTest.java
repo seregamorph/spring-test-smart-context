@@ -20,18 +20,18 @@ public class MavenSmartDirtiesVintageEngineTest {
 
     private static final String ENGINE = "junit-vintage";
 
-    private static Map<String, Map<Class<?>, SmartDirtiesTestsHolder.ClassOrderState>> prevEngineClassOrderStateMap;
+    private static Map<String, Map<Class<?>, SmartDirtiesTestsSupport.ClassOrderState>> prevEngineClassOrderStateMap;
 
     @BeforeAll
     public static void beforeClass() {
-        prevEngineClassOrderStateMap = SmartDirtiesTestsHolder.setEngineClassOrderStateMap(null);
+        prevEngineClassOrderStateMap = SmartDirtiesTestsSupport.setEngineClassOrderStateMap(null);
         TestEventTracker.startTracking();
     }
 
     @AfterAll
     public static void afterClass() {
         TestEventTracker.stopTracking();
-        SmartDirtiesTestsHolder.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
+        SmartDirtiesTestsSupport.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
     }
 
     @Test
@@ -59,11 +59,11 @@ public class MavenSmartDirtiesVintageEngineTest {
             SampleDirtiesContextBeforeClassTest.class
         ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration2Test.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
 
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration2Test.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
 
         TestEventTracker.assertConsumedEvent("Running com.github.seregamorph.testsmartcontext.demo.Unit1Test.test");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration2Test");

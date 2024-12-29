@@ -2,8 +2,8 @@ package com.github.seregamorph.testsmartcontext.jupiter;
 
 import static java.util.Collections.singletonList;
 
-import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsHolder;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
+import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +23,7 @@ import org.springframework.core.annotation.AnnotationUtils;
  *
  * @author Sergey Chernov
  */
-public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements ClassOrderer {
+public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implements ClassOrderer {
 
     private static final String ENGINE = "junit-jupiter";
 
@@ -68,7 +68,7 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
         if (uniqueClasses.isEmpty()) {
             // All are internal (@Nested), we do not reorder them.
             // The enclosing classes are already in the SmartDirtiesTestsHolder from previous call
-            if (SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE) == 0) {
+            if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE) == 0) {
                 throw new IllegalStateException("orderClasses is called with inner classes list " + classDescriptors
                     + " before being called with enclosing class list");
             }
@@ -80,9 +80,9 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
             // it's not possible to distinguish them here. Sometimes per single test is sent as argument,
             // sometimes - the whole suite. If it's a suite more than 1, we can save it and never update.
             // If it's 1 - we should also distinguish single test execution.
-            if (SmartDirtiesTestsHolder.classOrderStateMapSize(ENGINE) <= 1) {
+            if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE) <= 1) {
                 Class<?> testClass = classDescriptors.get(0).getTestClass();
-                SmartDirtiesTestsHolder.setTestClassesLists(ENGINE, singletonList(singletonList(testClass)));
+                SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, singletonList(singletonList(testClass)));
             }
             return;
         }
@@ -90,6 +90,6 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsHolder implements
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         List<List<Class<?>>> testClassesLists = sorter.sort(classDescriptors, ClassDescriptor::getTestClass);
 
-        SmartDirtiesTestsHolder.setTestClassesLists(ENGINE, testClassesLists);
+        SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, testClassesLists);
     }
 }

@@ -21,18 +21,18 @@ public class MavenSmartDirtiesVintageEngineTest {
 
     private static final String ENGINE = "junit-vintage";
 
-    private static Map<String, Map<Class<?>, SmartDirtiesTestsHolder.ClassOrderState>> prevEngineClassOrderStateMap;
+    private static Map<String, Map<Class<?>, SmartDirtiesTestsSupport.ClassOrderState>> prevEngineClassOrderStateMap;
 
     @BeforeClass
     public static void beforeClass() {
-        prevEngineClassOrderStateMap = SmartDirtiesTestsHolder.setEngineClassOrderStateMap(null);
+        prevEngineClassOrderStateMap = SmartDirtiesTestsSupport.setEngineClassOrderStateMap(null);
         TestEventTracker.startTracking();
     }
 
     @AfterClass
     public static void afterClass() {
         TestEventTracker.stopTracking();
-        SmartDirtiesTestsHolder.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
+        SmartDirtiesTestsSupport.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
     }
 
     @Test
@@ -61,13 +61,13 @@ public class MavenSmartDirtiesVintageEngineTest {
             SampleIntegrationTest.class
         ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleIntegrationTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration2Test.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleIntegrationTest.class));
 
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration1Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleIntegrationTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration1Test.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration2Test.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleIntegrationTest.class));
 
         TestEventTracker.assertConsumedEvent("Running Unit1Test");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration1Test");

@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
 class TestSmartDirtiesTestsHolder {
 
     static List<Class<?>> getIntegrationTestClasses(String engine) {
-        Set<Class<?>> testClasses = SmartDirtiesTestsHolder.getTestClasses(engine);
+        Set<Class<?>> testClasses = SmartDirtiesTestsSupport.getTestClasses(engine);
         List<Class<?>> integrationTestClasses = new ArrayList<>();
         IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
         Assert.state(testClasses != null, "Test classes are not initialized");

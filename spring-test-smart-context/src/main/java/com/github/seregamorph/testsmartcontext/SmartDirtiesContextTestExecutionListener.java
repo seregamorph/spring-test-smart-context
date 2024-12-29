@@ -1,6 +1,6 @@
 package com.github.seregamorph.testsmartcontext;
 
-import static com.github.seregamorph.testsmartcontext.SmartDirtiesTestsHolder.isInnerClass;
+import static com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport.isInnerClass;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +39,7 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
         CurrentTestContext.pushCurrentTestClass(testContext.getTestClass());
         Class<?> testClass = testContext.getTestClass();
         if (isInnerClass(testClass)) {
-            SmartDirtiesTestsHolder.verifyInnerClass(testClass);
+            SmartDirtiesTestsSupport.verifyInnerClass(testClass);
         }
     }
 
@@ -47,7 +47,7 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
     public void afterTestClass(TestContext testContext) {
         try {
             Class<?> testClass = testContext.getTestClass();
-            if (SmartDirtiesTestsHolder.isLastClassPerConfig(testClass)) {
+            if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
                 LOG.info("markDirty (closing context) after " + testClass.getName());
                 testContext.markApplicationContextDirty(null);
             } else {

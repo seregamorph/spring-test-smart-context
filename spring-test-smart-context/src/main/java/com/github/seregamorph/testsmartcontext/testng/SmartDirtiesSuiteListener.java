@@ -1,8 +1,8 @@
 package com.github.seregamorph.testsmartcontext.testng;
 
 import com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener;
-import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsHolder;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
+import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport;
 import java.util.List;
 import org.testng.IAlterSuiteListener;
 import org.testng.IMethodInstance;
@@ -23,7 +23,7 @@ import org.testng.xml.XmlSuite;
  * @author Sergey Chernov
  */
 @SuppressWarnings("CodeBlock2Expr")
-public class SmartDirtiesSuiteListener extends SmartDirtiesTestsHolder
+public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
     implements IAlterSuiteListener, IMethodInterceptor {
 
     private static final String ENGINE = "testng";
@@ -55,12 +55,14 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsHolder
 
         // this intercept method is executed by TestNG before running the suite (both IDEA and maven)
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        List<List<Class<?>>> testClassesLists = sorter.sort(methods, methodInstance -> {
-            return methodInstance.getMethod().getTestClass().getRealClass();
-        });
+        List<List<Class<?>>> testClassesLists = sorter.sort(methods, SmartDirtiesSuiteListener::getTestClass);
 
-        SmartDirtiesTestsHolder.setTestClassesLists(ENGINE, testClassesLists);
+        SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, testClassesLists);
 
         return methods;
+    }
+
+    private static Class<?> getTestClass(IMethodInstance methodInstance) {
+        return methodInstance.getMethod().getTestClass().getRealClass();
     }
 }

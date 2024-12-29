@@ -24,18 +24,18 @@ public class GradleSmartDirtiesJupiterEngineTest {
 
     private static final String ENGINE = "junit-jupiter";
 
-    private static Map<String, Map<Class<?>, SmartDirtiesTestsHolder.ClassOrderState>> prevEngineClassOrderStateMap;
+    private static Map<String, Map<Class<?>, SmartDirtiesTestsSupport.ClassOrderState>> prevEngineClassOrderStateMap;
 
     @BeforeAll
     public static void beforeClass() {
-        prevEngineClassOrderStateMap = SmartDirtiesTestsHolder.setEngineClassOrderStateMap(null);
+        prevEngineClassOrderStateMap = SmartDirtiesTestsSupport.setEngineClassOrderStateMap(null);
         TestEventTracker.startTracking();
     }
 
     @AfterAll
     public static void afterClass() {
         TestEventTracker.stopTracking();
-        SmartDirtiesTestsHolder.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
+        SmartDirtiesTestsSupport.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
     }
 
     @Test
@@ -63,21 +63,21 @@ public class GradleSmartDirtiesJupiterEngineTest {
             NoBaseClass2IntegrationTest.class,
             NoBaseClass1IntegrationTest.class,
             SampleIntegrationTest.class
-        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
+        ), new ArrayList<>(SmartDirtiesTestsSupport.getTestClasses(ENGINE)));
 
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
-        assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.NestedTest.class));
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));
-        assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass1IntegrationTest.class));
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass2IntegrationTest.class));
-        assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleIntegrationTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.class));
+        assertFalse(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.NestedTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration2Test.class));
+        assertFalse(SmartDirtiesTestsSupport.isFirstClassPerConfig(NoBaseClass1IntegrationTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(NoBaseClass2IntegrationTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleIntegrationTest.class));
 
-        assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration1Test.NestedTest.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration1Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(NoBaseClass1IntegrationTest.class));
-        assertFalse(SmartDirtiesTestsHolder.isLastClassPerConfig(NoBaseClass2IntegrationTest.class));
-        assertTrue(SmartDirtiesTestsHolder.isLastClassPerConfig(SampleIntegrationTest.class));
+        assertFalse(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration1Test.NestedTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration1Test.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration2Test.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(NoBaseClass1IntegrationTest.class));
+        assertFalse(SmartDirtiesTestsSupport.isLastClassPerConfig(NoBaseClass2IntegrationTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleIntegrationTest.class));
 
         TestEventTracker.assertConsumedEvent("Running Unit1Test.test");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration1Test");

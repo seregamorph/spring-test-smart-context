@@ -20,9 +20,11 @@ import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
 
 /**
+ * This class should only be used internally by the framework.
+ *
  * @author Sergey Chernov
  */
-public class SmartDirtiesTestsHolder {
+public class SmartDirtiesTestsSupport {
 
     /**
      * engine -> test class -> ClassOrderState
@@ -75,7 +77,7 @@ public class SmartDirtiesTestsHolder {
         if (engineClassOrderStateMap == null) {
             if (JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
                 try {
-                    ClassLoader classLoader = SmartDirtiesTestsHolder.class.getClassLoader();
+                    ClassLoader classLoader = SmartDirtiesTestsSupport.class.getClassLoader();
                     List<URL> junitPlatformConfigUrls = Collections.list(classLoader.getResources(
                         "junit-platform.properties"));
                     for (URL junitPlatformConfigUrl : junitPlatformConfigUrls) {
@@ -124,7 +126,7 @@ public class SmartDirtiesTestsHolder {
                 }
                 return null;
             }
-            throw new IllegalStateException("classOrderStateMap is not initialized");
+            throw new IllegalStateException("engineClassOrderStateMap is not initialized");
         }
 
         for (Map<Class<?>, ClassOrderState> classOrderStateMap : engineClassOrderStateMap.values()) {
@@ -151,10 +153,10 @@ public class SmartDirtiesTestsHolder {
                 isFirst = false;
             }
         }
-        if (SmartDirtiesTestsHolder.engineClassOrderStateMap == null) {
-            SmartDirtiesTestsHolder.engineClassOrderStateMap = new LinkedHashMap<>();
+        if (SmartDirtiesTestsSupport.engineClassOrderStateMap == null) {
+            SmartDirtiesTestsSupport.engineClassOrderStateMap = new LinkedHashMap<>();
         }
-        SmartDirtiesTestsHolder.engineClassOrderStateMap.put(engine, classOrderStateMap);
+        SmartDirtiesTestsSupport.engineClassOrderStateMap.put(engine, classOrderStateMap);
     }
 
     protected static void verifyInnerClass(Class<?> innerTestClass) {
@@ -196,8 +198,8 @@ public class SmartDirtiesTestsHolder {
     static Map<String, Map<Class<?>, ClassOrderState>> setEngineClassOrderStateMap(
         Map<String, Map<Class<?>, ClassOrderState>> engineClassOrderStateMap
     ) {
-        Map<String, Map<Class<?>, ClassOrderState>> prev = SmartDirtiesTestsHolder.engineClassOrderStateMap;
-        SmartDirtiesTestsHolder.engineClassOrderStateMap = engineClassOrderStateMap;
+        Map<String, Map<Class<?>, ClassOrderState>> prev = SmartDirtiesTestsSupport.engineClassOrderStateMap;
+        SmartDirtiesTestsSupport.engineClassOrderStateMap = engineClassOrderStateMap;
         return prev;
     }
 }

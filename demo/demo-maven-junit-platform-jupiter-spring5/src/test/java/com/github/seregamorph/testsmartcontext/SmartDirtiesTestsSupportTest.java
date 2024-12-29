@@ -12,23 +12,23 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-class SmartDirtiesTestsHolderTest {
+class SmartDirtiesTestsSupportTest {
 
     @BeforeEach
     public void prepare() {
-        SmartDirtiesTestsHolder.setTestClassesLists("SmartDirtiesTestsHolderTest",
+        SmartDirtiesTestsSupport.setTestClassesLists("SmartDirtiesTestsHolderTest",
             List.of(List.of(TestRootTest.class)));
     }
 
     @Test
     public void nestedInheritShouldPass() {
-        SmartDirtiesTestsHolder.verifyInnerClass(TestRootTest.NestedInheritTest.class);
+        SmartDirtiesTestsSupport.verifyInnerClass(TestRootTest.NestedInheritTest.class);
     }
 
     @Test
     public void nestedCustomShouldFail() {
         var ise = Assertions.assertThrows(IllegalStateException.class,
-            () -> SmartDirtiesTestsHolder.verifyInnerClass(TestRootTest.NestedCustomTest.class));
+            () -> SmartDirtiesTestsSupport.verifyInnerClass(TestRootTest.NestedCustomTest.class));
         assertEquals("Nested inner class com.github.seregamorph.testsmartcontext.TestRootTest$NestedCustomTest " +
             "declares custom context configuration which differs from enclosing class com.github.seregamorph" +
             ".testsmartcontext.TestRootTest. This is not properly supported by the spring-test-smart-context ordering" +

@@ -79,21 +79,22 @@
                     <groupId>org.junit.jupiter</groupId>
                     <artifactId>junit-jupiter</artifactId>
                 </exclusion>
-                <!--
-                TODO IDEA needs junit-jupiter-api to run via JUnit5 platform-launcher,
-                if the dependency is excluded, runs via bare org.junit.runner.JUnitCore
-                https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default
-
-                Related logic can be found in https://github.com/JetBrains/intellij-community classes
-                    com.intellij.rt.junit.JUnitStarter
-                    com.intellij.execution.junit.TestObject
-                    com.intellij.execution.junit.JUnitUtil
-                -->
-<!--                <exclusion>-->
-<!--                    <groupId>org.junit.jupiter</groupId>-->
-<!--                    <artifactId>junit-jupiter-api</artifactId>-->
-<!--                </exclusion>-->
             </exclusions>
+        </dependency>
+        <dependency>
+            <!--
+            TODO IDEA needs junit-jupiter-api to run via JUnit5 platform-launcher,
+            if the dependency is excluded, runs via bare org.junit.runner.JUnitCore
+            https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default
+
+            Related logic can be found in https://github.com/JetBrains/intellij-community classes
+                com.intellij.rt.junit.JUnitStarter
+                com.intellij.execution.junit.TestObject
+                com.intellij.execution.junit.JUnitUtil
+            -->
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.10.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.vintage</groupId>

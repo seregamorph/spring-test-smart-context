@@ -1,5 +1,8 @@
 org.springframework.test.context.TestExecutionListener = \
-    com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener
+    com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener,\
+    com.github.seregamorph.testsmartcontext.mockbean.MockitoTestExecutionListener,\
+    com.github.seregamorph.testsmartcontext.mockbean.ResetMocksTestExecutionListener
 
 org.springframework.test.context.ContextCustomizerFactory = \
-    com.github.seregamorph.testsmartcontext.SpringContextEventLoggerListenerCustomizerFactory
+    com.github.seregamorph.testsmartcontext.SpringContextEventLoggerListenerCustomizerFactory,\
+    com.github.seregamorph.testsmartcontext.mockbean.MockitoContextCustomizerFactory

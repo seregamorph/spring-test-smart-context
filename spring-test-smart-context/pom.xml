@@ -23,6 +23,7 @@
         <junit-platform.version>1.11.3</junit-platform.version>
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <testng-engine.version>1.0.5</testng-engine.version>
+        <mockito.version>5.11.0</mockito.version>
     </properties>
 
     <developers>
@@ -98,6 +99,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -46,7 +46,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
         }
 
         Set<Class<?>> uniqueClasses = childrenToReorder.stream()
-            .map(this::getTestClass)
+            .map(SmartDirtiesPostDiscoveryFilter::getTestClass)
             .collect(Collectors.toSet());
         if (uniqueClasses.size() == 1) {
             // This filter is executed several times during discover and execute phases and
@@ -66,7 +66,8 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
         childrenToReorder.forEach(testDescriptor::removeChild);
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        List<List<Class<?>>> testClassesLists = sorter.sort(childrenToReorder, this::getTestClass);
+        List<List<Class<?>>> testClassesLists = sorter.sort(childrenToReorder,
+            SmartDirtiesPostDiscoveryFilter::getTestClass);
 
         childrenToReorder.forEach(testDescriptor::addChild);
 
@@ -76,7 +77,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
     }
 
     @NonNull
-    private Class<?> getTestClass(TestDescriptor testDescriptor) {
+    private static Class<?> getTestClass(TestDescriptor testDescriptor) {
         Class<?> testClass = getTestClassOrNull(testDescriptor);
         if (testClass == null) {
             throw new UnsupportedOperationException("Unsupported TestDescriptor type " + testDescriptor.getClass()
@@ -87,7 +88,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
 
     @SuppressWarnings("RedundantIfStatement")
     @Nullable
-    private Class<?> getTestClassOrNull(TestDescriptor testDescriptor) {
+    private static Class<?> getTestClassOrNull(TestDescriptor testDescriptor) {
         if (JUnitPlatformSupport.isJUnitVintageEnginePresent()) {
             Class<?> testClass = getTestClassJUnitVintageEngine(testDescriptor);
             if (testClass != null) {
@@ -99,7 +100,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
     }
 
     @Nullable
-    private Class<?> getTestClassJUnitVintageEngine(TestDescriptor testDescriptor) {
+    private static Class<?> getTestClassJUnitVintageEngine(TestDescriptor testDescriptor) {
         if (testDescriptor instanceof RunnerTestDescriptor) {
             RunnerTestDescriptor runnerTestDescriptor = (RunnerTestDescriptor) testDescriptor;
             return runnerTestDescriptor.getDescription().getTestClass();

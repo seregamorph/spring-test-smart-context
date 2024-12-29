@@ -55,8 +55,7 @@ public class SmartDirtiesJupiterTestsSorterTest {
             List.of(SampleDirtiesContextBeforeClassTest.class, ExtendWithTest.class,
                 NoBaseClass1IntegrationTest.class, NoBaseClass2IntegrationTest.class,
                 SampleDirtiesContextAfterClassTest.class),
-            List.of(Integration1MockBeanTest.class),
-            List.of(Integration1Test.class),
+            List.of(Integration1MockBeanTest.class, Integration1Test.class),
             List.of(Integration2Test.class),
             List.of(SampleIntegrationTest.class)
         ), itClassesLists);

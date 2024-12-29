@@ -67,9 +67,9 @@ import org.springframework.util.StringUtils;
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * A {@link BeanFactoryPostProcessor} used to register and inject {@link MockBean @MockBeans} with the
+ * A {@link BeanFactoryPostProcessor} used to register and inject {@link SmartMockBean @MockBeans} with the
  * {@link ApplicationContext}. An initial set of definitions can be passed to the processor with additional definitions
- * being automatically created from {@code @Configuration} classes that use {@link MockBean @MockBean}.
+ * being automatically created from {@code @Configuration} classes that use {@link SmartMockBean @MockBean}.
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
@@ -77,17 +77,17 @@ import org.springframework.util.StringUtils;
  * @author Andreas Neiser
  * @since 1.4.0
  */
-public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor, BeanClassLoaderAware,
+public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProcessor, BeanClassLoaderAware,
     BeanFactoryAware, BeanFactoryPostProcessor, Ordered {
 
-    private static final String BEAN_NAME = MockitoPostProcessor.class.getName();
+    private static final String BEAN_NAME = SmartMockitoPostProcessor.class.getName();
 
     private static final String CONFIGURATION_CLASS_ATTRIBUTE = Conventions
         .getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "configurationClass");
 
     private static final BeanNameGenerator beanNameGenerator = new DefaultBeanNameGenerator();
 
-    private final Set<Definition> definitions;
+    private final DefinitionSet definitions;
 
     private ClassLoader classLoader;
 
@@ -102,11 +102,11 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
     private final Map<String, SpyDefinition> spies = new HashMap<>();
 
     /**
-     * Create a new {@link MockitoPostProcessor} instance with the given initial definitions.
+     * Create a new {@link SmartMockitoPostProcessor} instance with the given initial definitions.
      *
      * @param definitions the initial definitions
      */
-    public MockitoPostProcessor(Set<Definition> definitions) {
+    public SmartMockitoPostProcessor(DefinitionSet definitions) {
         this.definitions = definitions;
     }
 
@@ -131,11 +131,11 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
 
     private void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory, BeanDefinitionRegistry registry) {
         beanFactory.registerSingleton(MockitoBeans.class.getName(), this.mockitoBeans);
-        DefinitionsParser parser = new DefinitionsParser(this.definitions);
+        SmartDefinitionsParser parser = new SmartDefinitionsParser(this.definitions);
         for (Class<?> configurationClass : getConfigurationClasses(beanFactory)) {
             parser.parse(configurationClass);
         }
-        Set<Definition> definitions = parser.getDefinitions();
+        DefinitionSet definitions = parser.getDefinitions();
         for (Definition definition : definitions) {
             Field field = parser.getField(definition);
             register(beanFactory, registry, definition, field);
@@ -209,7 +209,7 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
         Set<String> existingBeans = getExistingBeans(beanFactory, mockDefinition.getTypeToMock(),
             mockDefinition.getQualifier());
         if (existingBeans.isEmpty()) {
-            return MockitoPostProcessor.beanNameGenerator.generateBeanName(beanDefinition, registry);
+            return SmartMockitoPostProcessor.beanNameGenerator.generateBeanName(beanDefinition, registry);
         }
         if (existingBeans.size() == 1) {
             return existingBeans.iterator().next();
@@ -273,7 +273,7 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
 
     private void createSpy(BeanDefinitionRegistry registry, SpyDefinition spyDefinition, Field field) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition(spyDefinition.getTypeToSpy().resolve());
-        String beanName = MockitoPostProcessor.beanNameGenerator.generateBeanName(beanDefinition, registry);
+        String beanName = SmartMockitoPostProcessor.beanNameGenerator.generateBeanName(beanDefinition, registry);
         registry.registerBeanDefinition(beanName, beanDefinition);
         registerSpy(spyDefinition, field, beanName);
     }
@@ -336,7 +336,7 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
     @Override
     public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName)
         throws BeansException {
-        ReflectionUtils.doWithFields(bean.getClass(), (field) -> postProcessField(bean, field));
+        ReflectionUtils.doWithFields(bean.getClass(), field -> postProcessField(bean, field));
         return pvs;
     }
 
@@ -347,23 +347,23 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
         }
     }
 
-    void inject(Field field, Object target, Definition definition) {
+    void inject(Field field, Object testClassInstance, Definition definition) {
         String beanName = this.beanNameRegistry.get(definition);
         Assert.state(StringUtils.hasLength(beanName), () -> "No bean found for definition " + definition);
-        inject(field, target, beanName);
+        inject(field, testClassInstance, beanName);
     }
 
-    private void inject(Field field, Object target, String beanName) {
+    private void inject(Field field, Object testClassInstance, String beanName) {
         try {
             field.setAccessible(true);
-            Object existingValue = ReflectionUtils.getField(field, target);
+            Object existingValue = ReflectionUtils.getField(field, testClassInstance);
             Object bean = this.beanFactory.getBean(beanName, field.getType());
             if (existingValue == bean) {
                 return;
             }
             Assert.state(existingValue == null, () -> "The existing value '" + existingValue + "' of field '" + field
                 + "' is not the same as the new value '" + bean + "'");
-            ReflectionUtils.setField(field, target, bean);
+            ReflectionUtils.setField(field, testClassInstance, bean);
         } catch (Throwable ex) {
             throw new BeanCreationException("Could not inject field: " + field, ex);
         }
@@ -374,15 +374,15 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
         return Ordered.LOWEST_PRECEDENCE - 10;
     }
 
-    /**
-     * Register the processor with a {@link BeanDefinitionRegistry}. Not required when using the {@link SpringRunner} as
-     * registration is automatic.
-     *
-     * @param registry the bean definition registry
-     */
-    public static void register(BeanDefinitionRegistry registry) {
-        register(registry, null);
-    }
+//    /**
+//     * Register the processor with a {@link BeanDefinitionRegistry}. Not required when using the {@link SpringRunner} as
+//     * registration is automatic.
+//     *
+//     * @param registry the bean definition registry
+//     */
+//    public static void register(BeanDefinitionRegistry registry) {
+//        register(registry, null);
+//    }
 
     /**
      * Register the processor with a {@link BeanDefinitionRegistry}. Not required when using the {@link SpringRunner} as
@@ -391,8 +391,8 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
      * @param registry    the bean definition registry
      * @param definitions the initial mock/spy definitions
      */
-    public static void register(BeanDefinitionRegistry registry, Set<Definition> definitions) {
-        register(registry, MockitoPostProcessor.class, definitions);
+    static void register(BeanDefinitionRegistry registry, DefinitionSet definitions) {
+        register(registry, SmartMockitoPostProcessor.class, definitions);
     }
 
     /**
@@ -403,20 +403,19 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
      * @param postProcessor the post processor class to register
      * @param definitions   the initial mock/spy definitions
      */
-    @SuppressWarnings("unchecked")
-    public static void register(BeanDefinitionRegistry registry, Class<? extends MockitoPostProcessor> postProcessor,
-                                Set<Definition> definitions) {
+    public static void register(BeanDefinitionRegistry registry, Class<? extends SmartMockitoPostProcessor> postProcessor,
+                                DefinitionSet definitions) {
         SpyPostProcessor.register(registry);
         BeanDefinition definition = getOrAddBeanDefinition(registry, postProcessor);
-        ValueHolder constructorArg = definition.getConstructorArgumentValues().getIndexedArgumentValue(0, Set.class);
-        Set<Definition> existing = (Set<Definition>) constructorArg.getValue();
+        ValueHolder constructorArg = definition.getConstructorArgumentValues().getIndexedArgumentValue(0, DefinitionSet.class);
+        DefinitionSet existing = (DefinitionSet) constructorArg.getValue();
         if (definitions != null) {
             existing.addAll(definitions);
         }
     }
 
     private static BeanDefinition getOrAddBeanDefinition(BeanDefinitionRegistry registry,
-                                                         Class<? extends MockitoPostProcessor> postProcessor) {
+                                                         Class<? extends SmartMockitoPostProcessor> postProcessor) {
         if (!registry.containsBeanDefinition(BEAN_NAME)) {
             RootBeanDefinition definition = new RootBeanDefinition(postProcessor);
             definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -429,7 +428,7 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
     }
 
     /**
-     * {@link BeanPostProcessor} to handle {@link SpyBean} definitions. Registered as a separate processor so that it
+     * {@link BeanPostProcessor} to handle {@link SmartSpyBean} definitions. Registered as a separate processor so that it
      * can be ordered above AOP post processors.
      */
     static class SpyPostProcessor implements SmartInstantiationAwareBeanPostProcessor, PriorityOrdered {
@@ -438,10 +437,10 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
 
         private final Map<String, Object> earlySpyReferences = new ConcurrentHashMap<>(16);
 
-        private final MockitoPostProcessor mockitoPostProcessor;
+        private final SmartMockitoPostProcessor smartMockitoPostProcessor;
 
-        SpyPostProcessor(MockitoPostProcessor mockitoPostProcessor) {
-            this.mockitoPostProcessor = mockitoPostProcessor;
+        SpyPostProcessor(SmartMockitoPostProcessor smartMockitoPostProcessor) {
+            this.smartMockitoPostProcessor = smartMockitoPostProcessor;
         }
 
         @Override
@@ -455,7 +454,7 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
                 return bean;
             }
             this.earlySpyReferences.put(getCacheKey(bean, beanName), bean);
-            return this.mockitoPostProcessor.createSpyIfNecessary(bean, beanName);
+            return this.smartMockitoPostProcessor.createSpyIfNecessary(bean, beanName);
         }
 
         @Override
@@ -464,7 +463,7 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
                 return bean;
             }
             if (this.earlySpyReferences.remove(getCacheKey(bean, beanName)) != bean) {
-                return this.mockitoPostProcessor.createSpyIfNecessary(bean, beanName);
+                return this.smartMockitoPostProcessor.createSpyIfNecessary(bean, beanName);
             }
             return bean;
         }
@@ -479,7 +478,7 @@ public class MockitoPostProcessor implements InstantiationAwareBeanPostProcessor
                 definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
                 ConstructorArgumentValues constructorArguments = definition.getConstructorArgumentValues();
                 constructorArguments.addIndexedArgumentValue(0,
-                    new RuntimeBeanReference(MockitoPostProcessor.BEAN_NAME));
+                    new RuntimeBeanReference(SmartMockitoPostProcessor.BEAN_NAME));
                 registry.registerBeanDefinition(BEAN_NAME, definition);
             }
         }

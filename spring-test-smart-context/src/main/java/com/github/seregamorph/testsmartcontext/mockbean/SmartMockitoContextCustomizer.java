@@ -16,8 +16,6 @@
 
 package com.github.seregamorph.testsmartcontext.mockbean;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextCustomizer;
@@ -31,20 +29,22 @@ import org.springframework.test.context.MergedContextConfiguration;
  *
  * @author Phillip Webb
  */
-class MockitoContextCustomizer implements ContextCustomizer {
+class SmartMockitoContextCustomizer implements ContextCustomizer {
 
-    private final Set<Definition> definitions;
+    private final DefinitionSet definitions;
 
-    MockitoContextCustomizer(Set<? extends Definition> definitions) {
-        this.definitions = new LinkedHashSet<>(definitions);
+    SmartMockitoContextCustomizer(DefinitionSet definitions) {
+        this.definitions = new DefinitionSet(definitions);
     }
 
     @Override
-    public void customizeContext(ConfigurableApplicationContext context,
-                                 MergedContextConfiguration mergedContextConfiguration) {
+    public void customizeContext(
+        ConfigurableApplicationContext context,
+        MergedContextConfiguration mergedContextConfiguration
+    ) {
         if (context instanceof BeanDefinitionRegistry) {
             BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
-            MockitoPostProcessor.register(registry, this.definitions);
+            SmartMockitoPostProcessor.register(registry, this.definitions);
         }
     }
 
@@ -56,7 +56,7 @@ class MockitoContextCustomizer implements ContextCustomizer {
         if (obj == null || obj.getClass() != getClass()) {
             return false;
         }
-        MockitoContextCustomizer other = (MockitoContextCustomizer) obj;
+        SmartMockitoContextCustomizer other = (SmartMockitoContextCustomizer) obj;
         return this.definitions.equals(other.definitions);
     }
 

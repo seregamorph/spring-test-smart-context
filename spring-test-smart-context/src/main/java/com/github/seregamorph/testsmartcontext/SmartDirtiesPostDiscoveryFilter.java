@@ -48,6 +48,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
         Set<Class<?>> uniqueClasses = childrenToReorder.stream()
             .map(SmartDirtiesPostDiscoveryFilter::getTestClass)
             .collect(Collectors.toSet());
+        SmartDirtiesTestsSupport.registerTestClasses(ENGINE, uniqueClasses);
         if (uniqueClasses.size() == 1) {
             // This filter is executed several times during discover and execute phases and
             // it's not possible to distinguish them here. Sometimes per single test is sent as argument,

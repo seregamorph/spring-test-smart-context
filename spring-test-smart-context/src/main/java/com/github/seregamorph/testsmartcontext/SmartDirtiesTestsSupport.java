@@ -6,9 +6,11 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -27,9 +29,9 @@ import org.springframework.test.context.MergedContextConfiguration;
 public class SmartDirtiesTestsSupport {
 
     /**
-     * engine -> test class -> ClassOrderState
+     * engine -> test class -> ClassOrderState (nullable before sort finished)
      */
-    private static Map<String, Map<Class<?>, ClassOrderState>> engineClassOrderStateMap;
+    private static Map<String, Map<Class<?>, /*@Nullable*/ ClassOrderState>> engineClassOrderStateMap;
 
     static class ClassOrderState {
         private final boolean isFirst;
@@ -39,6 +41,41 @@ public class SmartDirtiesTestsSupport {
             this.isFirst = isFirst;
             this.isLast = isLast;
         }
+    }
+
+    protected static void registerTestClasses(String engine, Collection<Class<?>> testClasses) {
+        if (engineClassOrderStateMap == null) {
+            engineClassOrderStateMap = new LinkedHashMap<>();
+        }
+        Map<Class<?>, ClassOrderState> classOrderStateMap = engineClassOrderStateMap.computeIfAbsent(engine,
+            $ -> new LinkedHashMap<>());
+        for (Class<?> testClass : testClasses) {
+            // hint: may already have non-null value
+            if (!classOrderStateMap.containsKey(testClass)) {
+                classOrderStateMap.put(testClass, null);
+            }
+        }
+    }
+
+    /**
+     * Get test classes of the same engine as testClass.
+     *
+     * @return null if no matching engine suite found
+     */
+    @Nullable
+    protected static Set<Class<?>> getIntegrationTestClasses(Class<?> testClass) {
+        if (engineClassOrderStateMap == null) {
+            return null;
+        }
+        for (Map<Class<?>, ClassOrderState> classOrderStateMap : engineClassOrderStateMap.values()) {
+            if (classOrderStateMap.containsKey(testClass)) {
+                Set<Class<?>> testClasses = new LinkedHashSet<>(classOrderStateMap.keySet());
+                IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
+                testClasses.removeIf(tc -> !integrationTestFilter.isIntegrationTest(tc));
+                return testClasses;
+            }
+        }
+        return null;
     }
 
     @Nullable
@@ -155,9 +192,6 @@ public class SmartDirtiesTestsSupport {
                 isFirst = false;
             }
         }
-        if (SmartDirtiesTestsSupport.engineClassOrderStateMap == null) {
-            SmartDirtiesTestsSupport.engineClassOrderStateMap = new LinkedHashMap<>();
-        }
         SmartDirtiesTestsSupport.engineClassOrderStateMap.put(engine, classOrderStateMap);
     }
 
@@ -166,7 +200,7 @@ public class SmartDirtiesTestsSupport {
         // We can order enclosing classes, but tests of Nested test classes will always go sequentially is scope
         // of their enclosing class. And the spring context may be shared between these inner Nested classes of
         // different tests.
-        Class<?> enclosingClass = getEnclosingClass(innerTestClass);
+        Class<?> enclosingClass = getUltimateEnclosingClass(innerTestClass);
         MergedContextConfiguration enclosingContextConfiguration =
             BootstrapUtilsHelper.resolveTestContextBootstrapper(enclosingClass).buildMergedContextConfiguration();
         MergedContextConfiguration innerContextConfiguration =
@@ -189,11 +223,11 @@ public class SmartDirtiesTestsSupport {
         return Modifier.isStatic(clazz.getModifiers());
     }
 
-    private static Class<?> getEnclosingClass(Class<?> clazz) {
+    protected static Class<?> getUltimateEnclosingClass(Class<?> clazz) {
         Class<?> enclosingClass = clazz.getEnclosingClass();
         // it can be deeply nesting - with recursion avoid possible infinite cycle
         // (see org.junit.platform.commons.util.ReflectionUtils.detectInnerClassCycle)
-        return enclosingClass == null ? clazz : getEnclosingClass(enclosingClass);
+        return enclosingClass == null ? clazz : getUltimateEnclosingClass(enclosingClass);
     }
 
     //@TestOnly

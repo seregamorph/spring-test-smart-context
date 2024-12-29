@@ -16,7 +16,6 @@
 
 package com.github.seregamorph.testsmartcontext.mockbean;
 
-import java.util.List;
 import org.mockito.MockSettings;
 import org.mockito.MockingDetails;
 import org.mockito.Mockito;
@@ -25,18 +24,20 @@ import org.mockito.listeners.MethodInvocationReport;
 import org.mockito.mock.MockCreationSettings;
 import org.springframework.util.Assert;
 
+import java.util.List;
+
 // Based on original code from
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * Reset strategy used on a mock bean. Usually applied to a mock through the {@link MockBean @MockBean} annotation but
+ * Reset strategy used on a mock bean. Usually applied to a mock through the {@link SmartMockBean @SmartMockBean} annotation but
  * can also be directly applied to any mock in the {@code ApplicationContext} using the static methods.
  *
  * @author Phillip Webb
  * @see ResetMocksTestExecutionListener
  * @since 1.4.0
  */
-public enum MockReset {
+public enum SmartMockReset {
 
     /**
      * Reset the mock before the test method runs.
@@ -78,18 +79,18 @@ public enum MockReset {
      * @param reset the reset type
      * @return mock settings
      */
-    public static MockSettings withSettings(MockReset reset) {
+    public static MockSettings withSettings(SmartMockReset reset) {
         return apply(reset, Mockito.withSettings());
     }
 
     /**
-     * Apply {@link MockReset} to existing {@link MockSettings settings}.
+     * Apply {@link SmartMockReset} to existing {@link MockSettings settings}.
      *
      * @param reset    the reset type
      * @param settings the settings
      * @return the configured settings
      */
-    public static MockSettings apply(MockReset reset, MockSettings settings) {
+    public static MockSettings apply(SmartMockReset reset, MockSettings settings) {
         Assert.notNull(settings, "Settings must not be null");
         if (reset != null && reset != NONE) {
             settings.invocationListeners(new ResetInvocationListener(reset));
@@ -98,13 +99,13 @@ public enum MockReset {
     }
 
     /**
-     * Get the {@link MockReset} associated with the given mock.
+     * Get the {@link SmartMockReset} associated with the given mock.
      *
      * @param mock the source mock
      * @return the reset type (never {@code null})
      */
-    static MockReset get(Object mock) {
-        MockReset reset = MockReset.NONE;
+    static SmartMockReset get(Object mock) {
+        SmartMockReset reset = SmartMockReset.NONE;
         MockingDetails mockingDetails = Mockito.mockingDetails(mock);
         if (mockingDetails.isMock()) {
             MockCreationSettings<?> settings = mockingDetails.getMockCreationSettings();
@@ -120,17 +121,17 @@ public enum MockReset {
     }
 
     /**
-     * Dummy {@link InvocationListener} used to hold the {@link MockReset} value.
+     * Dummy {@link InvocationListener} used to hold the {@link SmartMockReset} value.
      */
     private static class ResetInvocationListener implements InvocationListener {
 
-        private final MockReset reset;
+        private final SmartMockReset reset;
 
-        ResetInvocationListener(MockReset reset) {
+        ResetInvocationListener(SmartMockReset reset) {
             this.reset = reset;
         }
 
-        MockReset getReset() {
+        SmartMockReset getReset() {
             return this.reset;
         }
 

@@ -18,12 +18,12 @@ package com.github.seregamorph.testsmartcontext.mockbean;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.mockito.Answers;
+import org.mockito.MockSettings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -32,24 +32,25 @@ import org.springframework.test.context.junit4.SpringRunner;
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * Annotation that can be used to apply Mockito spies to a Spring {@link ApplicationContext}. Can be used as a class
- * level annotation or on fields in either {@code @Configuration} classes, or test classes that are
- * {@link RunWith @RunWith} the {@link SpringRunner}.
+ * Annotation that can be used to add mocks to a Spring {@link ApplicationContext}. Can be used as a class level
+ * annotation or on fields in either {@code @Configuration} classes, or test classes that are {@link RunWith @RunWith}
+ * the {@link SpringRunner}.
  * <p>
- * Spies can be applied by type or by {@link #name() bean name}. All beans in the context of a matching type (including
- * subclasses) will be wrapped with the spy. If no existing bean is defined a new one will be added. Dependencies that
- * are known to the application context but are not beans (such as those
+ * Mocks can be registered by type or by {@link #name() bean name}. When registered by type, any existing single bean of
+ * a matching type (including subclasses) in the context will be replaced by the mock. When registered by name, an
+ * existing bean can be specifically targeted for replacement by a mock. In either case, if no existing bean is defined
+ * a new one will be added. Dependencies that are known to the application context but are not beans (such as those
  * {@link org.springframework.beans.factory.config.ConfigurableListableBeanFactory#registerResolvableDependency(Class,
- * Object) registered directly}) will not be found and a spied bean will be added to the context alongside the existing
+ * Object) registered directly}) will not be found and a mocked bean will be added to the context alongside the existing
  * dependency.
  * <p>
- * When {@code @SpyBean} is used on a field, as well as being registered in the application context, the spy will also
+ * When {@code @MockBean} is used on a field, as well as being registered in the application context, the mock will also
  * be injected into the field. Typical usage might
  * be: <pre class="code">
  * &#064;RunWith(SpringRunner.class)
  * public class ExampleTests {
  *
- *     &#064;SpyBean
+ *     &#064;MockBean
  *     private ExampleService service;
  *
  *     &#064;Autowired
@@ -57,9 +58,9 @@ import org.springframework.test.context.junit4.SpringRunner;
  *
  *     &#064;Test
  *     public void testUserOfService() {
+ *         given(this.service.greet()).willReturn("Hello");
  *         String actual = this.userOfService.makeUse();
  *         assertEquals("Was: Hello", actual);
- *         verify(this.service).greet();
  *     }
  *
  *     &#064;Configuration
@@ -74,7 +75,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * &#064;RunWith(SpringRunner.class)
  * public class ExampleTests {
  *
- *     &#064;SpyBean
+ *     &#064;MockBean
  *     &#064;Qualifier("example")
  *     private ExampleService service;
  *
@@ -82,65 +83,65 @@ import org.springframework.test.context.junit4.SpringRunner;
  * }
  * </pre>
  * <p>
- * This annotation is {@code @Repeatable} and may be specified multiple times when working with Java 8 or contained
- * within a {@link SpyBeans @SpyBeans} annotation.
- *
  * @author Phillip Webb
- * @see MockitoPostProcessor
+ * @see SmartMockitoPostProcessor
  * @since 1.4.0
  */
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Repeatable(SpyBeans.class)
-public @interface SpyBean {
+public @interface SmartMockBean {
 
     /**
-     * The name of the bean to spy. If not specified the name will either be generated or, if the spy is for an existing
-     * bean, the existing name will be used.
+     * The name of the bean to register or replace. If not specified the name will either be generated or, if the mock
+     * replaces an existing bean, the existing name will be used.
      *
      * @return the name of the bean
      */
     String name() default "";
 
     /**
-     * The classes to spy. This is an alias of {@link #classes()} which can be used for brevity if no other attributes
+     * The classes to mock. This is an alias of {@link #classes()} which can be used for brevity if no other attributes
      * are defined. See {@link #classes()} for details.
      *
-     * @return the classes to spy
+     * @return the classes to mock
      */
     @AliasFor("classes")
     Class<?>[] value() default {};
 
     /**
-     * The classes to spy. Each class specified here will result in a spy being applied. Classes can be omitted when the
-     * annotation is used on a field.
+     * The classes to mock. Each class specified here will result in a mock being created and registered with the
+     * application context. Classes can be omitted when the annotation is used on a field.
      * <p>
-     * When {@code @SpyBean} also defines a {@code name} this attribute can only contain a single value.
+     * When {@code @MockBean} also defines a {@code name} this attribute can only contain a single value.
      * <p>
      * If this is the only specified attribute consider using the {@code value} alias instead.
      *
-     * @return the classes to spy
+     * @return the classes to mock
      */
     @AliasFor("value")
     Class<?>[] classes() default {};
 
     /**
-     * The reset mode to apply to the spied bean. The default is {@link MockReset#AFTER} meaning that spies are
+     * The {@link Answers} type to use on the mock.
+     *
+     * @return the answer type
+     */
+    Answers answer() default Answers.RETURNS_DEFAULTS;
+
+    /**
+     * If the generated mock is serializable. See {@link MockSettings#serializable()} for details.
+     *
+     * @return if the mock is serializable
+     */
+    boolean serializable() default false;
+
+    /**
+     * The reset mode to apply to the mock bean. The default is {@link SmartMockReset#AFTER} meaning that mocks are
      * automatically reset after each test method is invoked.
      *
      * @return the reset mode
      */
-    MockReset reset() default MockReset.AFTER;
-
-    /**
-     * Indicates that Mockito methods such as {@link Mockito#verify(Object) verify(mock)} should use the {@code target}
-     * of AOP advised beans, rather than the proxy itself. If set to {@code false} you may need to use the result of
-     * {@link org.springframework.test.util.AopTestUtils#getUltimateTargetObject(Object)
-     * AopTestUtils.getUltimateTargetObject(...)} when calling Mockito methods.
-     *
-     * @return {@code true} if the target of AOP advised beans is used or {@code false} if the proxy is used directly
-     */
-    boolean proxyTargetAware() default true;
+    SmartMockReset reset() default SmartMockReset.AFTER;
 
 }

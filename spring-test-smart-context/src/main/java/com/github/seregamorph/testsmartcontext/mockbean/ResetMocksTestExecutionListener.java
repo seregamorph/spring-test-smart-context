@@ -16,9 +16,6 @@
 
 package com.github.seregamorph.testsmartcontext.mockbean;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -34,15 +31,19 @@ import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.util.ClassUtils;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 // Based on original code from
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * {@link TestExecutionListener} to reset any mock beans that have been marked with a {@link MockReset}. Typically used
- * alongside {@link MockitoTestExecutionListener}.
+ * {@link TestExecutionListener} to reset any mock beans that have been marked with a {@link SmartMockReset}. Typically used
+ * alongside {@link SmartMockitoTestExecutionListener}.
  *
  * @author Phillip Webb
- * @see MockitoTestExecutionListener
+ * @see SmartMockitoTestExecutionListener
  * @since 1.4.0
  */
 public class ResetMocksTestExecutionListener extends AbstractTestExecutionListener {
@@ -58,25 +59,25 @@ public class ResetMocksTestExecutionListener extends AbstractTestExecutionListen
     @Override
     public void beforeTestMethod(TestContext testContext) throws Exception {
         if (MOCKITO_IS_PRESENT && !NativeDetector.inNativeImage()) {
-            resetMocks(testContext.getApplicationContext(), MockReset.BEFORE);
+            resetMocks(testContext.getApplicationContext(), SmartMockReset.BEFORE);
         }
     }
 
     @Override
     public void afterTestMethod(TestContext testContext) throws Exception {
         if (MOCKITO_IS_PRESENT && !NativeDetector.inNativeImage()) {
-            resetMocks(testContext.getApplicationContext(), MockReset.AFTER);
+            resetMocks(testContext.getApplicationContext(), SmartMockReset.AFTER);
         }
     }
 
-    private void resetMocks(ApplicationContext applicationContext, MockReset reset) {
+    private void resetMocks(ApplicationContext applicationContext, SmartMockReset reset) {
         if (applicationContext instanceof ConfigurableApplicationContext) {
             ConfigurableApplicationContext configurableContext = (ConfigurableApplicationContext) applicationContext;
             resetMocks(configurableContext, reset);
         }
     }
 
-    private void resetMocks(ConfigurableApplicationContext applicationContext, MockReset reset) {
+    private void resetMocks(ConfigurableApplicationContext applicationContext, SmartMockReset reset) {
         ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
         String[] names = beanFactory.getBeanDefinitionNames();
         Set<String> instantiatedSingletons = new HashSet<>(Arrays.asList(beanFactory.getSingletonNames()));
@@ -84,7 +85,7 @@ public class ResetMocksTestExecutionListener extends AbstractTestExecutionListen
             BeanDefinition definition = beanFactory.getBeanDefinition(name);
             if (definition.isSingleton() && instantiatedSingletons.contains(name)) {
                 Object bean = getBean(beanFactory, name);
-                if (bean != null && reset.equals(MockReset.get(bean))) {
+                if (bean != null && reset.equals(SmartMockReset.get(bean))) {
                     Mockito.reset(bean);
                 }
             }
@@ -92,7 +93,7 @@ public class ResetMocksTestExecutionListener extends AbstractTestExecutionListen
         try {
             MockitoBeans mockedBeans = beanFactory.getBean(MockitoBeans.class);
             for (Object mockedBean : mockedBeans) {
-                if (reset.equals(MockReset.get(mockedBean))) {
+                if (reset.equals(SmartMockReset.get(mockedBean))) {
                     Mockito.reset(mockedBean);
                 }
             }

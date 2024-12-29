@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import com.github.seregamorph.testsmartcontext.mockbean.SmartMockBean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -20,8 +20,7 @@ public class Integration1MockBeanTest extends AbstractIntegrationTest {
     @Autowired
     private SampleService sampleService;
 
-    @SuppressWarnings("removal")
-    @MockBean
+    @SmartMockBean
     private SampleBean sampleBean;
 
     @BeforeEach

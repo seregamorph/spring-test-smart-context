@@ -3,7 +3,9 @@ package com.github.seregamorph.testsmartcontext.testng;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import org.testng.IAlterSuiteListener;
 import org.testng.IMethodInstance;
 import org.testng.IMethodInterceptor;
@@ -53,6 +55,11 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
             return methods;
         }
 
+        Set<Class<?>> uniqueClasses = new LinkedHashSet<>();
+        for (IMethodInstance method : methods) {
+            uniqueClasses.add(getTestClass(method));
+        }
+        SmartDirtiesTestsSupport.registerTestClasses(ENGINE, uniqueClasses);
         // this intercept method is executed by TestNG before running the suite (both IDEA and maven)
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         List<List<Class<?>>> testClassesLists = sorter.sort(methods, SmartDirtiesSuiteListener::getTestClass);

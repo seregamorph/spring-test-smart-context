@@ -17,7 +17,6 @@
 package com.github.seregamorph.testsmartcontext.mockbean;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +25,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.MergedAnnotations;
+import org.springframework.lang.Nullable;
 
 // Based on original code from
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
@@ -79,15 +79,13 @@ class QualifierDefinition {
         return this.annotations.hashCode();
     }
 
-    static QualifierDefinition forElement(AnnotatedElement element) {
-        if (element instanceof Field) {
-            Field field = (Field) element;
-            Set<Annotation> annotations = getQualifierAnnotations(field);
-            if (!annotations.isEmpty()) {
-                return new QualifierDefinition(field, annotations);
-            }
+    @Nullable
+    static QualifierDefinition forField(Field field) {
+        Set<Annotation> annotations = getQualifierAnnotations(field);
+        if (annotations.isEmpty()) {
+            return null;
         }
-        return null;
+        return new QualifierDefinition(field, annotations);
     }
 
     private static Set<Annotation> getQualifierAnnotations(Field field) {
@@ -103,11 +101,11 @@ class QualifierDefinition {
     }
 
     private static boolean isMockOrSpyAnnotation(Class<? extends Annotation> type) {
-        if (type.equals(MockBean.class) || type.equals(SpyBean.class)) {
+        if (type.equals(SmartMockBean.class) || type.equals(SmartSpyBean.class)) {
             return true;
         }
         MergedAnnotations metaAnnotations = MergedAnnotations.from(type);
-        return metaAnnotations.isPresent(MockBean.class) || metaAnnotations.isPresent(SpyBean.class);
+        return metaAnnotations.isPresent(SmartMockBean.class) || metaAnnotations.isPresent(SmartSpyBean.class);
     }
 
 }

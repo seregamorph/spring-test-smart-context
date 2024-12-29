@@ -25,7 +25,7 @@ import org.springframework.util.ObjectUtils;
  * Base class for {@link MockDefinition} and {@link SpyDefinition}.
  *
  * @author Phillip Webb
- * @see DefinitionsParser
+ * @see SmartDefinitionsParser
  */
 abstract class Definition {
 
@@ -33,15 +33,15 @@ abstract class Definition {
 
     private final String name;
 
-    private final MockReset reset;
+    private final SmartMockReset reset;
 
     private final boolean proxyTargetAware;
 
     private final QualifierDefinition qualifier;
 
-    Definition(String name, MockReset reset, boolean proxyTargetAware, QualifierDefinition qualifier) {
+    Definition(String name, SmartMockReset reset, boolean proxyTargetAware, QualifierDefinition qualifier) {
         this.name = name;
-        this.reset = (reset != null) ? reset : MockReset.AFTER;
+        this.reset = reset == null ? SmartMockReset.AFTER : reset;
         this.proxyTargetAware = proxyTargetAware;
         this.qualifier = qualifier;
     }
@@ -60,7 +60,7 @@ abstract class Definition {
      *
      * @return the reset mode
      */
-    MockReset getReset() {
+    SmartMockReset getReset() {
         return this.reset;
     }
 

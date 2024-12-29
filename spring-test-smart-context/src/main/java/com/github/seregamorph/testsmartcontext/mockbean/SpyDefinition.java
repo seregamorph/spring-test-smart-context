@@ -45,7 +45,7 @@ class SpyDefinition extends Definition {
 
     private final ResolvableType typeToSpy;
 
-    SpyDefinition(String name, ResolvableType typeToSpy, MockReset reset, boolean proxyTargetAware,
+    SpyDefinition(String name, ResolvableType typeToSpy, SmartMockReset reset, boolean proxyTargetAware,
                   QualifierDefinition qualifier) {
         super(name, reset, proxyTargetAware, qualifier);
         Assert.notNull(typeToSpy, "TypeToSpy must not be null");
@@ -86,9 +86,9 @@ class SpyDefinition extends Definition {
             .toString();
     }
 
-    <T> T createSpy(Object instance) {
-        return createSpy(getName(), instance);
-    }
+//    <T> T createSpy(Object instance) {
+//        return createSpy(getName(), instance);
+//    }
 
     @SuppressWarnings("unchecked")
     <T> T createSpy(String name, Object instance) {
@@ -97,7 +97,7 @@ class SpyDefinition extends Definition {
         if (Mockito.mockingDetails(instance).isSpy()) {
             return (T) instance;
         }
-        MockSettings settings = MockReset.withSettings(getReset());
+        MockSettings settings = SmartMockReset.withSettings(getReset());
         if (StringUtils.hasLength(name)) {
             settings.name(name);
         }

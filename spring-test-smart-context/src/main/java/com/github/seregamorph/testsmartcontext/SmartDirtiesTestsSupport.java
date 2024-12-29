@@ -87,16 +87,18 @@ public class SmartDirtiesTestsSupport {
                         }
                         String configClassOrderer = properties.getProperty(ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME);
                         if (!SmartDirtiesClassOrderer.class.getName().equals(configClassOrderer)) {
-                            throw new IllegalStateException("classOrderStateMap is not initialized, because more than "
-                                + "one junit-platform.properties was found in the classpath: " + junitPlatformConfigUrls
-                                + ". JUnit 5 supports only one configuration file https://github" +
-                                ".com/junit-team/junit5/issues/2794\n" +
-                                "The " + junitPlatformConfigUrl + " " + (configClassOrderer == null ?
-                                "does not declare the " + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + " property"
-                                : "declares\n" + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + "=" + configClassOrderer +
-                                "\n")
+                            //@formatter:off
+                            throw new IllegalStateException("engineClassOrderStateMap is not initialized, "
+                                + "because more than one junit-platform.properties was found in the classpath: "
+                                + junitPlatformConfigUrls + ". JUnit 5 supports only one configuration file "
+                                + "https://github.com/junit-team/junit5/issues/2794\n"
+                                + "The " + junitPlatformConfigUrl + " "
+                                + (configClassOrderer == null ? "does not declare the "
+                                    + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + " property" : "declares\n"
+                                    + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + "=" + configClassOrderer + "\n")
                                 + " (should have value " + SmartDirtiesClassOrderer.class.getName()
                                 + " to address the issue)");
+                            //@formatter:on
                         }
                         //@formatter:off
 

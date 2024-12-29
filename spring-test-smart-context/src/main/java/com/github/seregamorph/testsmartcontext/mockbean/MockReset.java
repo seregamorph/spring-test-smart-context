@@ -29,113 +29,115 @@ import org.springframework.util.Assert;
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * Reset strategy used on a mock bean. Usually applied to a mock through the
- * {@link MockBean @MockBean} annotation but can also be directly applied to any mock in
- * the {@code ApplicationContext} using the static methods.
+ * Reset strategy used on a mock bean. Usually applied to a mock through the {@link MockBean @MockBean} annotation but
+ * can also be directly applied to any mock in the {@code ApplicationContext} using the static methods.
  *
  * @author Phillip Webb
- * @since 1.4.0
  * @see ResetMocksTestExecutionListener
+ * @since 1.4.0
  */
 public enum MockReset {
 
-	/**
-	 * Reset the mock before the test method runs.
-	 */
-	BEFORE,
+    /**
+     * Reset the mock before the test method runs.
+     */
+    BEFORE,
 
-	/**
-	 * Reset the mock after the test method runs.
-	 */
-	AFTER,
+    /**
+     * Reset the mock after the test method runs.
+     */
+    AFTER,
 
-	/**
-	 * Don't reset the mock.
-	 */
-	NONE;
+    /**
+     * Don't reset the mock.
+     */
+    NONE;
 
-	/**
-	 * Create {@link MockSettings settings} to be used with mocks where reset should occur
-	 * before each test method runs.
-	 * @return mock settings
-	 */
-	public static MockSettings before() {
-		return withSettings(BEFORE);
-	}
+    /**
+     * Create {@link MockSettings settings} to be used with mocks where reset should occur before each test method
+     * runs.
+     *
+     * @return mock settings
+     */
+    public static MockSettings before() {
+        return withSettings(BEFORE);
+    }
 
-	/**
-	 * Create {@link MockSettings settings} to be used with mocks where reset should occur
-	 * after each test method runs.
-	 * @return mock settings
-	 */
-	public static MockSettings after() {
-		return withSettings(AFTER);
-	}
+    /**
+     * Create {@link MockSettings settings} to be used with mocks where reset should occur after each test method runs.
+     *
+     * @return mock settings
+     */
+    public static MockSettings after() {
+        return withSettings(AFTER);
+    }
 
-	/**
-	 * Create {@link MockSettings settings} to be used with mocks where a specific reset
-	 * should occur.
-	 * @param reset the reset type
-	 * @return mock settings
-	 */
-	public static MockSettings withSettings(MockReset reset) {
-		return apply(reset, Mockito.withSettings());
-	}
+    /**
+     * Create {@link MockSettings settings} to be used with mocks where a specific reset should occur.
+     *
+     * @param reset the reset type
+     * @return mock settings
+     */
+    public static MockSettings withSettings(MockReset reset) {
+        return apply(reset, Mockito.withSettings());
+    }
 
-	/**
-	 * Apply {@link MockReset} to existing {@link MockSettings settings}.
-	 * @param reset the reset type
-	 * @param settings the settings
-	 * @return the configured settings
-	 */
-	public static MockSettings apply(MockReset reset, MockSettings settings) {
-		Assert.notNull(settings, "Settings must not be null");
-		if (reset != null && reset != NONE) {
-			settings.invocationListeners(new ResetInvocationListener(reset));
-		}
-		return settings;
-	}
+    /**
+     * Apply {@link MockReset} to existing {@link MockSettings settings}.
+     *
+     * @param reset    the reset type
+     * @param settings the settings
+     * @return the configured settings
+     */
+    public static MockSettings apply(MockReset reset, MockSettings settings) {
+        Assert.notNull(settings, "Settings must not be null");
+        if (reset != null && reset != NONE) {
+            settings.invocationListeners(new ResetInvocationListener(reset));
+        }
+        return settings;
+    }
 
-	/**
-	 * Get the {@link MockReset} associated with the given mock.
-	 * @param mock the source mock
-	 * @return the reset type (never {@code null})
-	 */
-	static MockReset get(Object mock) {
-		MockReset reset = MockReset.NONE;
-		MockingDetails mockingDetails = Mockito.mockingDetails(mock);
-		if (mockingDetails.isMock()) {
-			MockCreationSettings<?> settings = mockingDetails.getMockCreationSettings();
-			List<InvocationListener> listeners = settings.getInvocationListeners();
-			for (Object listener : listeners) {
-				if (listener instanceof ResetInvocationListener) {
+    /**
+     * Get the {@link MockReset} associated with the given mock.
+     *
+     * @param mock the source mock
+     * @return the reset type (never {@code null})
+     */
+    static MockReset get(Object mock) {
+        MockReset reset = MockReset.NONE;
+        MockingDetails mockingDetails = Mockito.mockingDetails(mock);
+        if (mockingDetails.isMock()) {
+            MockCreationSettings<?> settings = mockingDetails.getMockCreationSettings();
+            List<InvocationListener> listeners = settings.getInvocationListeners();
+            for (Object listener : listeners) {
+                if (listener instanceof ResetInvocationListener) {
                     ResetInvocationListener resetInvocationListener = (ResetInvocationListener) listener;
                     reset = resetInvocationListener.getReset();
-				}
-			}
-		}
-		return reset;
-	}
+                }
+            }
+        }
+        return reset;
+    }
 
-	/**
-	 * Dummy {@link InvocationListener} used to hold the {@link MockReset} value.
-	 */
-	private static class ResetInvocationListener implements InvocationListener {
+    /**
+     * Dummy {@link InvocationListener} used to hold the {@link MockReset} value.
+     */
+    private static class ResetInvocationListener implements InvocationListener {
 
-		private final MockReset reset;
+        private final MockReset reset;
 
-		ResetInvocationListener(MockReset reset) {
-			this.reset = reset;
-		}
+        ResetInvocationListener(MockReset reset) {
+            this.reset = reset;
+        }
 
-		MockReset getReset() {
-			return this.reset;
-		}
+        MockReset getReset() {
+            return this.reset;
+        }
 
-		@Override
-		public void reportInvocation(MethodInvocationReport methodInvocationReport) {
-		}
+        @Override
+        public void reportInvocation(MethodInvocationReport methodInvocationReport) {
+        }
 
-	}
+    }
 
 }

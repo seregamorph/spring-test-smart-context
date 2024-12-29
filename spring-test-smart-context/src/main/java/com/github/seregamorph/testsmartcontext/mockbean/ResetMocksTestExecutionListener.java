@@ -38,92 +38,90 @@ import org.springframework.util.ClassUtils;
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * {@link TestExecutionListener} to reset any mock beans that have been marked with a
- * {@link MockReset}. Typically used alongside {@link MockitoTestExecutionListener}.
+ * {@link TestExecutionListener} to reset any mock beans that have been marked with a {@link MockReset}. Typically used
+ * alongside {@link MockitoTestExecutionListener}.
  *
  * @author Phillip Webb
- * @since 1.4.0
  * @see MockitoTestExecutionListener
+ * @since 1.4.0
  */
 public class ResetMocksTestExecutionListener extends AbstractTestExecutionListener {
 
-	private static final boolean MOCKITO_IS_PRESENT = ClassUtils.isPresent("org.mockito.MockSettings",
-			ResetMocksTestExecutionListener.class.getClassLoader());
+    private static final boolean MOCKITO_IS_PRESENT = ClassUtils.isPresent("org.mockito.MockSettings",
+        ResetMocksTestExecutionListener.class.getClassLoader());
 
-	@Override
-	public int getOrder() {
-		return Ordered.LOWEST_PRECEDENCE - 100;
-	}
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE - 100;
+    }
 
-	@Override
-	public void beforeTestMethod(TestContext testContext) throws Exception {
-		if (MOCKITO_IS_PRESENT && !NativeDetector.inNativeImage()) {
-			resetMocks(testContext.getApplicationContext(), MockReset.BEFORE);
-		}
-	}
+    @Override
+    public void beforeTestMethod(TestContext testContext) throws Exception {
+        if (MOCKITO_IS_PRESENT && !NativeDetector.inNativeImage()) {
+            resetMocks(testContext.getApplicationContext(), MockReset.BEFORE);
+        }
+    }
 
-	@Override
-	public void afterTestMethod(TestContext testContext) throws Exception {
-		if (MOCKITO_IS_PRESENT && !NativeDetector.inNativeImage()) {
-			resetMocks(testContext.getApplicationContext(), MockReset.AFTER);
-		}
-	}
+    @Override
+    public void afterTestMethod(TestContext testContext) throws Exception {
+        if (MOCKITO_IS_PRESENT && !NativeDetector.inNativeImage()) {
+            resetMocks(testContext.getApplicationContext(), MockReset.AFTER);
+        }
+    }
 
-	private void resetMocks(ApplicationContext applicationContext, MockReset reset) {
-		if (applicationContext instanceof ConfigurableApplicationContext) {
+    private void resetMocks(ApplicationContext applicationContext, MockReset reset) {
+        if (applicationContext instanceof ConfigurableApplicationContext) {
             ConfigurableApplicationContext configurableContext = (ConfigurableApplicationContext) applicationContext;
             resetMocks(configurableContext, reset);
-		}
-	}
+        }
+    }
 
-	private void resetMocks(ConfigurableApplicationContext applicationContext, MockReset reset) {
-		ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
-		String[] names = beanFactory.getBeanDefinitionNames();
-		Set<String> instantiatedSingletons = new HashSet<>(Arrays.asList(beanFactory.getSingletonNames()));
-		for (String name : names) {
-			BeanDefinition definition = beanFactory.getBeanDefinition(name);
-			if (definition.isSingleton() && instantiatedSingletons.contains(name)) {
-				Object bean = getBean(beanFactory, name);
-				if (bean != null && reset.equals(MockReset.get(bean))) {
-					Mockito.reset(bean);
-				}
-			}
-		}
-		try {
-			MockitoBeans mockedBeans = beanFactory.getBean(MockitoBeans.class);
-			for (Object mockedBean : mockedBeans) {
-				if (reset.equals(MockReset.get(mockedBean))) {
-					Mockito.reset(mockedBean);
-				}
-			}
-		}
-		catch (NoSuchBeanDefinitionException ex) {
-			// Continue
-		}
-		if (applicationContext.getParent() != null) {
-			resetMocks(applicationContext.getParent(), reset);
-		}
-	}
+    private void resetMocks(ConfigurableApplicationContext applicationContext, MockReset reset) {
+        ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
+        String[] names = beanFactory.getBeanDefinitionNames();
+        Set<String> instantiatedSingletons = new HashSet<>(Arrays.asList(beanFactory.getSingletonNames()));
+        for (String name : names) {
+            BeanDefinition definition = beanFactory.getBeanDefinition(name);
+            if (definition.isSingleton() && instantiatedSingletons.contains(name)) {
+                Object bean = getBean(beanFactory, name);
+                if (bean != null && reset.equals(MockReset.get(bean))) {
+                    Mockito.reset(bean);
+                }
+            }
+        }
+        try {
+            MockitoBeans mockedBeans = beanFactory.getBean(MockitoBeans.class);
+            for (Object mockedBean : mockedBeans) {
+                if (reset.equals(MockReset.get(mockedBean))) {
+                    Mockito.reset(mockedBean);
+                }
+            }
+        } catch (NoSuchBeanDefinitionException ex) {
+            // Continue
+        }
+        if (applicationContext.getParent() != null) {
+            resetMocks(applicationContext.getParent(), reset);
+        }
+    }
 
-	private Object getBean(ConfigurableListableBeanFactory beanFactory, String name) {
-		try {
-			if (isStandardBeanOrSingletonFactoryBean(beanFactory, name)) {
-				return beanFactory.getBean(name);
-			}
-		}
-		catch (Exception ex) {
-			// Continue
-		}
-		return beanFactory.getSingleton(name);
-	}
+    private Object getBean(ConfigurableListableBeanFactory beanFactory, String name) {
+        try {
+            if (isStandardBeanOrSingletonFactoryBean(beanFactory, name)) {
+                return beanFactory.getBean(name);
+            }
+        } catch (Exception ex) {
+            // Continue
+        }
+        return beanFactory.getSingleton(name);
+    }
 
-	private boolean isStandardBeanOrSingletonFactoryBean(ConfigurableListableBeanFactory beanFactory, String name) {
-		String factoryBeanName = BeanFactory.FACTORY_BEAN_PREFIX + name;
-		if (beanFactory.containsBean(factoryBeanName)) {
-			FactoryBean<?> factoryBean = (FactoryBean<?>) beanFactory.getBean(factoryBeanName);
-			return factoryBean.isSingleton();
-		}
-		return true;
-	}
+    private boolean isStandardBeanOrSingletonFactoryBean(ConfigurableListableBeanFactory beanFactory, String name) {
+        String factoryBeanName = BeanFactory.FACTORY_BEAN_PREFIX + name;
+        if (beanFactory.containsBean(factoryBeanName)) {
+            FactoryBean<?> factoryBean = (FactoryBean<?>) beanFactory.getBean(factoryBeanName);
+            return factoryBean.isSingleton();
+        }
+        return true;
+    }
 
 }

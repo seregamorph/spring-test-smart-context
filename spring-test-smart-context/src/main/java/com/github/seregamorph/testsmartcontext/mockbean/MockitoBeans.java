@@ -30,15 +30,15 @@ import java.util.List;
  */
 class MockitoBeans implements Iterable<Object> {
 
-	private final List<Object> beans = new ArrayList<>();
+    private final List<Object> beans = new ArrayList<>();
 
-	void add(Object bean) {
-		this.beans.add(bean);
-	}
+    void add(Object bean) {
+        this.beans.add(bean);
+    }
 
-	@Override
-	public Iterator<Object> iterator() {
-		return this.beans.iterator();
-	}
+    @Override
+    public Iterator<Object> iterator() {
+        return this.beans.iterator();
+    }
 
 }

@@ -33,22 +33,20 @@ import org.springframework.test.context.junit4.SpringRunner;
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * Annotation that can be used to add mocks to a Spring {@link ApplicationContext}. Can be
- * used as a class level annotation or on fields in either {@code @Configuration} classes,
- * or test classes that are {@link RunWith @RunWith} the {@link SpringRunner}.
+ * Annotation that can be used to add mocks to a Spring {@link ApplicationContext}. Can be used as a class level
+ * annotation or on fields in either {@code @Configuration} classes, or test classes that are {@link RunWith @RunWith}
+ * the {@link SpringRunner}.
  * <p>
- * Mocks can be registered by type or by {@link #name() bean name}. When registered by
- * type, any existing single bean of a matching type (including subclasses) in the context
- * will be replaced by the mock. When registered by name, an existing bean can be
- * specifically targeted for replacement by a mock. In either case, if no existing bean is
- * defined a new one will be added. Dependencies that are known to the application context
- * but are not beans (such as those
- * {@link org.springframework.beans.factory.config.ConfigurableListableBeanFactory#registerResolvableDependency(Class, Object)
- * registered directly}) will not be found and a mocked bean will be added to the context
- * alongside the existing dependency.
+ * Mocks can be registered by type or by {@link #name() bean name}. When registered by type, any existing single bean of
+ * a matching type (including subclasses) in the context will be replaced by the mock. When registered by name, an
+ * existing bean can be specifically targeted for replacement by a mock. In either case, if no existing bean is defined
+ * a new one will be added. Dependencies that are known to the application context but are not beans (such as those
+ * {@link org.springframework.beans.factory.config.ConfigurableListableBeanFactory#registerResolvableDependency(Class,
+ * Object) registered directly}) will not be found and a mocked bean will be added to the context alongside the existing
+ * dependency.
  * <p>
- * When {@code @MockBean} is used on a field, as well as being registered in the
- * application context, the mock will also be injected into the field. Typical usage might
+ * When {@code @MockBean} is used on a field, as well as being registered in the application context, the mock will also
+ * be injected into the field. Typical usage might
  * be: <pre class="code">
  * &#064;RunWith(SpringRunner.class)
  * public class ExampleTests {
@@ -86,75 +84,77 @@ import org.springframework.test.context.junit4.SpringRunner;
  * }
  * </pre>
  * <p>
- * This annotation is {@code @Repeatable} and may be specified multiple times when working
- * with Java 8 or contained within an {@link MockBeans @MockBeans} annotation.
+ * This annotation is {@code @Repeatable} and may be specified multiple times when working with Java 8 or contained
+ * within an {@link MockBeans @MockBeans} annotation.
  *
  * @author Phillip Webb
- * @since 1.4.0
  * @see MockitoPostProcessor
+ * @since 1.4.0
  */
-@Target({ ElementType.TYPE, ElementType.FIELD })
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Repeatable(MockBeans.class)
 public @interface MockBean {
 
-	/**
-	 * The name of the bean to register or replace. If not specified the name will either
-	 * be generated or, if the mock replaces an existing bean, the existing name will be
-	 * used.
-	 * @return the name of the bean
-	 */
-	String name() default "";
+    /**
+     * The name of the bean to register or replace. If not specified the name will either be generated or, if the mock
+     * replaces an existing bean, the existing name will be used.
+     *
+     * @return the name of the bean
+     */
+    String name() default "";
 
-	/**
-	 * The classes to mock. This is an alias of {@link #classes()} which can be used for
-	 * brevity if no other attributes are defined. See {@link #classes()} for details.
-	 * @return the classes to mock
-	 */
-	@AliasFor("classes")
-	Class<?>[] value() default {};
+    /**
+     * The classes to mock. This is an alias of {@link #classes()} which can be used for brevity if no other attributes
+     * are defined. See {@link #classes()} for details.
+     *
+     * @return the classes to mock
+     */
+    @AliasFor("classes")
+    Class<?>[] value() default {};
 
-	/**
-	 * The classes to mock. Each class specified here will result in a mock being created
-	 * and registered with the application context. Classes can be omitted when the
-	 * annotation is used on a field.
-	 * <p>
-	 * When {@code @MockBean} also defines a {@code name} this attribute can only contain
-	 * a single value.
-	 * <p>
-	 * If this is the only specified attribute consider using the {@code value} alias
-	 * instead.
-	 * @return the classes to mock
-	 */
-	@AliasFor("value")
-	Class<?>[] classes() default {};
+    /**
+     * The classes to mock. Each class specified here will result in a mock being created and registered with the
+     * application context. Classes can be omitted when the annotation is used on a field.
+     * <p>
+     * When {@code @MockBean} also defines a {@code name} this attribute can only contain a single value.
+     * <p>
+     * If this is the only specified attribute consider using the {@code value} alias instead.
+     *
+     * @return the classes to mock
+     */
+    @AliasFor("value")
+    Class<?>[] classes() default {};
 
-	/**
-	 * Any extra interfaces that should also be declared on the mock. See
-	 * {@link MockSettings#extraInterfaces(Class...)} for details.
-	 * @return any extra interfaces
-	 */
-	Class<?>[] extraInterfaces() default {};
+    /**
+     * Any extra interfaces that should also be declared on the mock. See {@link MockSettings#extraInterfaces(Class...)}
+     * for details.
+     *
+     * @return any extra interfaces
+     */
+    Class<?>[] extraInterfaces() default {};
 
-	/**
-	 * The {@link Answers} type to use on the mock.
-	 * @return the answer type
-	 */
-	Answers answer() default Answers.RETURNS_DEFAULTS;
+    /**
+     * The {@link Answers} type to use on the mock.
+     *
+     * @return the answer type
+     */
+    Answers answer() default Answers.RETURNS_DEFAULTS;
 
-	/**
-	 * If the generated mock is serializable. See {@link MockSettings#serializable()} for
-	 * details.
-	 * @return if the mock is serializable
-	 */
-	boolean serializable() default false;
+    /**
+     * If the generated mock is serializable. See {@link MockSettings#serializable()} for details.
+     *
+     * @return if the mock is serializable
+     */
+    boolean serializable() default false;
 
-	/**
-	 * The reset mode to apply to the mock bean. The default is {@link MockReset#AFTER}
-	 * meaning that mocks are automatically reset after each test method is invoked.
-	 * @return the reset mode
-	 */
-	MockReset reset() default MockReset.AFTER;
+    /**
+     * The reset mode to apply to the mock bean. The default is {@link MockReset#AFTER} meaning that mocks are
+     * automatically reset after each test method is invoked.
+     *
+     * @return the reset mode
+     */
+    MockReset reset() default MockReset.AFTER;
 
 }

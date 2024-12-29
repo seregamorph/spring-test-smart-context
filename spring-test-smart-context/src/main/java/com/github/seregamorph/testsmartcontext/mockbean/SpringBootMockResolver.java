@@ -26,38 +26,37 @@ import org.springframework.util.Assert;
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * A {@link MockResolver} for testing Spring Boot applications with Mockito. It resolves
- * mocks by walking the proxy chain until the target or a non-static proxy is found.
+ * A {@link MockResolver} for testing Spring Boot applications with Mockito. It resolves mocks by walking the proxy
+ * chain until the target or a non-static proxy is found.
  *
  * @author Andy Wilkinson
  * @since 2.4.0
  */
 public class SpringBootMockResolver implements MockResolver {
 
-	@Override
-	public Object resolve(Object instance) {
-		return getUltimateTargetObject(instance);
-	}
+    @Override
+    public Object resolve(Object instance) {
+        return getUltimateTargetObject(instance);
+    }
 
-	@SuppressWarnings("unchecked")
-	private static <T> T getUltimateTargetObject(Object candidate) {
-		Assert.notNull(candidate, "Candidate must not be null");
-		try {
-			if (AopUtils.isAopProxy(candidate) && candidate instanceof Advised) {
+    @SuppressWarnings("unchecked")
+    private static <T> T getUltimateTargetObject(Object candidate) {
+        Assert.notNull(candidate, "Candidate must not be null");
+        try {
+            if (AopUtils.isAopProxy(candidate) && candidate instanceof Advised) {
                 Advised advised = (Advised) candidate;
-				TargetSource targetSource = advised.getTargetSource();
-				if (targetSource.isStatic()) {
-					Object target = targetSource.getTarget();
-					if (target != null) {
-						return getUltimateTargetObject(target);
-					}
-				}
-			}
-		}
-		catch (Throwable ex) {
-			throw new IllegalStateException("Failed to unwrap proxied object", ex);
-		}
-		return (T) candidate;
-	}
+                TargetSource targetSource = advised.getTargetSource();
+                if (targetSource.isStatic()) {
+                    Object target = targetSource.getTarget();
+                    if (target != null) {
+                        return getUltimateTargetObject(target);
+                    }
+                }
+            }
+        } catch (Throwable ex) {
+            throw new IllegalStateException("Failed to unwrap proxied object", ex);
+        }
+        return (T) candidate;
+    }
 
 }

@@ -33,36 +33,36 @@ import org.springframework.test.context.MergedContextConfiguration;
  */
 class MockitoContextCustomizer implements ContextCustomizer {
 
-	private final Set<Definition> definitions;
+    private final Set<Definition> definitions;
 
-	MockitoContextCustomizer(Set<? extends Definition> definitions) {
-		this.definitions = new LinkedHashSet<>(definitions);
-	}
+    MockitoContextCustomizer(Set<? extends Definition> definitions) {
+        this.definitions = new LinkedHashSet<>(definitions);
+    }
 
-	@Override
-	public void customizeContext(ConfigurableApplicationContext context,
-			MergedContextConfiguration mergedContextConfiguration) {
-		if (context instanceof BeanDefinitionRegistry) {
+    @Override
+    public void customizeContext(ConfigurableApplicationContext context,
+                                 MergedContextConfiguration mergedContextConfiguration) {
+        if (context instanceof BeanDefinitionRegistry) {
             BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
             MockitoPostProcessor.register(registry, this.definitions);
-		}
-	}
+        }
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) {
-			return true;
-		}
-		if (obj == null || obj.getClass() != getClass()) {
-			return false;
-		}
-		MockitoContextCustomizer other = (MockitoContextCustomizer) obj;
-		return this.definitions.equals(other.definitions);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != getClass()) {
+            return false;
+        }
+        MockitoContextCustomizer other = (MockitoContextCustomizer) obj;
+        return this.definitions.equals(other.definitions);
+    }
 
-	@Override
-	public int hashCode() {
-		return this.definitions.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return this.definitions.hashCode();
+    }
 
 }

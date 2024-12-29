@@ -32,21 +32,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
 
 /**
- * Annotation that can be used to apply Mockito spies to a Spring
- * {@link ApplicationContext}. Can be used as a class level annotation or on fields in
- * either {@code @Configuration} classes, or test classes that are
+ * Annotation that can be used to apply Mockito spies to a Spring {@link ApplicationContext}. Can be used as a class
+ * level annotation or on fields in either {@code @Configuration} classes, or test classes that are
  * {@link RunWith @RunWith} the {@link SpringRunner}.
  * <p>
- * Spies can be applied by type or by {@link #name() bean name}. All beans in the context
- * of a matching type (including subclasses) will be wrapped with the spy. If no existing
- * bean is defined a new one will be added. Dependencies that are known to the application
- * context but are not beans (such as those
- * {@link org.springframework.beans.factory.config.ConfigurableListableBeanFactory#registerResolvableDependency(Class, Object)
- * registered directly}) will not be found and a spied bean will be added to the context
- * alongside the existing dependency.
+ * Spies can be applied by type or by {@link #name() bean name}. All beans in the context of a matching type (including
+ * subclasses) will be wrapped with the spy. If no existing bean is defined a new one will be added. Dependencies that
+ * are known to the application context but are not beans (such as those
+ * {@link org.springframework.beans.factory.config.ConfigurableListableBeanFactory#registerResolvableDependency(Class,
+ * Object) registered directly}) will not be found and a spied bean will be added to the context alongside the existing
+ * dependency.
  * <p>
- * When {@code @SpyBean} is used on a field, as well as being registered in the
- * application context, the spy will also be injected into the field. Typical usage might
+ * When {@code @SpyBean} is used on a field, as well as being registered in the application context, the spy will also
+ * be injected into the field. Typical usage might
  * be: <pre class="code">
  * &#064;RunWith(SpringRunner.class)
  * public class ExampleTests {
@@ -84,64 +82,65 @@ import org.springframework.test.context.junit4.SpringRunner;
  * }
  * </pre>
  * <p>
- * This annotation is {@code @Repeatable} and may be specified multiple times when working
- * with Java 8 or contained within a {@link SpyBeans @SpyBeans} annotation.
+ * This annotation is {@code @Repeatable} and may be specified multiple times when working with Java 8 or contained
+ * within a {@link SpyBeans @SpyBeans} annotation.
  *
  * @author Phillip Webb
- * @since 1.4.0
  * @see MockitoPostProcessor
+ * @since 1.4.0
  */
-@Target({ ElementType.TYPE, ElementType.FIELD })
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Repeatable(SpyBeans.class)
 public @interface SpyBean {
 
-	/**
-	 * The name of the bean to spy. If not specified the name will either be generated or,
-	 * if the spy is for an existing bean, the existing name will be used.
-	 * @return the name of the bean
-	 */
-	String name() default "";
+    /**
+     * The name of the bean to spy. If not specified the name will either be generated or, if the spy is for an existing
+     * bean, the existing name will be used.
+     *
+     * @return the name of the bean
+     */
+    String name() default "";
 
-	/**
-	 * The classes to spy. This is an alias of {@link #classes()} which can be used for
-	 * brevity if no other attributes are defined. See {@link #classes()} for details.
-	 * @return the classes to spy
-	 */
-	@AliasFor("classes")
-	Class<?>[] value() default {};
+    /**
+     * The classes to spy. This is an alias of {@link #classes()} which can be used for brevity if no other attributes
+     * are defined. See {@link #classes()} for details.
+     *
+     * @return the classes to spy
+     */
+    @AliasFor("classes")
+    Class<?>[] value() default {};
 
-	/**
-	 * The classes to spy. Each class specified here will result in a spy being applied.
-	 * Classes can be omitted when the annotation is used on a field.
-	 * <p>
-	 * When {@code @SpyBean} also defines a {@code name} this attribute can only contain a
-	 * single value.
-	 * <p>
-	 * If this is the only specified attribute consider using the {@code value} alias
-	 * instead.
-	 * @return the classes to spy
-	 */
-	@AliasFor("value")
-	Class<?>[] classes() default {};
+    /**
+     * The classes to spy. Each class specified here will result in a spy being applied. Classes can be omitted when the
+     * annotation is used on a field.
+     * <p>
+     * When {@code @SpyBean} also defines a {@code name} this attribute can only contain a single value.
+     * <p>
+     * If this is the only specified attribute consider using the {@code value} alias instead.
+     *
+     * @return the classes to spy
+     */
+    @AliasFor("value")
+    Class<?>[] classes() default {};
 
-	/**
-	 * The reset mode to apply to the spied bean. The default is {@link MockReset#AFTER}
-	 * meaning that spies are automatically reset after each test method is invoked.
-	 * @return the reset mode
-	 */
-	MockReset reset() default MockReset.AFTER;
+    /**
+     * The reset mode to apply to the spied bean. The default is {@link MockReset#AFTER} meaning that spies are
+     * automatically reset after each test method is invoked.
+     *
+     * @return the reset mode
+     */
+    MockReset reset() default MockReset.AFTER;
 
-	/**
-	 * Indicates that Mockito methods such as {@link Mockito#verify(Object) verify(mock)}
-	 * should use the {@code target} of AOP advised beans, rather than the proxy itself.
-	 * If set to {@code false} you may need to use the result of
-	 * {@link org.springframework.test.util.AopTestUtils#getUltimateTargetObject(Object)
-	 * AopTestUtils.getUltimateTargetObject(...)} when calling Mockito methods.
-	 * @return {@code true} if the target of AOP advised beans is used or {@code false} if
-	 * the proxy is used directly
-	 */
-	boolean proxyTargetAware() default true;
+    /**
+     * Indicates that Mockito methods such as {@link Mockito#verify(Object) verify(mock)} should use the {@code target}
+     * of AOP advised beans, rather than the proxy itself. If set to {@code false} you may need to use the result of
+     * {@link org.springframework.test.util.AopTestUtils#getUltimateTargetObject(Object)
+     * AopTestUtils.getUltimateTargetObject(...)} when calling Mockito methods.
+     *
+     * @return {@code true} if the target of AOP advised beans is used or {@code false} if the proxy is used directly
+     */
+    boolean proxyTargetAware() default true;
 
 }

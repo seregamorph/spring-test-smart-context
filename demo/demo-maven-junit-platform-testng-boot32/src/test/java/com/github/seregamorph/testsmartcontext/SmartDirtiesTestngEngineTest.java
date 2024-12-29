@@ -13,23 +13,28 @@ import com.github.seregamorph.testsmartcontext.demo.SampleIT;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.platform.testkit.engine.EngineTestKit;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class SmartDirtiesTestngEngineTest {
 
     private static final String ENGINE = "testng";
 
-    @BeforeMethod
-    public void before() {
+    private static Map<String, Map<Class<?>, SmartDirtiesTestsHolder.ClassOrderState>> prevEngineClassOrderStateMap;
+
+    @BeforeClass
+    public static void beforeClass() {
+        prevEngineClassOrderStateMap = SmartDirtiesTestsHolder.setEngineClassOrderStateMap(null);
         TestEventTracker.startTracking();
     }
 
-    @AfterMethod
-    public void after() {
+    @AfterClass
+    public static void afterClass() {
         TestEventTracker.stopTracking();
+        SmartDirtiesTestsHolder.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
     }
 
     @Test
@@ -37,7 +42,6 @@ public class SmartDirtiesTestngEngineTest {
         // to avoid confusion of duplicated test execution output
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println(">>>EngineTestKit duplicating the suite>>>");
-        SmartDirtiesTestsHolder.reset(ENGINE);
 
         var events = EngineTestKit.execute(ENGINE, request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))

@@ -29,7 +29,7 @@ public class SmartDirtiesTestsHolder {
      */
     private static Map<String, Map<Class<?>, ClassOrderState>> engineClassOrderStateMap;
 
-    private static class ClassOrderState {
+    static class ClassOrderState {
         private final boolean isFirst;
         private final boolean isLast;
 
@@ -193,9 +193,11 @@ public class SmartDirtiesTestsHolder {
     }
 
     //@TestOnly
-    static void reset(String engine) {
-        if (engineClassOrderStateMap != null) {
-            engineClassOrderStateMap.remove(engine);
-        }
+    static Map<String, Map<Class<?>, ClassOrderState>> setEngineClassOrderStateMap(
+        Map<String, Map<Class<?>, ClassOrderState>> engineClassOrderStateMap
+    ) {
+        Map<String, Map<Class<?>, ClassOrderState>> prev = SmartDirtiesTestsHolder.engineClassOrderStateMap;
+        SmartDirtiesTestsHolder.engineClassOrderStateMap = engineClassOrderStateMap;
+        return prev;
     }
 }

@@ -11,6 +11,7 @@ import com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,14 +21,18 @@ public class MavenSmartDirtiesVintageEngineTest {
 
     private static final String ENGINE = "junit-vintage";
 
+    private static Map<String, Map<Class<?>, SmartDirtiesTestsHolder.ClassOrderState>> prevEngineClassOrderStateMap;
+
     @BeforeClass
     public static void beforeClass() {
+        prevEngineClassOrderStateMap = SmartDirtiesTestsHolder.setEngineClassOrderStateMap(null);
         TestEventTracker.startTracking();
     }
 
     @AfterClass
     public static void afterClass() {
         TestEventTracker.stopTracking();
+        SmartDirtiesTestsHolder.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
     }
 
     @Test
@@ -35,7 +40,6 @@ public class MavenSmartDirtiesVintageEngineTest {
         // to avoid confusion of duplicated test execution output
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println(">>>EngineTestKit duplicating the suite>>>");
-        SmartDirtiesTestsHolder.reset(ENGINE);
 
         var events = EngineTestKit.execute(ENGINE, request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))

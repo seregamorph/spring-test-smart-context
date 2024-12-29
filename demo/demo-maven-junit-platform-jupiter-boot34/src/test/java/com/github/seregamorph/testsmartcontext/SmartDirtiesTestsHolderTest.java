@@ -2,13 +2,21 @@ package com.github.seregamorph.testsmartcontext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 class SmartDirtiesTestsHolderTest {
+
+    @BeforeEach
+    public void prepare() {
+        SmartDirtiesTestsHolder.setTestClassesLists("SmartDirtiesTestsHolderTest",
+            List.of(List.of(TestRootTest.class)));
+    }
 
     @Test
     public void nestedInheritShouldPass() {
@@ -26,7 +34,7 @@ class SmartDirtiesTestsHolderTest {
     }
 }
 
-@ContextConfiguration(classes = {
+@SpringBootTest(classes = {
     TestRootTest.Configuration.class
 })
 class TestRootTest {

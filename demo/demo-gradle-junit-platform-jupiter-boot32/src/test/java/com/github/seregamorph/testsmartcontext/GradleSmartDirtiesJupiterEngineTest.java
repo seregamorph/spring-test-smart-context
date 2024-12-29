@@ -14,8 +14,9 @@ import com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.testkit.engine.EngineTestKit;
 
@@ -23,14 +24,18 @@ public class GradleSmartDirtiesJupiterEngineTest {
 
     private static final String ENGINE = "junit-jupiter";
 
-    @BeforeEach
-    public void before() {
+    private static Map<String, Map<Class<?>, SmartDirtiesTestsHolder.ClassOrderState>> prevEngineClassOrderStateMap;
+
+    @BeforeAll
+    public static void beforeClass() {
+        prevEngineClassOrderStateMap = SmartDirtiesTestsHolder.setEngineClassOrderStateMap(null);
         TestEventTracker.startTracking();
     }
 
-    @AfterEach
-    public void after() {
+    @AfterAll
+    public static void afterClass() {
         TestEventTracker.stopTracking();
+        SmartDirtiesTestsHolder.setEngineClassOrderStateMap(prevEngineClassOrderStateMap);
     }
 
     @Test
@@ -38,7 +43,6 @@ public class GradleSmartDirtiesJupiterEngineTest {
         // to avoid confusion of duplicated test execution output
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println(">>>EngineTestKit duplicating the suite>>>");
-        SmartDirtiesTestsHolder.reset(ENGINE);
 
         var events = EngineTestKit.execute(ENGINE, request()
                 .selectors(selectPackage("com.github.seregamorph.testsmartcontext.demo"))

@@ -53,7 +53,7 @@ public class MavenSmartDirtiesVintageEngineTest {
         assertEquals(List.of(
             Integration2Test.class,
             SampleDirtiesContextBeforeClassTest.class
-        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
+        ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleDirtiesContextBeforeClassTest.class));

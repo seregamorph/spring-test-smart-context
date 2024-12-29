@@ -57,7 +57,7 @@ public class SmartDirtiesTestngEngineTest {
             Integration1IT.class,
             Integration2IT.class,
             SampleIT.class
-        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
+        ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1SecondIT.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1IT.class));

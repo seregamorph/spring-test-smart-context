@@ -59,7 +59,7 @@ public class MavenSmartDirtiesJupiterEngineTest {
             SampleDirtiesContextBeforeClassTest.class,
             SampleDirtiesContextAfterClassTest.class,
             SampleIntegrationTest.class
-        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
+        ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.NestedTest.class));

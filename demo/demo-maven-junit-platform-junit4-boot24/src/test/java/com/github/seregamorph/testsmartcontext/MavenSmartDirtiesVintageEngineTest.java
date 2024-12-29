@@ -55,7 +55,7 @@ public class MavenSmartDirtiesVintageEngineTest {
             Integration1Test.class,
             Integration2Test.class,
             SampleIntegrationTest.class
-        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
+        ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration2Test.class));

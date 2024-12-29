@@ -52,7 +52,7 @@ public class MavenSmartDirtiesTestngEngineTest {
         assertEquals(List.of(
             Integration1Test.class,
             SampleDirtiesContextAfterClassTest.class
-        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
+        ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(Integration1Test.class));
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(SampleDirtiesContextAfterClassTest.class));

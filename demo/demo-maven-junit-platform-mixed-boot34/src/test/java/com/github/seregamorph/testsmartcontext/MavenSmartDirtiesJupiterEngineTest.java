@@ -61,7 +61,7 @@ public class MavenSmartDirtiesJupiterEngineTest {
             NoBaseClass2IntegrationTest.class,
             Integration2SpringJUnitConfigTest.class,
             SampleIntegrationTest.class
-        ), new ArrayList<>(SmartDirtiesTestsHolder.getTestClasses(ENGINE)));
+        ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsHolder.isFirstClassPerConfig(ExtendWithTest.class));
         assertFalse(SmartDirtiesTestsHolder.isFirstClassPerConfig(NoBaseClass1IntegrationTest.class));

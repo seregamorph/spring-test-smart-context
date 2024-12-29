@@ -40,7 +40,7 @@ public class SmartDirtiesTestsHolder {
     }
 
     @Nullable
-    protected static Set<Class<?>> getTestClasses(String engine) {
+    static Set<Class<?>> getTestClasses(String engine) {
         Map<Class<?>, ClassOrderState> classOrderStateMap = engineClassOrderStateMap == null ? null
             : engineClassOrderStateMap.get(engine);
         return classOrderStateMap == null ? null : classOrderStateMap.keySet();

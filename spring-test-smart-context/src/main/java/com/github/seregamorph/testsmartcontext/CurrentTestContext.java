@@ -13,29 +13,43 @@ import org.springframework.lang.Nullable;
  */
 public class CurrentTestContext {
 
-    private static final ThreadLocal<Stack<Class<?>>> currentTestClassIdentifier = new ThreadLocal<>();
+    private static final ThreadLocal<Stack<Class<?>>> currentTestClassStack = new InheritableThreadLocal<>();
+
+    private static volatile Class<?> globalCurrentTestClass;
+
+    @Nullable
+    public static Class<?> getCurrentTestClass() {
+        // ThreadLocal is always more precise and we claim that parallel test execution is not supported,
+        // but with global reference failover we can call this from any thread
+        Stack<Class<?>> stack = currentTestClassStack.get();
+        return stack == null ? globalCurrentTestClass : stack.peek();
+    }
 
     @Nullable
     public static String getCurrentTestClassName() {
-        Stack<Class<?>> stack = currentTestClassIdentifier.get();
-        return stack == null ? null : stack.peek().getName();
+        Class<?> currentTestClass = getCurrentTestClass();
+        return currentTestClass == null ? null : currentTestClass.getName();
     }
 
     static void pushCurrentTestClass(Class<?> testClass) {
-        Stack<Class<?>> stack = currentTestClassIdentifier.get();
+        Stack<Class<?>> stack = currentTestClassStack.get();
         if (stack == null) {
             stack = new Stack<>();
-            currentTestClassIdentifier.set(stack);
+            currentTestClassStack.set(stack);
         }
         stack.push(testClass);
+        globalCurrentTestClass = testClass;
     }
 
     static void popCurrentTestClass() {
-        Stack<Class<?>> stack = currentTestClassIdentifier.get();
+        Stack<Class<?>> stack = currentTestClassStack.get();
         if (stack != null) {
             stack.pop();
             if (stack.isEmpty()) {
-                currentTestClassIdentifier.remove();
+                currentTestClassStack.remove();
+                globalCurrentTestClass = null;
+            } else {
+                globalCurrentTestClass = stack.peek();
             }
         }
     }

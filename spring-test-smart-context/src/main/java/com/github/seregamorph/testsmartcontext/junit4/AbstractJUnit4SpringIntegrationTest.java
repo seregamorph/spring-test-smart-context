@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext.junit4;
 
+import com.github.seregamorph.testsmartcontext.CurrentTestContextTestExecutionListener;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
  */
 @Deprecated
 @TestExecutionListeners(listeners = {
+    CurrentTestContextTestExecutionListener.class,
     SmartDirtiesContextTestExecutionListener.class,
 }, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public abstract class AbstractJUnit4SpringIntegrationTest extends AbstractJUnit4SpringContextTests {

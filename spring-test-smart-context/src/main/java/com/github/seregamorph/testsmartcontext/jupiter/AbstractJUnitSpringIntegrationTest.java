@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext.jupiter;
 
+import com.github.seregamorph.testsmartcontext.CurrentTestContextTestExecutionListener;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.TestExecutionListeners;
@@ -13,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @see SmartDirtiesContextTestExecutionListener
  */
 @TestExecutionListeners(listeners = {
+    CurrentTestContextTestExecutionListener.class,
     SmartDirtiesContextTestExecutionListener.class,
 }, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 @ExtendWith(SpringExtension.class)

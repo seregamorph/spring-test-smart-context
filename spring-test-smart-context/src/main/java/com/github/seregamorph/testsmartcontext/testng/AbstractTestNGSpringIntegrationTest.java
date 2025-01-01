@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext.testng;
 
+import com.github.seregamorph.testsmartcontext.CurrentTestContextTestExecutionListener;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -12,6 +13,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
  * @see SmartDirtiesContextTestExecutionListener
  */
 @TestExecutionListeners(listeners = {
+    CurrentTestContextTestExecutionListener.class,
     SmartDirtiesContextTestExecutionListener.class,
 }, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public abstract class AbstractTestNGSpringIntegrationTest extends AbstractTestNGSpringContextTests {

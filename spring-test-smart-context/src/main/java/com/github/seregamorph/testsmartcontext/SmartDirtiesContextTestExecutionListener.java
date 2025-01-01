@@ -36,7 +36,6 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
     @Override
     public void beforeTestClass(TestContext testContext) {
         // stack Nested classes
-        CurrentTestContext.pushCurrentTestClass(testContext.getTestClass());
         Class<?> testClass = testContext.getTestClass();
         if (isInnerClass(testClass)) {
             SmartDirtiesTestsSupport.verifyInnerClass(testClass);
@@ -45,17 +44,12 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     @Override
     public void afterTestClass(TestContext testContext) {
-        try {
-            Class<?> testClass = testContext.getTestClass();
-            if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
-                LOG.info("markDirty (closing context) after " + testClass.getName());
-                testContext.markApplicationContextDirty(null);
-            } else {
-                LOG.debug("Reusing context after " + testClass.getName());
-            }
-        } finally {
-            // pop Nested classes
-            CurrentTestContext.popCurrentTestClass();
+        Class<?> testClass = testContext.getTestClass();
+        if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
+            LOG.info("markDirty (closing context) after " + testClass.getName());
+            testContext.markApplicationContextDirty(null);
+        } else {
+            LOG.debug("Reusing context after " + testClass.getName());
         }
     }
 }

@@ -26,7 +26,14 @@ public class SpringContextEventLoggerListener implements ApplicationListener<App
     }
 
     protected void onCreated() {
-        LOG.info("Creating context for " + CurrentTestContext.getCurrentTestClassName());
+        String currentTestClassName = CurrentTestContext.getCurrentTestClassName();
+        if (currentTestClassName == null) {
+            LOG.warn("Could not resolve current class name, ensure that CurrentTestContextTestExecutionListener " +
+                "is registered for test class. Hint:\n" +
+                "Maybe you should set @TestExecutionListeners.mergeMode to MERGE_WITH_DEFAULTS for your test class.");
+        } else {
+            LOG.info("Creating context for " + currentTestClassName);
+        }
     }
 
     @Override

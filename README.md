@@ -96,7 +96,9 @@ Then this test execution listener
 will be auto-discovered via [spring.factories](spring-test-smart-context/src/main/resources/META-INF/spring.factories).
 Alternatively it can be defined explicitly
 ```java
-@TestExecutionListeners(SmartDirtiesContextTestExecutionListener.class)
+@TestExecutionListeners(listeners = {
+        SmartDirtiesContextTestExecutionListener.class
+}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 ```
 or even inherited from
 [AbstractJUnitSpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/jupiter/AbstractJUnitSpringIntegrationTest.java)
@@ -111,7 +113,9 @@ which will reorder test classes on each execution and prepare the list of last t
 The integration test classes should add
 [SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java)
 ```java
-@TestExecutionListeners(SmartDirtiesContextTestExecutionListener.class)
+@TestExecutionListeners(listeners = {
+        SmartDirtiesContextTestExecutionListener.class
+}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 ```
 Note: the annotation is inherited, so it makes sense to annotate the base test class or use
 [AbstractTestNGSpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/testng/AbstractTestNGSpringIntegrationTest.java)
@@ -180,7 +184,9 @@ Then this test execution listener
 will be auto-discovered via [spring.factories](spring-test-smart-context/src/main/resources/META-INF/spring.factories).
 Alternatively it can be defined explicitly
 ```java
-@TestExecutionListeners(SmartDirtiesContextTestExecutionListener.class)
+@TestExecutionListeners(listeners = {
+        SmartDirtiesContextTestExecutionListener.class
+}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 ```
 or even inherited from
 [AbstractJUnit4SpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/junit4/AbstractJUnit4SpringIntegrationTest.java)

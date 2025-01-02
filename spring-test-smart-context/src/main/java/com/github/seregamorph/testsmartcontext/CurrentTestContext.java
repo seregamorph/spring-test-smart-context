@@ -15,6 +15,10 @@ public class CurrentTestContext {
 
     private static final ThreadLocal<Stack<Class<?>>> currentTestClassIdentifier = new ThreadLocal<>();
 
+    /**
+     * Get current test class name. It's only defined for integration test classes and
+     * for the same thread as test engine.
+     */
     @Nullable
     public static String getCurrentTestClassName() {
         Stack<Class<?>> stack = currentTestClassIdentifier.get();

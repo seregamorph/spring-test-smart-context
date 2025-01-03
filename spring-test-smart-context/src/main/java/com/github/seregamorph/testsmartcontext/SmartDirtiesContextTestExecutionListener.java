@@ -46,12 +46,12 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
     @Override
     public void afterTestClass(TestContext testContext) {
         try {
-        Class<?> testClass = testContext.getTestClass();
-        if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
-            LOG.info("markDirty (closing context) after " + testClass.getName());
-            testContext.markApplicationContextDirty(null);
-        } else {
-            LOG.debug("Reusing context after " + testClass.getName());
+            Class<?> testClass = testContext.getTestClass();
+            if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
+                LOG.info("markDirty (closing context) after " + testClass.getName());
+                testContext.markApplicationContextDirty(null);
+            } else {
+                LOG.debug("Reusing context after " + testClass.getName());
             }
         } finally {
             // pop Nested classes

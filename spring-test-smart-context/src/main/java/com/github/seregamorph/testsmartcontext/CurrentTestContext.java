@@ -13,7 +13,7 @@ import org.springframework.lang.Nullable;
  */
 public class CurrentTestContext {
 
-    private static final ThreadLocal<Stack<Class<?>>> currentTestClassIdentifier = new ThreadLocal<>();
+    private static final ThreadLocal<Stack<Class<?>>> currentTestClass = new ThreadLocal<>();
 
     /**
      * Get current test class name. It's only defined for integration test classes and
@@ -21,25 +21,25 @@ public class CurrentTestContext {
      */
     @Nullable
     public static String getCurrentTestClassName() {
-        Stack<Class<?>> stack = currentTestClassIdentifier.get();
+        Stack<Class<?>> stack = currentTestClass.get();
         return stack == null ? null : stack.peek().getName();
     }
 
     static void pushCurrentTestClass(Class<?> testClass) {
-        Stack<Class<?>> stack = currentTestClassIdentifier.get();
+        Stack<Class<?>> stack = currentTestClass.get();
         if (stack == null) {
             stack = new Stack<>();
-            currentTestClassIdentifier.set(stack);
+            currentTestClass.set(stack);
         }
         stack.push(testClass);
     }
 
     static void popCurrentTestClass() {
-        Stack<Class<?>> stack = currentTestClassIdentifier.get();
+        Stack<Class<?>> stack = currentTestClass.get();
         if (stack != null) {
             stack.pop();
             if (stack.isEmpty()) {
-                currentTestClassIdentifier.remove();
+                currentTestClass.remove();
             }
         }
     }

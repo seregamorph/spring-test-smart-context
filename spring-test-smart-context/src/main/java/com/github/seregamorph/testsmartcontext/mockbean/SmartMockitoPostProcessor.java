@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -29,8 +28,6 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.PropertyValues;
-import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -51,14 +48,11 @@ import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultBeanNameGenerator;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ConfigurationClassPostProcessor;
-import org.springframework.core.Conventions;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.ResolvableType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -77,27 +71,22 @@ import org.springframework.util.StringUtils;
  * @author Andreas Neiser
  * @since 1.4.0
  */
-public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProcessor, BeanClassLoaderAware,
+public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProcessor,
     BeanFactoryAware, BeanFactoryPostProcessor, Ordered {
 
     private static final String BEAN_NAME = SmartMockitoPostProcessor.class.getName();
-
-    private static final String CONFIGURATION_CLASS_ATTRIBUTE = Conventions
-        .getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "configurationClass");
 
     private static final BeanNameGenerator beanNameGenerator = new DefaultBeanNameGenerator();
 
     private final DefinitionSet definitions;
 
-    private ClassLoader classLoader;
-
     private BeanFactory beanFactory;
 
     private final MockitoBeans mockitoBeans = new MockitoBeans();
 
-    private final Map<Definition, String> beanNameRegistry = new HashMap<>();
+    private final Map<String, SmartMockTargetSource> proxyTargetSources = new HashMap<>();
 
-    private final Map<Field, String> fieldRegistry = new HashMap<>();
+    private final Map<Definition, String> beanNameRegistry = new HashMap<>();
 
     private final Map<String, SpyDefinition> spies = new HashMap<>();
 
@@ -108,11 +97,6 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
      */
     public SmartMockitoPostProcessor(DefinitionSet definitions) {
         this.definitions = definitions;
-    }
-
-    @Override
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
     }
 
     @Override
@@ -132,48 +116,25 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
     private void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory, BeanDefinitionRegistry registry) {
         beanFactory.registerSingleton(MockitoBeans.class.getName(), this.mockitoBeans);
         SmartDefinitionsParser parser = new SmartDefinitionsParser(this.definitions);
-        for (Class<?> configurationClass : getConfigurationClasses(beanFactory)) {
-            parser.parse(configurationClass);
-        }
         DefinitionSet definitions = parser.getDefinitions();
         for (Definition definition : definitions) {
-            Field field = parser.getField(definition);
-            register(beanFactory, registry, definition, field);
+            register(beanFactory, registry, definition);
         }
-    }
-
-    private Set<Class<?>> getConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
-        Set<Class<?>> configurationClasses = new LinkedHashSet<>();
-        for (BeanDefinition beanDefinition : getConfigurationBeanDefinitions(beanFactory).values()) {
-            configurationClasses.add(ClassUtils.resolveClassName(beanDefinition.getBeanClassName(), this.classLoader));
-        }
-        return configurationClasses;
-    }
-
-    private Map<String, BeanDefinition> getConfigurationBeanDefinitions(ConfigurableListableBeanFactory beanFactory) {
-        Map<String, BeanDefinition> definitions = new LinkedHashMap<>();
-        for (String beanName : beanFactory.getBeanDefinitionNames()) {
-            BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
-            if (definition.getAttribute(CONFIGURATION_CLASS_ATTRIBUTE) != null) {
-                definitions.put(beanName, definition);
-            }
-        }
-        return definitions;
     }
 
     private void register(ConfigurableListableBeanFactory beanFactory, BeanDefinitionRegistry registry,
-                          Definition definition, Field field) {
+                          Definition definition) {
         if (definition instanceof MockDefinition) {
             MockDefinition mockDefinition = (MockDefinition) definition;
-            registerMock(beanFactory, registry, mockDefinition, field);
+            registerMock(beanFactory, registry, mockDefinition);
         } else if (definition instanceof SpyDefinition) {
             SpyDefinition spyDefinition = (SpyDefinition) definition;
-            registerSpy(beanFactory, registry, spyDefinition, field);
+            registerSpy(beanFactory, registry, spyDefinition);
         }
     }
 
     private void registerMock(ConfigurableListableBeanFactory beanFactory, BeanDefinitionRegistry registry,
-                              MockDefinition definition, Field field) {
+                              MockDefinition definition) {
         RootBeanDefinition beanDefinition = createBeanDefinition(definition);
         String beanName = getBeanName(beanFactory, registry, definition, beanDefinition);
         String transformedBeanName = BeanFactoryUtils.transformedBeanName(beanName);
@@ -184,12 +145,17 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
         }
         registry.registerBeanDefinition(transformedBeanName, beanDefinition);
         Object mock = definition.createMock(beanName + " bean");
+
+        SmartMockTargetSource proxyTargetSource = proxyTargetSources.get(transformedBeanName);
+        if (proxyTargetSource == null) {
+//            proxyTargetSource = new SmartMockTargetSource(transformedBeanName, ));
+            proxyTargetSources.put(transformedBeanName, proxyTargetSource);
+        }
+
         beanFactory.registerSingleton(transformedBeanName, mock);
+
         this.mockitoBeans.add(mock);
         this.beanNameRegistry.put(definition, beanName);
-        if (field != null) {
-            this.fieldRegistry.put(field, beanName);
-        }
     }
 
     private RootBeanDefinition createBeanDefinition(MockDefinition mockDefinition) {
@@ -227,13 +193,13 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
     }
 
     private void registerSpy(ConfigurableListableBeanFactory beanFactory, BeanDefinitionRegistry registry,
-                             SpyDefinition spyDefinition, Field field) {
+                             SpyDefinition spyDefinition) {
         Set<String> existingBeans = getExistingBeans(beanFactory, spyDefinition.getTypeToSpy(),
             spyDefinition.getQualifier());
         if (ObjectUtils.isEmpty(existingBeans)) {
-            createSpy(registry, spyDefinition, field);
+            createSpy(registry, spyDefinition);
         } else {
-            registerSpies(registry, spyDefinition, field, existingBeans);
+            registerSpies(registry, spyDefinition, existingBeans);
         }
     }
 
@@ -271,18 +237,18 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
         }
     }
 
-    private void createSpy(BeanDefinitionRegistry registry, SpyDefinition spyDefinition, Field field) {
+    private void createSpy(BeanDefinitionRegistry registry, SpyDefinition spyDefinition) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition(spyDefinition.getTypeToSpy().resolve());
         String beanName = SmartMockitoPostProcessor.beanNameGenerator.generateBeanName(beanDefinition, registry);
         registry.registerBeanDefinition(beanName, beanDefinition);
-        registerSpy(spyDefinition, field, beanName);
+        registerSpy(spyDefinition, beanName);
     }
 
-    private void registerSpies(BeanDefinitionRegistry registry, SpyDefinition spyDefinition, Field field,
+    private void registerSpies(BeanDefinitionRegistry registry, SpyDefinition spyDefinition,
                                Collection<String> existingBeans) {
         try {
             String beanName = determineBeanName(existingBeans, spyDefinition, registry);
-            registerSpy(spyDefinition, field, beanName);
+            registerSpy(spyDefinition, beanName);
         } catch (RuntimeException ex) {
             throw new IllegalStateException("Unable to register spy bean " + spyDefinition.getTypeToSpy(), ex);
         }
@@ -316,12 +282,9 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
         return primaryBeanName;
     }
 
-    private void registerSpy(SpyDefinition definition, Field field, String beanName) {
+    private void registerSpy(SpyDefinition definition, String beanName) {
         this.spies.put(beanName, definition);
         this.beanNameRegistry.put(definition, beanName);
-        if (field != null) {
-            this.fieldRegistry.put(field, beanName);
-        }
     }
 
     protected final Object createSpyIfNecessary(Object bean, String beanName) throws BeansException {
@@ -331,20 +294,6 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
             this.mockitoBeans.add(bean);
         }
         return bean;
-    }
-
-    @Override
-    public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName)
-        throws BeansException {
-        ReflectionUtils.doWithFields(bean.getClass(), field -> postProcessField(bean, field));
-        return pvs;
-    }
-
-    private void postProcessField(Object bean, Field field) {
-        String beanName = this.fieldRegistry.get(field);
-        if (StringUtils.hasText(beanName)) {
-            inject(field, bean, beanName);
-        }
     }
 
     void inject(Field field, Object testClassInstance, Definition definition) {
@@ -374,16 +323,6 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
         return Ordered.LOWEST_PRECEDENCE - 10;
     }
 
-//    /**
-//     * Register the processor with a {@link BeanDefinitionRegistry}. Not required when using the {@link SpringRunner} as
-//     * registration is automatic.
-//     *
-//     * @param registry the bean definition registry
-//     */
-//    public static void register(BeanDefinitionRegistry registry) {
-//        register(registry, null);
-//    }
-
     /**
      * Register the processor with a {@link BeanDefinitionRegistry}. Not required when using the {@link SpringRunner} as
      * registration is automatic.
@@ -403,7 +342,7 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
      * @param postProcessor the post processor class to register
      * @param definitions   the initial mock/spy definitions
      */
-    public static void register(BeanDefinitionRegistry registry, Class<? extends SmartMockitoPostProcessor> postProcessor,
+    private static void register(BeanDefinitionRegistry registry, Class<? extends SmartMockitoPostProcessor> postProcessor,
                                 DefinitionSet definitions) {
         SpyPostProcessor.register(registry);
         BeanDefinition definition = getOrAddBeanDefinition(registry, postProcessor);
@@ -420,7 +359,7 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
             RootBeanDefinition definition = new RootBeanDefinition(postProcessor);
             definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             ConstructorArgumentValues constructorArguments = definition.getConstructorArgumentValues();
-            constructorArguments.addIndexedArgumentValue(0, new LinkedHashSet<>());
+            constructorArguments.addIndexedArgumentValue(0, new DefinitionSet());
             registry.registerBeanDefinition(BEAN_NAME, definition);
             return definition;
         }

@@ -16,6 +16,9 @@
 
 package com.github.seregamorph.testsmartcontext.mockbean;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -30,10 +33,6 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.util.ClassUtils;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 // Based on original code from
 // https://github.com/spring-projects/spring-boot/tree/v3.3.7/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/mock/mockito
@@ -78,6 +77,8 @@ public class ResetMocksTestExecutionListener extends AbstractTestExecutionListen
     }
 
     private void resetMocks(ConfigurableApplicationContext applicationContext, SmartMockReset reset) {
+        // TODO rewrite - reset only SmartMockBean of current test class
+
         ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
         String[] names = beanFactory.getBeanDefinitionNames();
         Set<String> instantiatedSingletons = new HashSet<>(Arrays.asList(beanFactory.getSingletonNames()));

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
@@ -69,7 +70,7 @@ import org.springframework.util.StringUtils;
  * @author Andy Wilkinson
  * @author Stephane Nicoll
  * @author Andreas Neiser
- * @since 1.4.0
+ * @author Sergey Chernov
  */
 public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProcessor,
     BeanFactoryAware, BeanFactoryPostProcessor, Ordered {
@@ -81,8 +82,6 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
     private final DefinitionSet definitions;
 
     private BeanFactory beanFactory;
-
-    private final MockitoBeans mockitoBeans = new MockitoBeans();
 
     private final Map<String, SmartMockTargetSource> proxyTargetSources = new HashMap<>();
 
@@ -114,10 +113,7 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
     }
 
     private void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory, BeanDefinitionRegistry registry) {
-        beanFactory.registerSingleton(MockitoBeans.class.getName(), this.mockitoBeans);
-        SmartDefinitionsParser parser = new SmartDefinitionsParser(this.definitions);
-        DefinitionSet definitions = parser.getDefinitions();
-        for (Definition definition : definitions) {
+        for (Definition definition : this.definitions) {
             register(beanFactory, registry, definition);
         }
     }
@@ -138,23 +134,27 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
         RootBeanDefinition beanDefinition = createBeanDefinition(definition);
         String beanName = getBeanName(beanFactory, registry, definition, beanDefinition);
         String transformedBeanName = BeanFactoryUtils.transformedBeanName(beanName);
-        if (registry.containsBeanDefinition(transformedBeanName)) {
-            BeanDefinition existing = registry.getBeanDefinition(transformedBeanName);
-            copyBeanDefinitionDetails(existing, beanDefinition);
-            registry.removeBeanDefinition(transformedBeanName);
-        }
-        registry.registerBeanDefinition(transformedBeanName, beanDefinition);
-        Object mock = definition.createMock(beanName + " bean");
-
         SmartMockTargetSource proxyTargetSource = proxyTargetSources.get(transformedBeanName);
         if (proxyTargetSource == null) {
-//            proxyTargetSource = new SmartMockTargetSource(transformedBeanName, ));
+            if (registry.containsBeanDefinition(transformedBeanName)) {
+                BeanDefinition existing = registry.getBeanDefinition(transformedBeanName);
+                copyBeanDefinitionDetails(existing, beanDefinition);
+                registry.removeBeanDefinition(transformedBeanName);
+            }
+            registry.registerBeanDefinition(transformedBeanName, beanDefinition);
+
+            proxyTargetSource = new SmartMockTargetSource(transformedBeanName,
+                definition.getTypeToMock().resolve(), );
+            ProxyFactory proxyFactory = new ProxyFactory();
+            proxyFactory.setProxyTargetClass(true);
+            proxyFactory.setTargetSource(proxyTargetSource);
+            Object proxy = proxyFactory.getProxy();
+            beanFactory.registerSingleton(transformedBeanName, proxy);
             proxyTargetSources.put(transformedBeanName, proxyTargetSource);
         }
+        //Object mock = definition.createMock(beanName + " bean");
+        //beanFactory.registerSingleton(transformedBeanName, mock);
 
-        beanFactory.registerSingleton(transformedBeanName, mock);
-
-        this.mockitoBeans.add(mock);
         this.beanNameRegistry.put(definition, beanName);
     }
 
@@ -291,7 +291,6 @@ public class SmartMockitoPostProcessor implements InstantiationAwareBeanPostProc
         SpyDefinition definition = this.spies.get(beanName);
         if (definition != null) {
             bean = definition.createSpy(beanName, bean);
-            this.mockitoBeans.add(bean);
         }
         return bean;
     }

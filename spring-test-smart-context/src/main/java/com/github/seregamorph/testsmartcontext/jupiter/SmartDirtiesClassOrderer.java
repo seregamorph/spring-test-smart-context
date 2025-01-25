@@ -88,8 +88,13 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
         }
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        List<List<Class<?>>> testClassesLists = sorter.sort(classDescriptors, ClassDescriptor::getTestClass);
-
+        List<List<Class<?>>> testClassesLists;
+        try {
+            testClassesLists = sorter.sort(classDescriptors, ClassDescriptor::getTestClass);
+        } catch (Throwable e) {
+            SmartDirtiesTestsSupport.setFailureCause(e);
+            throw e;
+        }
         SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, testClassesLists);
     }
 }

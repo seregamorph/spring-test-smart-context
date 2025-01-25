@@ -31,6 +31,9 @@ public class SmartDirtiesTestsSupport {
      */
     private static Map<String, Map<Class<?>, ClassOrderState>> engineClassOrderStateMap;
 
+    @Nullable
+    private static Throwable failureCause;
+
     static class ClassOrderState {
         private final boolean isFirst;
         private final boolean isLast;
@@ -97,7 +100,7 @@ public class SmartDirtiesTestsSupport {
                                     + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + " property" : "declares\n"
                                     + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + "=" + configClassOrderer + "\n")
                                 + " (should have value " + SmartDirtiesClassOrderer.class.getName()
-                                + " to address the issue)");
+                                + " to address the issue)", failureCause);
                             //@formatter:on
                         }
                         //@formatter:off
@@ -128,7 +131,7 @@ public class SmartDirtiesTestsSupport {
                 }
                 return null;
             }
-            throw new IllegalStateException("engineClassOrderStateMap is not initialized");
+            throw new IllegalStateException("engineClassOrderStateMap is not initialized", failureCause);
         }
 
         for (Map<Class<?>, ClassOrderState> classOrderStateMap : engineClassOrderStateMap.values()) {
@@ -138,10 +141,10 @@ public class SmartDirtiesTestsSupport {
             }
         }
         throw new IllegalStateException("engineClassOrderStateMap is not defined for class "
-            + testClass + ", it means that it was skipped on initial analysis. "
+            + testClass + ", it means that it was skipped on initial analysis or failed. "
             + "Discovered classes: " + engineClassOrderStateMap.entrySet().stream()
             .map(entry -> entry.getKey() + ": " + entry.getValue().keySet())
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList()), failureCause);
     }
 
     protected static void setTestClassesLists(String engine, List<List<Class<?>>> testClassesLists) {
@@ -159,6 +162,10 @@ public class SmartDirtiesTestsSupport {
             SmartDirtiesTestsSupport.engineClassOrderStateMap = new LinkedHashMap<>();
         }
         SmartDirtiesTestsSupport.engineClassOrderStateMap.put(engine, classOrderStateMap);
+    }
+
+    protected static void setFailureCause(Throwable failureCause) {
+        SmartDirtiesTestsSupport.failureCause = failureCause;
     }
 
     protected static void verifyInnerClass(Class<?> innerTestClass) {

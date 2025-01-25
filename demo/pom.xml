@@ -27,6 +27,7 @@
         <module>demo-maven-junit-platform-junit4-boot24</module>
         <module>demo-maven-junit-platform-jupiter-boot34</module>
         <module>demo-maven-junit-platform-jupiter-spring5</module>
+        <module>demo-maven-junit-platform-jupiter-spring7</module>
         <module>demo-maven-junit-platform-mixed-boot34</module>
         <module>demo-maven-junit-platform-testng-boot32</module>
         <module>demo-maven-testng-boot24</module>
@@ -57,4 +58,11 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <url>https://repo.spring.io/milestone/</url>
+        </repository>
+    </repositories>
 </project>

@@ -1,3 +1,6 @@
+[![Maven Central Version](https://img.shields.io/maven-central/v/com.github.seregamorph/spring-test-smart-context?style=flat-square)](https://central.sonatype.com/artifact/com.github.seregamorph/spring-test-smart-context/overview)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 ## Improving Spring Boot Test efficiency
 
 ### Problem statement

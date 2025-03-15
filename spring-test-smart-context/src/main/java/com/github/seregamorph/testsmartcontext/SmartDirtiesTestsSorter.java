@@ -15,8 +15,8 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.BootstrapUtilsHelper;
@@ -35,7 +35,7 @@ import org.springframework.test.context.TestContextBootstrapper;
  */
 public class SmartDirtiesTestsSorter {
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final SmartDirtiesTestsSorter instance = initInstance();
 
@@ -162,7 +162,7 @@ public class SmartDirtiesTestsSorter {
         pw.println("Running suite of " + totalTests + " tests. Integration test classes " +
             "(" + itClasses.size() + " classes):");
         itClasses.forEach(pw::println);
-        log.debug(sw.toString());
+        logger.debug(sw.toString());
     }
 
     private void printSuiteTestsPerConfig(int itClassesSize, List<List<Class<?>>> sortedConfigToTests) {
@@ -190,7 +190,7 @@ public class SmartDirtiesTestsSorter {
                 isFirst = false;
             }
         });
-        log.info(sw.toString());
+        logger.info(sw.toString());
     }
 
     @FunctionalInterface

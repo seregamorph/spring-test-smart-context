@@ -2,8 +2,8 @@ package com.github.seregamorph.testsmartcontext;
 
 import static com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport.isInnerClass;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 
@@ -24,7 +24,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  */
 public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecutionListener {
 
-    private static final Log LOG = LogFactory.getLog(SmartDirtiesContextTestExecutionListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(SmartDirtiesContextTestExecutionListener.class);
 
     @Override
     public int getOrder() {
@@ -48,10 +48,10 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
         try {
             Class<?> testClass = testContext.getTestClass();
             if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
-                LOG.info("markDirty (closing context) after " + testClass.getName());
+                logger.info("markDirty (closing context) after {}", testClass.getName());
                 testContext.markApplicationContextDirty(null);
             } else {
-                LOG.debug("Reusing context after " + testClass.getName());
+                logger.debug("Reusing context after {}", testClass.getName());
             }
         } finally {
             // pop Nested classes

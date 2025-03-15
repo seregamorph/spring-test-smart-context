@@ -2,8 +2,8 @@ package com.github.seregamorph.testsmartcontext;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
@@ -17,7 +17,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  */
 public class SpringContextEventLoggerListener implements ApplicationListener<ApplicationContextEvent> {
 
-    private static final Log LOG = LogFactory.getLog(SpringContextEventLoggerListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpringContextEventLoggerListener.class);
 
     private final long createdNanos = System.nanoTime();
 
@@ -28,11 +28,11 @@ public class SpringContextEventLoggerListener implements ApplicationListener<App
     protected void onCreated() {
         String currentTestClassName = CurrentTestContext.getCurrentTestClassName();
         if (currentTestClassName == null) {
-            LOG.error("Could not resolve current class name, ensure that SmartDirtiesContextTestExecutionListener " +
+            logger.error("Could not resolve current class name, ensure that SmartDirtiesContextTestExecutionListener " +
                 "is registered for test class. Hint:\n" +
                 "Maybe you should set @TestExecutionListeners.mergeMode to MERGE_WITH_DEFAULTS for your test class.");
         } else {
-            LOG.info("Creating context for " + currentTestClassName);
+            logger.info("Creating context for {}", currentTestClassName);
         }
     }
 
@@ -48,17 +48,17 @@ public class SpringContextEventLoggerListener implements ApplicationListener<App
     protected void onContextRefreshedEvent(ContextRefreshedEvent event) {
         long nowNanos = System.nanoTime();
         String contextInitFormatted = formatNanos(nowNanos - createdNanos);
-        LOG.info("Created context in " + contextInitFormatted + " for " + CurrentTestContext.getCurrentTestClassName());
+        logger.info("Created context in {} for {}", contextInitFormatted, CurrentTestContext.getCurrentTestClassName());
     }
 
     protected void onContextClosedEvent(ContextClosedEvent event) {
         String testClassIdentifier = CurrentTestContext.getCurrentTestClassName();
         if (testClassIdentifier == null) {
             // system shutdown hook
-            LOG.info("Destroying context (hook)");
+            logger.info("Destroying context (hook)");
         } else {
             // triggered via SmartDirtiesContextTestExecutionListener or spring DirtiesContextTestExecutionListener
-            LOG.info("Destroying context for " + testClassIdentifier);
+            logger.info("Destroying context for {}", testClassIdentifier);
         }
     }
 

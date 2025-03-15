@@ -18,6 +18,7 @@
     </description>
 
     <properties>
+        <slf4j.version>1.7.36</slf4j.version>
         <spring.version>6.1.16</spring.version>
         <testng.version>7.10.2</testng.version>
         <junit-platform.version>1.11.3</junit-platform.version>
@@ -51,10 +52,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jcl</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

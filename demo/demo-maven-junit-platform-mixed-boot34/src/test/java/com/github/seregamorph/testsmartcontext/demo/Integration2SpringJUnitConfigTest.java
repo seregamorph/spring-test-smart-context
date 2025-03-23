@@ -6,7 +6,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 // JUnit 5 Jupiter
 @SpringJUnitConfig(classes = {
-    Integration2Test.Configuration.class
+    Integration2SpringJUnitConfigTest.Configuration.class
 })
 public class Integration2SpringJUnitConfigTest {
 
@@ -24,4 +24,6 @@ public class Integration2SpringJUnitConfigTest {
         }
     }
 
+    public static class Configuration {
+    }
 }

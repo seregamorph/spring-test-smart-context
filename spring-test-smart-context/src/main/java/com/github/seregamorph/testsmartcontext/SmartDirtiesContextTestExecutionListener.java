@@ -12,7 +12,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  * {@link org.springframework.test.context.support.DirtiesContextTestExecutionListener}. Based on known list (ordered)
  * of tests to execute (reordered via {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}
  * for Jupiter classes, {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener} for TestNG
- * classes or {@link SmartDirtiesPostDiscoveryFilter} for JUnit 4 classes), the last test in each group that shares the
+ * classes, the last test in each group that shares the
  * same configuration (=share the same spring context) will automatically close the ApplicationContext on after-class,
  * which will release resources as well (like Docker containers defined as spring beans). See detailed explanation <a
  * href="https://github.com/seregamorph/spring-test-smart-context/blob/master/README.md">README</a>.

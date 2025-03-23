@@ -15,9 +15,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.ClassOrderer;
+import org.junit.runner.RunWith;
+import org.junit.runner.Runner;
 import org.springframework.lang.Nullable;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * This class should only be used internally by the framework.
@@ -117,18 +120,9 @@ public class SmartDirtiesTestsSupport {
                     throw new UncheckedIOException(e);
                 }
             }
-            if (JUnitPlatformSupport.isJunit4Present() && JUnitPlatformSupport.isJUnit4IdeaTestRunnerPresent()) {
-                System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), " +
-                    "the Smart DirtiesContext behaviour is disabled.");
-                if (!JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
-                    //@formatter:off
-                    System.err.println("If you add org.junit.jupiter:junit-jupiter-api test dependency, \n" +
-                        "it will allow to run packages/modules with tests with Smart DirtiesContext semantics via " +
-                        "IDEA. See \n" +
-                        "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default\n" +
-                        "for details.");
-                    //@formatter:on
-                }
+            if (JUnitPlatformSupport.isJunit4Present() && isIntegrationTestJUnit4(testClass)) {
+                System.err.println(testClass.getName() + " is a JUnit 4 test class, " +
+                    "the Smart DirtiesContext behaviour is not supported. The last version supporting JUnit 4 is 0.9");
                 return null;
             }
             throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);
@@ -211,5 +205,16 @@ public class SmartDirtiesTestsSupport {
         Map<String, Map<Class<?>, ClassOrderState>> prev = SmartDirtiesTestsSupport.engineClassOrderStateMap;
         SmartDirtiesTestsSupport.engineClassOrderStateMap = engineClassOrderStateMap;
         return prev;
+    }
+
+    private static boolean isIntegrationTestJUnit4(Class<?> testClass) {
+        // can be inherited, but cannot be meta-annotation
+        RunWith runWith = testClass.getAnnotation(RunWith.class);
+        if (runWith == null) {
+            return false;
+        }
+        Class<? extends Runner> runner = runWith.value();
+        // includes org.springframework.test.context.junit4.SpringRunner
+        return SpringJUnit4ClassRunner.class.isAssignableFrom(runner);
     }
 }

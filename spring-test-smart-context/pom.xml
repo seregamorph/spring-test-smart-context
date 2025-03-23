@@ -21,6 +21,7 @@
         <slf4j.version>1.7.36</slf4j.version>
         <spring.version>6.1.16</spring.version>
         <testng.version>7.10.2</testng.version>
+        <junit4.version>4.13.2</junit4.version>
         <junit-platform.version>1.11.3</junit-platform.version>
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <testng-engine.version>1.0.5</testng-engine.version>
@@ -70,9 +71,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit4.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

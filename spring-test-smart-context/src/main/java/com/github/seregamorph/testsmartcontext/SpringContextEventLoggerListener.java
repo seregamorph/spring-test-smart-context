@@ -48,17 +48,20 @@ public class SpringContextEventLoggerListener implements ApplicationListener<App
     protected void onContextRefreshedEvent(ContextRefreshedEvent event) {
         long nowNanos = System.nanoTime();
         String contextInitFormatted = formatNanos(nowNanos - createdNanos);
-        logger.info("Created context in {} for {}", contextInitFormatted, CurrentTestContext.getCurrentTestClassName());
+        boolean isChild = event.getApplicationContext().getParent() != null;
+        logger.info("Created {} in {} for {}",
+            isChild ? "child context" : "context", contextInitFormatted, CurrentTestContext.getCurrentTestClassName());
     }
 
     protected void onContextClosedEvent(ContextClosedEvent event) {
         String testClassIdentifier = CurrentTestContext.getCurrentTestClassName();
+        boolean isChild = event.getApplicationContext().getParent() != null;
         if (testClassIdentifier == null) {
             // system shutdown hook
-            logger.info("Destroying context (hook)");
+            logger.info("Destroying {} (hook)", isChild ? "child context" : "context");
         } else {
             // triggered via SmartDirtiesContextTestExecutionListener or spring DirtiesContextTestExecutionListener
-            logger.info("Destroying context for {}", testClassIdentifier);
+            logger.info("Destroying {} for {}", isChild ? "child context" : "context", testClassIdentifier);
         }
     }
 

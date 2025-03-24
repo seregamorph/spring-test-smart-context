@@ -16,6 +16,7 @@ import com.github.seregamorph.testsmartcontext.demo.NoBaseClass2IntegrationTest;
 import com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextAfterClassTest;
 import com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextBeforeClassTest;
 import com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest;
+import com.github.seregamorph.testsmartcontext.demo.WebIntegrationTest;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +57,9 @@ public class MavenSmartDirtiesJupiterEngineTest {
 
         // 16 = 10 ITs + 3 Nested + 2 UTs + 1 suite
         events.assertStatistics(stats -> stats
-            .started(16)
-            .succeeded(16)
-            .finished(16)
+            .started(17)
+            .succeeded(17)
+            .finished(17)
             .aborted(0)
             .failed(0));
 
@@ -72,7 +73,8 @@ public class MavenSmartDirtiesJupiterEngineTest {
             Integration1Test.class,
             Integration2SpringJUnitConfigTest.class,
             Integration2Test.class,
-            SampleIntegrationTest.class
+            SampleIntegrationTest.class,
+            WebIntegrationTest.class
         ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
@@ -88,6 +90,7 @@ public class MavenSmartDirtiesJupiterEngineTest {
         assertFalse(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration2Test.class));
         assertFalse(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration2Test.NestedTest.class));
         assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleIntegrationTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(WebIntegrationTest.class));
 
         assertFalse(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
         assertFalse(SmartDirtiesTestsSupport.isLastClassPerConfig(ExtendWithTest.class));
@@ -102,6 +105,7 @@ public class MavenSmartDirtiesJupiterEngineTest {
         assertFalse(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration2Test.NestedTest.class));
         assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration2Test.class));
         assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleIntegrationTest.class));
+        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(WebIntegrationTest.class));
 
         TestEventTracker.assertConsumedEvent("Started SmartDirtiesJupiterTestsSorterTest.shouldSortMostlyAlphabeticallyAndGroupSameConfigurations");
         TestEventTracker.assertConsumedEvent("Finished SmartDirtiesJupiterTestsSorterTest.shouldSortMostlyAlphabeticallyAndGroupSameConfigurations");
@@ -122,6 +126,9 @@ public class MavenSmartDirtiesJupiterEngineTest {
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest");
         TestEventTracker.assertConsumedEvent("Destroying context for com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest");
+        TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.WebIntegrationTest");
+        TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.WebIntegrationTest");
+        TestEventTracker.assertConsumedEvent("Destroying context for com.github.seregamorph.testsmartcontext.demo.WebIntegrationTest");
         TestEventTracker.assertEmpty();
 
         System.out.println("<<<EngineTestKit duplicating the suite<<<");

@@ -15,7 +15,7 @@
     <description>Demo project with tests launched via Maven junit-platform jupiter with spring-boot 3.5</description>
 
     <properties>
-        <spring-boot.version>3.5.0-M2</spring-boot.version>
+        <spring-boot.version>3.5.0-M3</spring-boot.version>
         <maven.install.skip>true</maven.install.skip>
     </properties>
 
@@ -51,6 +51,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>

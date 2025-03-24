@@ -79,11 +79,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit.support</groupId>
             <artifactId>testng-engine</artifactId>
             <version>${testng-engine.version}</version>

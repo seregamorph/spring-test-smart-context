@@ -111,7 +111,7 @@ public class SmartDirtiesTestsSorter {
             .collect(Collectors.toList());
 
         if (!sortedConfigToTests.isEmpty()) {
-            printSuiteTestsPerConfig(itClasses.size(), sortedConfigToTests);
+            printSuiteTestsPerConfig(testItems.size(), itClasses.size(), sortedConfigToTests);
         }
 
         return sortedConfigToTests;
@@ -165,10 +165,11 @@ public class SmartDirtiesTestsSorter {
         logger.debug(sw.toString());
     }
 
-    private void printSuiteTestsPerConfig(int itClassesSize, List<List<Class<?>>> sortedConfigToTests) {
+    private void printSuiteTestsPerConfig(int totalTests, int itClassesSize, List<List<Class<?>>> sortedConfigToTests) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        pw.println(itClassesSize + " integration test classes grouped and reordered by MergedContextConfiguration "
+        pw.println("Running suite of " + totalTests + " tests. "
+            + itClassesSize + " integration test classes grouped and reordered by MergedContextConfiguration "
             + "(" + sortedConfigToTests.size() + " groups):");
         sortedConfigToTests.forEach(itClasses -> {
             pw.println("---");

@@ -2,6 +2,7 @@ package com.github.seregamorph.testsmartcontext;
 
 import static com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport.isInnerClass;
 
+import com.github.seregamorph.testsmartcontext.leakage.ResourceLeakageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.TestContext;
@@ -28,28 +29,38 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     @Override
     public int getOrder() {
-        // DirtiesContextTestExecutionListener.getOrder() + 1
+        // DirtiesContextTestExecutionListener.getOrder() + 10
         //noinspection MagicNumber
-        return 3001;
+        return 3010;
     }
 
     @Override
     public void beforeTestClass(TestContext testContext) {
+        Class<?> testClass = testContext.getTestClass();
         // stack Nested classes
         CurrentTestContext.pushCurrentTestClass(testContext.getTestClass());
-        Class<?> testClass = testContext.getTestClass();
         if (isInnerClass(testClass)) {
             SmartDirtiesTestsSupport.verifyInnerClass(testClass);
         }
+
+        ResourceLeakageManager leakageManager = ResourceLeakageManager.getInstance();
+        if (SmartDirtiesTestsSupport.isFirstClassPerConfig(testClass)) {
+            logger.info("firstClassPerConfig {}", testClass.getName());
+            leakageManager.handleBeforeClassGroup();
+        }
+        leakageManager.handleBeforeClass(testClass);
     }
 
     @Override
     public void afterTestClass(TestContext testContext) {
         try {
             Class<?> testClass = testContext.getTestClass();
+            ResourceLeakageManager leakageManager = ResourceLeakageManager.getInstance();
+            leakageManager.handleAfterClass(testClass);
             if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
                 logger.info("markDirty (closing context) after {}", testClass.getName());
                 testContext.markApplicationContextDirty(null);
+                leakageManager.handleAfterClassGroup(testClass);
             } else {
                 logger.debug("Reusing context after {}", testClass.getName());
             }

@@ -2,7 +2,6 @@ package com.github.seregamorph.testsmartcontext.jdbc;
 
 import java.util.function.Supplier;
 import javax.sql.DataSource;
-import org.springframework.jdbc.datasource.DelegatingDataSource;
 import org.springframework.lang.Nullable;
 
 /**
@@ -24,10 +23,11 @@ import org.springframework.lang.Nullable;
  *         });
  *     }
  * }</pre>
+ * This DataSource delegates close call to the target.
  *
  * @author Sergey Chernov
  */
-public class LateInitDataSource extends DelegatingDataSource {
+public class LateInitDataSource extends CloseableDelegatingDataSource {
 
     @Nullable
     private final String name;

@@ -1,9 +1,13 @@
 package com.github.seregamorph.testsmartcontext.testng;
 
+import static java.util.Collections.singletonList;
+
 import com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import org.testng.IAlterSuiteListener;
 import org.testng.IMethodInstance;
 import org.testng.IMethodInterceptor;
@@ -50,6 +54,18 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
         // call of this method with dryRun=false on execution phase
         if (RuntimeBehavior.isDryRun()) {
             // the list of test classes is wrong, listener is called per each class as single in suite
+            return methods;
+        }
+
+        Set<Class<?>> uniqueClasses = new LinkedHashSet<>();
+        for (IMethodInstance method : methods) {
+            Class<?> testClass = getTestClass(method);
+            uniqueClasses.add(testClass);
+        }
+
+        if (uniqueClasses.size() == 1) {
+            Class<?> testClass = getTestClass(methods.get(0));
+            SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, singletonList(singletonList(testClass)));
             return methods;
         }
 

@@ -131,7 +131,7 @@ public class SmartDirtiesTestsSupport {
                 }
                 return null;
             }
-            throw new IllegalStateException("engineClassOrderStateMap is not initialized", failureCause);
+            throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);
         }
 
         for (Map<Class<?>, ClassOrderState> classOrderStateMap : engineClassOrderStateMap.values()) {
@@ -140,11 +140,12 @@ public class SmartDirtiesTestsSupport {
                 return classOrderState;
             }
         }
+        List<String> classes = engineClassOrderStateMap.entrySet().stream()
+            .map(entry -> entry.getKey() + ": " + entry.getValue().keySet())
+            .collect(Collectors.toList());
         throw new IllegalStateException("engineClassOrderStateMap is not defined for class "
             + testClass + ", it means that it was skipped on initial analysis or failed. "
-            + "Discovered classes: " + engineClassOrderStateMap.entrySet().stream()
-            .map(entry -> entry.getKey() + ": " + entry.getValue().keySet())
-            .collect(Collectors.toList()), failureCause);
+            + "Discovered classes: " + classes + ": " + failureCause, failureCause);
     }
 
     protected static void setTestClassesLists(String engine, List<List<Class<?>>> testClassesLists) {

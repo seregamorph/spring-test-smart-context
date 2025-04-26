@@ -70,7 +70,7 @@ public class SmartDirtiesTestsSorter {
     public <T> List<List<Class<?>>> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         initialSort(testItems, testClassExtractor);
 
-        Set<Class<?>> itClasses = filterItClasses(testItems, testClassExtractor);
+        Set<Class<?>> itClasses = filterSpringItClasses(testItems, testClassExtractor);
         if (!itClasses.isEmpty()) {
             printSuiteTests(testItems.size(), itClasses);
         }
@@ -117,7 +117,7 @@ public class SmartDirtiesTestsSorter {
         return sortedConfigToTests;
     }
 
-    private static <T> Set<Class<?>> filterItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+    private static <T> Set<Class<?>> filterSpringItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
         IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
         Set<Class<?>> itClasses = new LinkedHashSet<>();
         for (T t : testItems) {
@@ -169,7 +169,7 @@ public class SmartDirtiesTestsSorter {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
         pw.println("Running suite of " + totalTests + " tests. "
-            + itClassesSize + " integration test classes grouped and reordered by MergedContextConfiguration "
+            + itClassesSize + " Spring integration test classes grouped and reordered by MergedContextConfiguration "
             + "(" + sortedConfigToTests.size() + " groups):");
         sortedConfigToTests.forEach(itClasses -> {
             pw.println("---");

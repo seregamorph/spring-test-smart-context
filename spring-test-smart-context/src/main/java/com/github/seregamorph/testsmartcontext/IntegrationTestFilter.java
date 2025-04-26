@@ -45,6 +45,12 @@ public class IntegrationTestFilter {
     protected IntegrationTestFilter() {
     }
 
+    /**
+     * Returns true if testClass is a Spring integration test class
+     *
+     * @param testClass
+     * @return
+     */
     protected boolean isIntegrationTest(Class<?> testClass) {
         if (Modifier.isAbstract(testClass.getModifiers())) {
             return false;

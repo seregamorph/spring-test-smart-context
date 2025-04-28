@@ -68,7 +68,8 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         List<List<Class<?>>> testClassesLists;
         try {
-            testClassesLists = sorter.sort(childrenToReorder, SmartDirtiesPostDiscoveryFilter::getTestClass);
+            testClassesLists = sorter.sort(childrenToReorder,
+                TestClassExtractor.ofClass(SmartDirtiesPostDiscoveryFilter::getTestClass));
         } catch (Throwable e) {
             SmartDirtiesTestsSupport.setFailureCause(e);
             throw e;

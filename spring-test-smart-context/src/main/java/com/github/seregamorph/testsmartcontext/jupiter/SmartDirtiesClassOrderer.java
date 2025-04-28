@@ -4,6 +4,7 @@ import static java.util.Collections.singletonList;
 
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport;
+import com.github.seregamorph.testsmartcontext.TestClassExtractor;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         List<List<Class<?>>> testClassesLists;
         try {
-            testClassesLists = sorter.sort(classDescriptors, ClassDescriptor::getTestClass);
+            testClassesLists = sorter.sort(classDescriptors, TestClassExtractor.ofClass(ClassDescriptor::getTestClass));
         } catch (Throwable e) {
             SmartDirtiesTestsSupport.setFailureCause(e);
             throw e;

@@ -3,6 +3,7 @@ package com.github.seregamorph.testsmartcontext.demo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
+import com.github.seregamorph.testsmartcontext.TestClassExtractor;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,7 @@ public class SmartDirtiesJupiterTestsSorterTest {
             ExtendWithTest.class,
             SmartDirtiesJupiterTestsSorterTest.class
         );
-        var itClassesLists = sorter.sort(testItems, testClass -> testClass);
+        var itClassesLists = sorter.sort(testItems, TestClassExtractor.ofClass(testClass -> testClass));
 
         assertEquals(Arrays.asList(
             // UT

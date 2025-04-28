@@ -67,12 +67,12 @@ public class SmartDirtiesTestsSorter {
      * @param testClassExtractor
      * @return integration test classes lists grouped by config (non-integration tests classes not included)
      */
-    public <T> List<List<Class<?>>> sort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+    public <T> List<List<Class<?>>> sort(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {
         initialSort(testItems, testClassExtractor);
 
         Set<Class<?>> itClasses = filterSpringItClasses(testItems, testClassExtractor);
         if (!itClasses.isEmpty()) {
-            printSuiteTests(testItems.size(), itClasses);
+            logSuiteTests(testItems.size(), itClasses, testClassExtractor);
         }
 
         Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
@@ -111,13 +111,13 @@ public class SmartDirtiesTestsSorter {
             .collect(Collectors.toList());
 
         if (!sortedConfigToTests.isEmpty()) {
-            printSuiteTestsPerConfig(testItems.size(), itClasses.size(), sortedConfigToTests);
+            logSuiteTestsPerConfig(testItems.size(), itClasses.size(), sortedConfigToTests, testClassExtractor);
         }
 
         return sortedConfigToTests;
     }
 
-    private static <T> Set<Class<?>> filterSpringItClasses(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+    private static <T> Set<Class<?>> filterSpringItClasses(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {
         IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
         Set<Class<?>> itClasses = new LinkedHashSet<>();
         for (T t : testItems) {
@@ -137,7 +137,7 @@ public class SmartDirtiesTestsSorter {
         return 0;
     }
 
-    protected <T> void initialSort(List<T> testItems, TestClassExtractor<T> testClassExtractor) {
+    protected <T> void initialSort(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {
         testItems.sort(comparing(testItem -> testClassExtractor.getTestClass(testItem).getName()));
         if (Boolean.getBoolean("testsmartcontext.reverse")) {
             Collections.reverse(testItems);
@@ -156,20 +156,31 @@ public class SmartDirtiesTestsSorter {
         return 0;
     }
 
-    private void printSuiteTests(int totalTests, Collection<Class<?>> itClasses) {
+    private void logSuiteTests(
+        int totalTests,
+        Collection<Class<?>> itClasses,
+        TestClassExtractor<?> testClassExtractor
+    ) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        pw.println("Running suite of " + totalTests + " tests. Integration test classes " +
-            "(" + itClasses.size() + " classes):");
+        pw.println("Running suite of " + totalTests + " "
+            + (testClassExtractor.getItemType() == TestClassExtractor.ItemType.TEST_CLASS ? "test classes" : "test methods")
+            + ". Integration test classes (" + itClasses.size() + " classes):");
         itClasses.forEach(pw::println);
         logger.debug(sw.toString());
     }
 
-    private void printSuiteTestsPerConfig(int totalTests, int itClassesSize, List<List<Class<?>>> sortedConfigToTests) {
+    private void logSuiteTestsPerConfig(
+        int totalTests,
+        int itClassesSize,
+        List<List<Class<?>>> sortedConfigToTests,
+        TestClassExtractor<?> testClassExtractor
+    ) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        pw.println("Running suite of " + totalTests + " tests. "
-            + itClassesSize + " Spring integration test classes grouped and reordered by MergedContextConfiguration "
+        pw.println("Running suite of " + totalTests + " "
+            + (testClassExtractor.getItemType() == TestClassExtractor.ItemType.TEST_CLASS ? "test classes" : "test methods")
+            + ". " + itClassesSize + " Spring integration test classes grouped and reordered by MergedContextConfiguration "
             + "(" + sortedConfigToTests.size() + " groups):");
         sortedConfigToTests.forEach(itClasses -> {
             pw.println("---");
@@ -192,11 +203,6 @@ public class SmartDirtiesTestsSorter {
             }
         });
         logger.info(sw.toString());
-    }
-
-    @FunctionalInterface
-    public interface TestClassExtractor<T> {
-        Class<?> getTestClass(T test);
     }
 
     private static final class TestClasses {

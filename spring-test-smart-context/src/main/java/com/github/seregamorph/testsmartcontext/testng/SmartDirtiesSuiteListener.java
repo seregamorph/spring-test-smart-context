@@ -22,8 +22,7 @@ import org.testng.xml.XmlSuite;
  * Reorders TestNG test classes in suite grouping ITs with the same context configuration to minimize number of parallel
  * existing contexts.
  * <p>
- * For Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}, for
- * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
+ * For Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}.
  *
  * @author Sergey Chernov
  */

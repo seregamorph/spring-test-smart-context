@@ -19,8 +19,7 @@ import org.springframework.core.annotation.AnnotationUtils;
  * configuration. Also stores information about last integration class per configuration, which is used by
  * {@link com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener}.
  * <p>
- * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, for
- * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
+ * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}.
  *
  * @author Sergey Chernov
  */

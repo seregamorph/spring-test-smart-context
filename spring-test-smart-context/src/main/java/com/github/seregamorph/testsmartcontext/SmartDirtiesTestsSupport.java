@@ -150,7 +150,7 @@ public class SmartDirtiesTestsSupport {
             .collect(Collectors.toList());
         throw new IllegalStateException("engineClassOrderStateMap is not defined for "
             + testClass + ", it means that it was skipped on initial analysis or failed. "
-            + "Discovered classes: " + classes + (failureCause == null ? "" : ": " + failureCause), failureCause);
+            + "Discovered classes by engine: " + classes + (failureCause == null ? "" : ": " + failureCause), failureCause);
     }
 
     protected static void setTestClassesLists(String engine, List<List<Class<?>>> testClassesLists) {

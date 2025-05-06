@@ -141,11 +141,16 @@ public class SmartDirtiesTestsSupport {
             }
         }
         List<String> classes = engineClassOrderStateMap.entrySet().stream()
-            .map(entry -> entry.getKey() + ": " + entry.getValue().keySet())
+            .map(entry -> {
+                String engineClassNames = entry.getValue().keySet().stream()
+                    .map(Class::getName)
+                    .collect(Collectors.joining(", "));
+                return entry.getKey() + ": " + engineClassNames;
+            })
             .collect(Collectors.toList());
         throw new IllegalStateException("engineClassOrderStateMap is not defined for class "
             + testClass + ", it means that it was skipped on initial analysis or failed. "
-            + "Discovered classes: " + classes + ": " + failureCause, failureCause);
+            + "Discovered classes: " + classes + (failureCause == null ? "" : ": " + failureCause), failureCause);
     }
 
     protected static void setTestClassesLists(String engine, List<List<Class<?>>> testClassesLists) {

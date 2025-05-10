@@ -4,7 +4,7 @@
     https://docs.gradle.com/develocity/maven-extension/current/
     This extension is used for maven build optimization and enhanced caching.
     Config: develocity.xml
-    Use "-Ddevelocity.cache.local.enabled" to disable optimizations.
+    Use "-Ddevelocity.cache.local.enabled=false" to disable build cache optimizations.
     -->
     <extension>
         <groupId>com.gradle</groupId>

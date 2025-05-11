@@ -173,7 +173,10 @@
         <profile>
             <id>demo</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>performRelease</name>
+                    <value>!true</value>
+                </property>
             </activation>
             <modules>
                 <module>demo</module>

@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
 }
 
-def stscVersion = "0.12-SNAPSHOT"
+def stscVersion = "0.13-SNAPSHOT"
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter"
     implementation "org.springframework.boot:spring-boot-starter-web"

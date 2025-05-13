@@ -1,10 +1,9 @@
 package com.github.seregamorph.testsmartcontext.jupiter;
 
-import static java.util.Collections.singletonList;
-
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport;
 import com.github.seregamorph.testsmartcontext.TestClassExtractor;
+import com.github.seregamorph.testsmartcontext.TestSortResult;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -81,13 +80,14 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
             // If it's 1 - we should also distinguish single test execution.
             if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE_JUNIT_JUPITER) <= 1) {
                 Class<?> testClass = classDescriptors.get(0).getTestClass();
-                SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_JUNIT_JUPITER, singletonList(singletonList(testClass)));
+                SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_JUNIT_JUPITER,
+                    TestSortResult.singletonList(testClass));
             }
             return;
         }
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        List<List<Class<?>>> testClassesLists;
+        TestSortResult testClassesLists;
         try {
             testClassesLists = sorter.sort(classDescriptors, TestClassExtractor.ofClass(ClassDescriptor::getTestClass));
         } catch (Throwable e) {

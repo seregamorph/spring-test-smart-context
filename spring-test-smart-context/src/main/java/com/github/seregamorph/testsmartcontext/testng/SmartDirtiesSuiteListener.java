@@ -1,11 +1,10 @@
 package com.github.seregamorph.testsmartcontext.testng;
 
-import static java.util.Collections.singletonList;
-
 import com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport;
 import com.github.seregamorph.testsmartcontext.TestClassExtractor;
+import com.github.seregamorph.testsmartcontext.TestSortResult;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +63,7 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
 
         if (uniqueClasses.size() == 1) {
             Class<?> testClass = getTestClass(methods.get(0));
-            SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_TESTNG, singletonList(singletonList(testClass)));
+            SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_TESTNG, TestSortResult.singletonList(testClass));
             return methods;
         }
 
@@ -72,7 +71,7 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         // Do not store the failure as if it throws, TestNG will fail the suite
         // (both pure TestNG and JUnit 5 testng-engine)
-        List<List<Class<?>>> testClassesLists = sorter.sort(methods,
+        TestSortResult testClassesLists = sorter.sort(methods,
             TestClassExtractor.ofMethod(SmartDirtiesSuiteListener::getTestClass));
 
         SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_TESTNG, testClassesLists);

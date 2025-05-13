@@ -192,8 +192,9 @@ public class SmartDirtiesTestsSupport {
         return classOrderStates;
     }
 
-    protected static void setTestClassesLists(String engine, List<List<Class<?>>> testClassesLists) {
+    protected static void setTestClassesLists(String engine, TestSortResult testSortResult) {
         Map<Class<?>, ClassOrderState> classOrderStateMap = new LinkedHashMap<>();
+        List<List<Class<?>>> testClassesLists = testSortResult.getSortedConfigToTests();
         for (List<Class<?>> testClasses : testClassesLists) {
             Iterator<Class<?>> iterator = testClasses.iterator();
             boolean isFirst = true;

@@ -67,7 +67,7 @@ public class SmartDirtiesTestsSorter {
      * @param testClassExtractor
      * @return integration test classes lists grouped by config (non-integration tests classes not included)
      */
-    public <T> List<List<Class<?>>> sort(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {
+    public <T> TestSortResult sort(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {
         initialSort(testItems, testClassExtractor);
 
         Set<Class<?>> itClasses = filterSpringItClasses(testItems, testClassExtractor);
@@ -114,7 +114,7 @@ public class SmartDirtiesTestsSorter {
             logSuiteTestsPerConfig(testItems.size(), itClasses.size(), sortedConfigToTests, testClassExtractor);
         }
 
-        return sortedConfigToTests;
+        return new TestSortResult(sortedConfigToTests);
     }
 
     private static <T> Set<Class<?>> filterSpringItClasses(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {

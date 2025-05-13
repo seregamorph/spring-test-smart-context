@@ -49,7 +49,7 @@ public class SmartDirtiesJupiterTestsSorterTest {
             List.of(SampleDirtiesContextBeforeClassTest.class,
                 SampleDirtiesContextAfterClassTest.class),
             List.of(SampleIntegrationTest.class)
-        ), itClassesLists);
+        ), itClassesLists.getSortedConfigToTests());
 
         TestEventTracker.trackEvent("Finished " + getClass().getSimpleName() +
             ".shouldSortMostlyAlphabeticallyAndGroupSameConfigurations");

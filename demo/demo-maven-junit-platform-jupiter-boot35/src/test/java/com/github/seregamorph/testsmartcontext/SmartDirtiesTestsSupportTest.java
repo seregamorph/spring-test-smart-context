@@ -2,7 +2,6 @@ package com.github.seregamorph.testsmartcontext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +14,7 @@ class SmartDirtiesTestsSupportTest {
     @BeforeEach
     public void prepare() {
         SmartDirtiesTestsSupport.setTestClassesLists("SmartDirtiesTestsHolderTest",
-            List.of(List.of(TestRootTest.class)));
+            TestSortResult.singletonList(TestRootTest.class));
     }
 
     @Test

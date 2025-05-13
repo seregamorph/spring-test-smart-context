@@ -1,7 +1,5 @@
 package com.github.seregamorph.testsmartcontext;
 
-import static java.util.Collections.singletonList;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +62,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
             // If it's 1 - we should also distinguish single test execution.
             if (SmartDirtiesTestsSupport.classOrderStateMapSize(engine) <= 1) {
                 Class<?> testClass = getTestClass(childrenToReorder.get(0));
-                SmartDirtiesTestsSupport.setTestClassesLists(engine, singletonList(singletonList(testClass)));
+                SmartDirtiesTestsSupport.setTestClassesLists(engine, TestSortResult.singletonList(testClass));
             }
 
             // the logic here may differ for JUnit 4 via Maven vs IntelliJ:
@@ -75,9 +73,9 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
         childrenToReorder.forEach(testDescriptor::removeChild);
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
-        List<List<Class<?>>> testClassesLists;
+        TestSortResult testSortResult;
         try {
-            testClassesLists = sorter.sort(childrenToReorder,
+            testSortResult = sorter.sort(childrenToReorder,
                 TestClassExtractor.ofClass(SmartDirtiesPostDiscoveryFilter::getTestClass));
         } catch (Throwable e) {
             SmartDirtiesTestsSupport.setFailureCause(e);
@@ -86,7 +84,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
 
         childrenToReorder.forEach(testDescriptor::addChild);
 
-        SmartDirtiesTestsSupport.setTestClassesLists(engine, testClassesLists);
+        SmartDirtiesTestsSupport.setTestClassesLists(engine, testSortResult);
 
         return FilterResult.included("sorted");
     }

@@ -70,7 +70,20 @@ public class SmartDirtiesTestsSorter {
     public <T> TestSortResult sort(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {
         initialSort(testItems, testClassExtractor);
 
-        Set<Class<?>> itClasses = filterSpringItClasses(testItems, testClassExtractor);
+        IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
+        Set<Class<?>> itClasses = new LinkedHashSet<>();
+        Set<Class<?>> nonItClasses = new LinkedHashSet<>();
+        for (T t : testItems) {
+            Class<?> testClass = testClassExtractor.getTestClass(t);
+            if (!itClasses.contains(testClass) && !nonItClasses.contains(testClass)) {
+                if (integrationTestFilter.isIntegrationTest(testClass)) {
+                    itClasses.add(testClass);
+                } else {
+                    nonItClasses.add(testClass);
+                }
+            }
+        }
+
         if (!itClasses.isEmpty()) {
             logSuiteTests(testItems.size(), itClasses, testClassExtractor);
         }
@@ -114,19 +127,7 @@ public class SmartDirtiesTestsSorter {
             logSuiteTestsPerConfig(testItems.size(), itClasses.size(), sortedConfigToTests, testClassExtractor);
         }
 
-        return new TestSortResult(sortedConfigToTests);
-    }
-
-    private static <T> Set<Class<?>> filterSpringItClasses(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {
-        IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
-        Set<Class<?>> itClasses = new LinkedHashSet<>();
-        for (T t : testItems) {
-            Class<?> testClass = testClassExtractor.getTestClass(t);
-            if (!itClasses.contains(testClass) && integrationTestFilter.isIntegrationTest(testClass)) {
-                itClasses.add(testClass);
-            }
-        }
-        return itClasses;
+        return new TestSortResult(sortedConfigToTests, nonItClasses);
     }
 
     /**

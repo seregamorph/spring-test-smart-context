@@ -43,11 +43,13 @@ public class SmartDirtiesTestsSupport {
     private static Throwable failureCause;
 
     static class ClassOrderState {
+        private final boolean isIntegrationTest;
         private final String testEngine;
         private final boolean isFirst;
         private final boolean isLast;
 
-        private ClassOrderState(String testEngine, boolean isFirst, boolean isLast) {
+        private ClassOrderState(boolean isIntegrationTest, String testEngine, boolean isFirst, boolean isLast) {
+            this.isIntegrationTest = isIntegrationTest;
             this.testEngine = testEngine;
             this.isFirst = isFirst;
             this.isLast = isLast;
@@ -76,7 +78,11 @@ public class SmartDirtiesTestsSupport {
         // this method is only used in tests, so we don't need to be lenient there
         List<ClassOrderState> classOrderStates = getOrderStates(testClass);
         if (classOrderStates.size() == 1) {
-            return classOrderStates.get(0).isFirst;
+            ClassOrderState classOrderState = classOrderStates.get(0);
+            if (!classOrderState.isIntegrationTest) {
+                throw new IllegalStateException("Test " + testClass + " is not recognized as integration test");
+            }
+            return classOrderState.isFirst;
         } else {
             throw new IllegalStateException("Unexpected more than one matching test engine for " + testClass);
         }
@@ -89,6 +95,16 @@ public class SmartDirtiesTestsSupport {
         }
 
         List<ClassOrderState> classOrderStates = getOrderStates(testClass);
+        for (ClassOrderState classOrderState : classOrderStates) {
+            if (!classOrderState.isIntegrationTest) {
+                // This can be a result of custom extension or listener.
+                // To fix this implement own IntegrationTestFilter and declare via META-INF SPI
+                log.warn("Test {} in suite of {} engine was not recognized as spring integration test by {}, " +
+                        "it's recommended to override the IntegrationTestFilter accordingly",
+                    testClass, classOrderState.testEngine, IntegrationTestFilter.getInstance().getClass());
+            }
+        }
+
         if (classOrderStates.isEmpty()) {
             List<String> classes = engineClassOrderStateMap.entrySet().stream()
                 .map(entry -> {
@@ -100,7 +116,8 @@ public class SmartDirtiesTestsSupport {
                 .collect(Collectors.toList());
             throw new IllegalStateException("engineClassOrderStateMap is not defined for "
                 + testClass + ", it means that it was skipped on initial analysis or failed. "
-                + "Discovered classes by engine: " + classes + (failureCause == null ? "" : ": " + failureCause), failureCause);
+                + "Discovered classes by engine: " + classes + (failureCause == null ? "" : ": " + failureCause),
+                failureCause);
         } else if (classOrderStates.size() == 1) {
             return classOrderStates.get(0).isLast;
         } else {
@@ -194,16 +211,22 @@ public class SmartDirtiesTestsSupport {
 
     protected static void setTestClassesLists(String engine, TestSortResult testSortResult) {
         Map<Class<?>, ClassOrderState> classOrderStateMap = new LinkedHashMap<>();
-        List<List<Class<?>>> testClassesLists = testSortResult.getSortedConfigToTests();
-        for (List<Class<?>> testClasses : testClassesLists) {
+        for (List<Class<?>> testClasses : testSortResult.getSortedConfigToTests()) {
             Iterator<Class<?>> iterator = testClasses.iterator();
             boolean isFirst = true;
             while (iterator.hasNext()) {
                 Class<?> testClass = iterator.next();
-                classOrderStateMap.put(testClass, new ClassOrderState(engine, isFirst, !iterator.hasNext()));
+                classOrderStateMap.put(testClass,
+                    new ClassOrderState(true, engine, isFirst, !iterator.hasNext()));
                 isFirst = false;
             }
         }
+        for (Class<?> nonItClass : testSortResult.getNonItClasses()) {
+            ClassOrderState prev = classOrderStateMap.put(nonItClass,
+                new ClassOrderState(false, engine, false, false));
+            assert prev == null;
+        }
+
         if (SmartDirtiesTestsSupport.engineClassOrderStateMap == null) {
             SmartDirtiesTestsSupport.engineClassOrderStateMap = new LinkedHashMap<>();
         }

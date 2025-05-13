@@ -11,6 +11,7 @@ import com.github.seregamorph.testsmartcontext.demo.Integration2Test;
 import com.github.seregamorph.testsmartcontext.demo.NoBaseClass1IntegrationTest;
 import com.github.seregamorph.testsmartcontext.demo.NoBaseClass2IntegrationTest;
 import com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest;
+import com.github.seregamorph.testsmartcontext.demo.Unit1Test;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,8 @@ public class GradleSmartDirtiesJupiterEngineTest {
             Integration2Test.class,
             NoBaseClass2IntegrationTest.class,
             NoBaseClass1IntegrationTest.class,
-            SampleIntegrationTest.class
+            SampleIntegrationTest.class,
+            Unit1Test.class
         ), new ArrayList<>(SmartDirtiesTestsSupport.getTestClasses(ENGINE)));
 
         assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.class));

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -15,6 +16,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.ClassOrderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
@@ -26,6 +29,7 @@ import org.springframework.test.context.MergedContextConfiguration;
  */
 public class SmartDirtiesTestsSupport {
 
+    private static final Logger log = LoggerFactory.getLogger(SmartDirtiesTestsSupport.class);
     /**
      * engine -> test class -> ClassOrderState
      */
@@ -35,10 +39,12 @@ public class SmartDirtiesTestsSupport {
     private static Throwable failureCause;
 
     static class ClassOrderState {
+        private final String testEngine;
         private final boolean isFirst;
         private final boolean isLast;
 
-        private ClassOrderState(boolean isFirst, boolean isLast) {
+        private ClassOrderState(String testEngine, boolean isFirst, boolean isLast) {
+            this.testEngine = testEngine;
             this.isFirst = isFirst;
             this.isLast = isLast;
         }
@@ -62,8 +68,14 @@ public class SmartDirtiesTestsSupport {
             // to support @Nested classes (without own context configuration)
             return false;
         }
-        ClassOrderState classOrderState = getOrderState(testClass);
-        return classOrderState != null && classOrderState.isFirst;
+
+        // this method is only used in tests, so we don't need to be lenient there
+        List<ClassOrderState> classOrderStates = getOrderStates(testClass);
+        if (classOrderStates.size() == 1) {
+            return classOrderStates.get(0).isFirst;
+        } else {
+            throw new IllegalStateException("Unexpected more than one matching test engine for " + testClass);
+        }
     }
 
     static boolean isLastClassPerConfig(Class<?> testClass) {
@@ -71,12 +83,44 @@ public class SmartDirtiesTestsSupport {
             // to support @Nested classes (without own context configuration)
             return false;
         }
-        ClassOrderState classOrderState = getOrderState(testClass);
-        return classOrderState != null && classOrderState.isLast;
+
+        List<ClassOrderState> classOrderStates = getOrderStates(testClass);
+        if (classOrderStates.isEmpty()) {
+            List<String> classes = engineClassOrderStateMap.entrySet().stream()
+                .map(entry -> {
+                    String engineClassNames = entry.getValue().keySet().stream()
+                        .map(Class::getName)
+                        .collect(Collectors.joining(", "));
+                    return entry.getKey() + ": " + engineClassNames;
+                })
+                .collect(Collectors.toList());
+            throw new IllegalStateException("engineClassOrderStateMap is not defined for "
+                + testClass + ", it means that it was skipped on initial analysis or failed. "
+                + "Discovered classes by engine: " + classes + (failureCause == null ? "" : ": " + failureCause), failureCause);
+        } else if (classOrderStates.size() == 1) {
+            return classOrderStates.get(0).isLast;
+        } else {
+            // In the common case it's theoretically possible that the same class is discovered by more than one
+            // test engine. And at this point we don't know which engine is running current test,
+            // so we do a failover logic
+            Set<Boolean> isLasts = classOrderStates.stream()
+                .map(state -> state.isLast)
+                .collect(Collectors.toSet());
+
+            if (isLasts.size() == 1) {
+                // no ambiguity
+                return isLasts.iterator().next();
+            } else {
+                assert isLasts.size() == 2;
+                log.warn("Test {} was discovered by more than one test engine with different ordering {}",
+                    testClass, classOrderStates.stream().map(state -> state.testEngine).collect(Collectors.toList()));
+                // at least one engine considers it as last: do close the context
+                return true;
+            }
+        }
     }
 
-    @Nullable
-    private static ClassOrderState getOrderState(Class<?> testClass) {
+    private static List<ClassOrderState> getOrderStates(Class<?> testClass) {
         if (engineClassOrderStateMap == null) {
             if (JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
                 try {
@@ -129,28 +173,19 @@ public class SmartDirtiesTestsSupport {
                         "for details.");
                     //@formatter:on
                 }
-                return null;
+                return Collections.emptyList();
             }
             throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);
         }
 
+        List<ClassOrderState> classOrderStates = new ArrayList<>();
         for (Map<Class<?>, ClassOrderState> classOrderStateMap : engineClassOrderStateMap.values()) {
             ClassOrderState classOrderState = classOrderStateMap.get(testClass);
             if (classOrderState != null) {
-                return classOrderState;
+                classOrderStates.add(classOrderState);
             }
         }
-        List<String> classes = engineClassOrderStateMap.entrySet().stream()
-            .map(entry -> {
-                String engineClassNames = entry.getValue().keySet().stream()
-                    .map(Class::getName)
-                    .collect(Collectors.joining(", "));
-                return entry.getKey() + ": " + engineClassNames;
-            })
-            .collect(Collectors.toList());
-        throw new IllegalStateException("engineClassOrderStateMap is not defined for "
-            + testClass + ", it means that it was skipped on initial analysis or failed. "
-            + "Discovered classes by engine: " + classes + (failureCause == null ? "" : ": " + failureCause), failureCause);
+        return classOrderStates;
     }
 
     protected static void setTestClassesLists(String engine, List<List<Class<?>>> testClassesLists) {
@@ -160,7 +195,7 @@ public class SmartDirtiesTestsSupport {
             boolean isFirst = true;
             while (iterator.hasNext()) {
                 Class<?> testClass = iterator.next();
-                classOrderStateMap.put(testClass, new ClassOrderState(isFirst, !iterator.hasNext()));
+                classOrderStateMap.put(testClass, new ClassOrderState(engine, isFirst, !iterator.hasNext()));
                 isFirst = false;
             }
         }

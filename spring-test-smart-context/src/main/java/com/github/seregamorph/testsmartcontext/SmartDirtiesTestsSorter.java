@@ -85,7 +85,7 @@ public class SmartDirtiesTestsSorter {
         }
 
         if (!itClasses.isEmpty()) {
-            logSuiteTests(testItems.size(), itClasses, testClassExtractor);
+            logSuiteTests(testItems.size(), itClasses, nonItClasses, testClassExtractor.getItemType());
         }
 
         Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
@@ -124,7 +124,7 @@ public class SmartDirtiesTestsSorter {
             .collect(Collectors.toList());
 
         if (!sortedConfigToTests.isEmpty()) {
-            logSuiteTestsPerConfig(testItems.size(), itClasses.size(), sortedConfigToTests, testClassExtractor);
+            logSuiteTestsPerConfig(itClasses.size(), nonItClasses.size(), sortedConfigToTests);
         }
 
         return new TestSortResult(sortedConfigToTests, nonItClasses);
@@ -160,28 +160,31 @@ public class SmartDirtiesTestsSorter {
     private void logSuiteTests(
         int totalTests,
         Collection<Class<?>> itClasses,
-        TestClassExtractor<?> testClassExtractor
+        Collection<Class<?>> nonItClasses,
+        TestClassExtractor.ItemType itemType
     ) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
         pw.println("Running suite of " + totalTests + " "
-            + (testClassExtractor.getItemType() == TestClassExtractor.ItemType.TEST_CLASS ? "test classes" : "test methods")
+            + (itemType == TestClassExtractor.ItemType.TEST_CLASS ? "test classes" : "test methods")
             + ". Integration test classes (" + itClasses.size() + " classes):");
         itClasses.forEach(pw::println);
+        if (!nonItClasses.isEmpty()) {
+            pw.println("Non-integration test classes (" + nonItClasses.size() + " classes):");
+            nonItClasses.forEach(pw::println);
+        }
         logger.debug(sw.toString());
     }
 
     private void logSuiteTestsPerConfig(
-        int totalTests,
         int itClassesSize,
-        List<List<Class<?>>> sortedConfigToTests,
-        TestClassExtractor<?> testClassExtractor
+        int nonItClassesSize,
+        List<List<Class<?>>> sortedConfigToTests
     ) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        pw.println("Running suite of " + totalTests + " "
-            + (testClassExtractor.getItemType() == TestClassExtractor.ItemType.TEST_CLASS ? "test classes" : "test methods")
-            + ". " + itClassesSize + " Spring integration test classes grouped and reordered by MergedContextConfiguration "
+        pw.println("Running suite of " + (itClassesSize + nonItClassesSize) + " test classes" + ". "
+            + itClassesSize + " Spring integration test classes grouped and reordered by MergedContextConfiguration "
             + "(" + sortedConfigToTests.size() + " groups):");
         sortedConfigToTests.forEach(itClasses -> {
             pw.println("---");

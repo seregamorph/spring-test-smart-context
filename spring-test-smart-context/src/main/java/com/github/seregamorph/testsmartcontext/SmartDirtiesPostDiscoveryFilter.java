@@ -27,7 +27,10 @@ import org.springframework.lang.Nullable;
  */
 public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
 
-    private static final List<String> skippedEngines = Arrays.asList("junit-jupiter", "testng");
+    private static final List<String> skippedEngines = Arrays.asList(
+        SmartDirtiesTestsSupport.ENGINE_JUNIT_JUPITER,
+        SmartDirtiesTestsSupport.ENGINE_TESTNG
+    );
 
     @Override
     public FilterResult apply(TestDescriptor testDescriptor) {

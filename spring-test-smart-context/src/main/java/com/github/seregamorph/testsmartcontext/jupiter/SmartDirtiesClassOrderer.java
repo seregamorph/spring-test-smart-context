@@ -26,8 +26,6 @@ import org.springframework.core.annotation.AnnotationUtils;
  */
 public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implements ClassOrderer {
 
-    private static final String ENGINE = "junit-jupiter";
-
     @Override
     public void orderClasses(ClassOrdererContext context) {
         List<? extends ClassDescriptor> classDescriptors = context.getClassDescriptors();
@@ -69,7 +67,7 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
         if (uniqueClasses.isEmpty()) {
             // All are internal (@Nested), we do not reorder them.
             // The enclosing classes are already in the SmartDirtiesTestsHolder from previous call
-            if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE) == 0) {
+            if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE_JUNIT_JUPITER) == 0) {
                 throw new IllegalStateException("orderClasses is called with inner classes list " + classDescriptors
                     + " before being called with enclosing class list");
             }
@@ -81,9 +79,9 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
             // it's not possible to distinguish them here. Sometimes per single test is sent as argument,
             // sometimes - the whole suite. If it's a suite more than 1, we can save it and never update.
             // If it's 1 - we should also distinguish single test execution.
-            if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE) <= 1) {
+            if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE_JUNIT_JUPITER) <= 1) {
                 Class<?> testClass = classDescriptors.get(0).getTestClass();
-                SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, singletonList(singletonList(testClass)));
+                SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_JUNIT_JUPITER, singletonList(singletonList(testClass)));
             }
             return;
         }
@@ -96,6 +94,6 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
             SmartDirtiesTestsSupport.setFailureCause(e);
             throw e;
         }
-        SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, testClassesLists);
+        SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_JUNIT_JUPITER, testClassesLists);
     }
 }

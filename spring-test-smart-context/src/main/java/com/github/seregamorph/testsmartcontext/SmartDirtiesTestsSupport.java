@@ -30,6 +30,10 @@ import org.springframework.test.context.MergedContextConfiguration;
 public class SmartDirtiesTestsSupport {
 
     private static final Logger log = LoggerFactory.getLogger(SmartDirtiesTestsSupport.class);
+
+    protected static final String ENGINE_TESTNG = "testng";
+    protected static final String ENGINE_JUNIT_JUPITER = "junit-jupiter";
+
     /**
      * engine -> test class -> ClassOrderState
      */

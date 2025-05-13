@@ -31,8 +31,6 @@ import org.testng.xml.XmlSuite;
 public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
     implements IAlterSuiteListener, IMethodInterceptor {
 
-    private static final String ENGINE = "testng";
-
     @Override
     public void alter(List<XmlSuite> suites) {
         // dryRun is only true when called via junit5 testng-engine on discovery phase, there will be subsequent
@@ -66,7 +64,7 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
 
         if (uniqueClasses.size() == 1) {
             Class<?> testClass = getTestClass(methods.get(0));
-            SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, singletonList(singletonList(testClass)));
+            SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_TESTNG, singletonList(singletonList(testClass)));
             return methods;
         }
 
@@ -77,7 +75,7 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
         List<List<Class<?>>> testClassesLists = sorter.sort(methods,
             TestClassExtractor.ofMethod(SmartDirtiesSuiteListener::getTestClass));
 
-        SmartDirtiesTestsSupport.setTestClassesLists(ENGINE, testClassesLists);
+        SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_TESTNG, testClassesLists);
 
         return methods;
     }

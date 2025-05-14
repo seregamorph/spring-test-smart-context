@@ -7,6 +7,8 @@ import org.springframework.jdbc.datasource.DelegatingDataSource;
 
 /**
  * Closeable DataSource which delegates close call to target
+ *
+ * @author Sergey Chernov
  */
 public class CloseableDelegatingDataSource extends DelegatingDataSource implements Closeable {
 

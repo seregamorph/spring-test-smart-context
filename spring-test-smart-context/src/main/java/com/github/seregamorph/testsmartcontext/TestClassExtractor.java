@@ -2,6 +2,9 @@ package com.github.seregamorph.testsmartcontext;
 
 import java.util.function.Function;
 
+/**
+ * @author Sergey Chernov
+ */
 public abstract class TestClassExtractor<T> {
 
     private final ItemType itemType;

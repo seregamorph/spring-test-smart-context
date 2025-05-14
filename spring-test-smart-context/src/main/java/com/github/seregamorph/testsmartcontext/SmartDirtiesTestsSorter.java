@@ -183,8 +183,8 @@ public class SmartDirtiesTestsSorter {
     ) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        pw.println("Running suite of " + (itClassesSize + nonItClassesSize) + " test classes" + ". "
-            + itClassesSize + " Spring integration test classes grouped and reordered by MergedContextConfiguration "
+        pw.println("Running suite of " + (nonItClassesSize > 0 ? nonItClassesSize + " unit and " : "")
+            + itClassesSize + " integration test classes grouped and reordered by their MergedContextConfiguration "
             + "(" + sortedConfigToTests.size() + " groups):");
         sortedConfigToTests.forEach(itClasses -> {
             pw.println("---");

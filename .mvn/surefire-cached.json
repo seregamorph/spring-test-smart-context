@@ -1,0 +1,30 @@
+{
+  "//": "Configuration for Maven surefire-cached-extension",
+  "common": {
+    "inputIgnoredProperties": [
+      "java.version",
+      "os.arch",
+      "os.name"
+    ],
+    "cacheExcludes": [
+    ]
+  },
+  "surefire": {
+    "artifacts": {
+      "surefire-reports": {
+        "includes": [
+          "surefire-reports/TEST-*.xml"
+        ]
+      }
+    }
+  },
+  "failsafe": {
+    "artifacts": {
+      "failsafe-reports": {
+        "includes": [
+          "failsafe-reports/TEST-*.xml"
+        ]
+      }
+    }
+  }
+}

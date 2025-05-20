@@ -83,8 +83,10 @@ Or Gradle dependency:
 ```groovy
 testImplementation("com.github.seregamorph:spring-test-smart-context:0.13")
 ```
+Then remove usages of standard `@DirtiesContext` annotation in your project to use auto-close context implemented
+by this library. 
 Also it's recommended to configure `"INFO"` level for `com.github.seregamorph.testsmartcontext` logger.
-It's recommended to check [Demo projects](demo).
+Check the [Demo projects](demo) for examples.
 
 ### How it works
 

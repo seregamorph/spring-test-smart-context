@@ -36,6 +36,11 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
+        <!--
+        https://maven.apache.org/guides/mini/guide-reproducible-builds.html
+        -->
+        <project.build.outputTimestamp>2025-01-01T01:00:00Z</project.build.outputTimestamp>
+
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>

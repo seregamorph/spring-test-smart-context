@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extensions>
-    <!--
-    https://docs.gradle.com/develocity/maven-extension/current/
-    This extension is used for maven build optimization and enhanced caching.
-    Config: develocity.xml
-    Use "-Ddevelocity.cache.local.enabled=false" to disable build cache optimizations.
-    -->
     <extension>
-        <groupId>com.gradle</groupId>
-        <artifactId>develocity-maven-extension</artifactId>
-        <version>2.0</version>
+        <!-- https://github.com/seregamorph/maven-surefire-cached -->
+        <groupId>com.github.seregamorph</groupId>
+        <artifactId>surefire-cached-extension</artifactId>
+        <version>0.29</version>
     </extension>
 </extensions>

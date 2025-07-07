@@ -4,6 +4,6 @@
         <!-- https://github.com/seregamorph/maven-surefire-cached -->
         <groupId>com.github.seregamorph</groupId>
         <artifactId>surefire-cached-extension</artifactId>
-        <version>0.13</version>
+        <version>0.21</version>
     </extension>
 </extensions>

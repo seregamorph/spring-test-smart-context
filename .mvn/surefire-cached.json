@@ -6,7 +6,7 @@
       "os.arch",
       "os.name"
     ],
-    "cacheExcludes": [
+    "excludeModules": [
     ]
   },
   "surefire": {

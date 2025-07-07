@@ -206,7 +206,8 @@ public class SmartDirtiesTestsSorter {
                 isFirst = false;
             }
         });
-        logger.info(sw.toString());
+        // logger may be not yet initialized at this moment
+        System.out.println(sw);
     }
 
     private static final class TestClasses {

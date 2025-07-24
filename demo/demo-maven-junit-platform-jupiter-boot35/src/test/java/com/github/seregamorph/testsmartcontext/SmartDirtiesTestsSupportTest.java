@@ -9,34 +9,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+@SpringBootTest(classes = {
+    SmartDirtiesTestsSupportTest.Configuration.class
+})
 class SmartDirtiesTestsSupportTest {
 
     @BeforeEach
     public void prepare() {
         SmartDirtiesTestsSupport.setTestClassesLists("SmartDirtiesTestsHolderTest",
-            TestSortResult.singletonList(TestRootTest.class));
+            TestSortResult.singletonList(SmartDirtiesTestsSupportTest.class));
     }
 
     @Test
     public void nestedInheritShouldPass() {
-        SmartDirtiesTestsSupport.verifyInnerClass(TestRootTest.NestedInheritTest.class);
+        SmartDirtiesTestsSupport.verifyInnerClass(SmartDirtiesTestsSupportTest.NestedInheritTest.class);
     }
 
     @Test
     public void nestedCustomShouldFail() {
         var ise = Assertions.assertThrows(IllegalStateException.class,
-            () -> SmartDirtiesTestsSupport.verifyInnerClass(TestRootTest.NestedCustomTest.class));
-        assertEquals("Nested inner class com.github.seregamorph.testsmartcontext.TestRootTest$NestedCustomTest " +
-            "declares custom context configuration which differs from enclosing class com.github.seregamorph" +
-            ".testsmartcontext.TestRootTest. This is not properly supported by the spring-test-smart-context ordering" +
-            " because of framework limitations. Please extract inner test class to upper level.", ise.getMessage());
+            () -> SmartDirtiesTestsSupport.verifyInnerClass(SmartDirtiesTestsSupportTest.NestedCustomTest.class));
+        assertEquals("Nested inner class com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupportTest$NestedCustomTest declares custom context configuration which differs from enclosing class com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupportTest. This is not properly supported by the spring-test-smart-context ordering because of framework limitations. Please extract inner test class to upper level.", ise.getMessage());
     }
-}
-
-@SpringBootTest(classes = {
-    TestRootTest.Configuration.class
-})
-class TestRootTest {
 
     public static class Configuration {
 

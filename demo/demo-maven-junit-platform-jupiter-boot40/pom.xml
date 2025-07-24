@@ -10,12 +10,13 @@
         <version>0.14-SNAPSHOT</version>
     </parent>
 
-    <artifactId>demo-maven-junit-platform-jupiter-boot35</artifactId>
+    <artifactId>demo-maven-junit-platform-jupiter-boot40</artifactId>
 
-    <description>Demo project with tests launched via Maven junit-platform jupiter with spring-boot 3.5</description>
+    <description>Demo project with tests launched via Maven junit-platform jupiter with spring-boot 4.0
+        and Spring Framework 7.0</description>
 
     <properties>
-        <spring-boot.version>3.5.4</spring-boot.version>
+        <spring-boot.version>4.0.0-M1</spring-boot.version>
         <maven.install.skip>true</maven.install.skip>
     </properties>
 
@@ -54,6 +55,10 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
@@ -78,6 +83,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-web-server-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

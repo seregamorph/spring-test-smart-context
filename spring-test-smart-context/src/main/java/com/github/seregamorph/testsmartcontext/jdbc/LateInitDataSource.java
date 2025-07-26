@@ -12,8 +12,8 @@ import org.springframework.lang.Nullable;
  * <p>
  * Usage example:
  * <pre>{@code
- *    @Bean
- *    public DataSource dataSource(PostgreSQLContainer<?> container) {
+ *     @Bean
+ *     public DataSource dataSource(PostgreSQLContainer<?> container) {
  *         // lazy late initialization - the JDBC url is not known yet, because container is not running
  *         return new LateInitDataSource(() -> {
  *             LOGGER.info("Late initialization data source docker container {}", container);

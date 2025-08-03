@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.2'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.github.seregamorph'
@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
 }
 
-def stscVersion = "0.14-SNAPSHOT"
+def stscVersion = "0.15-SNAPSHOT"
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter"
     implementation "org.springframework.boot:spring-boot-starter-web"

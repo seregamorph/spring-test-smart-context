@@ -93,7 +93,13 @@ public class SmartDirtiesTestsSorter {
         AtomicInteger orderCounter = new AtomicInteger();
         for (Class<?> itClass : itClasses) {
             TestContextBootstrapper bootstrapper = BootstrapUtilsHelper.resolveTestContextBootstrapper(itClass);
-            MergedContextConfiguration mergedContextConfiguration = bootstrapper.buildMergedContextConfiguration();
+            MergedContextConfiguration mergedContextConfiguration;
+            try {
+                mergedContextConfiguration = bootstrapper.buildMergedContextConfiguration();
+            } catch (RuntimeException e) {
+                // failed to calculate configuration
+                throw new IllegalStateException("Failed to build MergedContextConfiguration for " + itClass, e);
+            }
             // Sequentially each unique mergedContextConfiguration will have own order
             // via orderCounter. initial order values all have a gap to allow for moving
             // @DirtiesContext annotated classes to the back later.

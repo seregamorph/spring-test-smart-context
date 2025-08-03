@@ -143,6 +143,9 @@ public class SmartDirtiesTestsSupport {
 
     private static List<ClassOrderState> getOrderStates(Class<?> testClass) {
         if (engineClassOrderStateMap == null) {
+            if (failureCause != null) {
+                throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);
+            }
             if (JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
                 try {
                     ClassLoader classLoader = SmartDirtiesTestsSupport.class.getClassLoader();
@@ -196,7 +199,7 @@ public class SmartDirtiesTestsSupport {
                 }
                 return Collections.emptyList();
             }
-            throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);
+            throw new IllegalStateException("Test ordering is not initialized or failed");
         }
 
         List<ClassOrderState> classOrderStates = new ArrayList<>();

@@ -1,5 +1,4 @@
 .idea
-.mvn/.develocity
 target
 build
 .gradle

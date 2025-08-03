@@ -67,7 +67,7 @@ Supported test frameworks:
 * `JUnit 5 Jupiter`
 * `TestNG` (both bare TestNG and JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
 
-`Develocity Maven Extension` (test execution caching) correctly supports changed behaviour
+Known test execution caching solutions correctly support changed behaviour.
 
 ### How to use
 Add maven dependency (available in maven central):
@@ -75,13 +75,13 @@ Add maven dependency (available in maven central):
 <dependency>
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context</artifactId>
-    <version>0.13</version>
+    <version>0.14</version>
     <scope>test</scope>
 </dependency>
 ```
 Or Gradle dependency:
 ```groovy
-testImplementation("com.github.seregamorph:spring-test-smart-context:0.13")
+testImplementation("com.github.seregamorph:spring-test-smart-context:0.14")
 ```
 Then remove usages of standard `@DirtiesContext` annotation in your project on root test classes
 to use smart auto-close context implemented by this library instead. Keep the annotations for tests that really 

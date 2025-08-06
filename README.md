@@ -48,6 +48,9 @@ will be reduced, hence tests are executed faster.
 This idea was submitted to the Spring Framework team as a feature request:
 * https://github.com/spring-projects/spring-framework/issues/32289
 
+Public presentation at Spring I/O:
+* https://www.youtube.com/watch?v=7jMIipe2AJI
+
 Public presentation with AtomicJar (TestContainers creators):
 * https://www.youtube.com/watch?v=_Vci_5nr8R0
 

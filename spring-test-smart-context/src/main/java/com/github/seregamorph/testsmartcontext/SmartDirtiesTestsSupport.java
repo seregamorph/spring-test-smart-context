@@ -99,8 +99,8 @@ public class SmartDirtiesTestsSupport {
             if (!classOrderState.isIntegrationTest) {
                 // This can be a result of custom extension or listener.
                 // To fix this implement own IntegrationTestFilter and declare via META-INF SPI
-                log.warn("Test {} in suite of {} engine was not recognized as spring integration test by {}, " +
-                        "it's recommended to override the IntegrationTestFilter accordingly",
+                log.warn("Test {} in suite of {} engine was not recognized as spring integration test by {}, "
+                        + "it's recommended to override the IntegrationTestFilter accordingly",
                     testClass, classOrderState.testEngine, IntegrationTestFilter.getInstance().getClass());
             }
         }
@@ -133,8 +133,10 @@ public class SmartDirtiesTestsSupport {
                 return isLasts.iterator().next();
             } else {
                 assert isLasts.size() == 2;
-                log.warn("Test {} was discovered by more than one test engine with different ordering {}",
-                    testClass, classOrderStates.stream().map(state -> state.testEngine).collect(Collectors.toList()));
+                log.warn("Test {} was discovered by more than one test engine with different ordering {}", testClass,
+                    classOrderStates.stream()
+                        .map(state -> state.testEngine)
+                        .collect(Collectors.toList()));
                 // at least one engine considers it as last: do close the context
                 return true;
             }
@@ -186,15 +188,15 @@ public class SmartDirtiesTestsSupport {
                 }
             }
             if (JUnitPlatformSupport.isJunit4Present() && JUnitPlatformSupport.isJUnit4IdeaTestRunnerPresent()) {
-                System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), " +
-                    "the Smart DirtiesContext behaviour is disabled.");
+                System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), "
+                    + "the Smart DirtiesContext behaviour is disabled.");
                 if (!JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
                     //@formatter:off
-                    System.err.println("If you add org.junit.jupiter:junit-jupiter-api test dependency, \n" +
-                        "it will allow to run packages/modules with tests with Smart DirtiesContext semantics via " +
-                        "IDEA. See \n" +
-                        "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default\n" +
-                        "for details.");
+                    System.err.println("If you add org.junit.jupiter:junit-jupiter-api test dependency, \n"
+                        + "it will allow to run packages/modules with tests with Smart DirtiesContext semantics via "
+                        + "IDEA. See \n"
+                        + "https://youtrack.jetbrains.com/issue/IDEA-343605/junit-vintage-engine-is-not-preferred-by-default\n"
+                        + "for details.");
                     //@formatter:on
                 }
                 return Collections.emptyList();
@@ -253,10 +255,10 @@ public class SmartDirtiesTestsSupport {
 
         // TODO find compromising solution for @Nested classes
         if (!enclosingContextConfiguration.equals(innerContextConfiguration)) {
-            throw new IllegalStateException("Nested inner " + innerTestClass + " declares custom context " +
-                "configuration which differs from enclosing " + enclosingClass + ". " +
-                "This is not properly supported by the spring-test-smart-context ordering because of framework " +
-                "limitations. Please extract inner test class to upper level.");
+            throw new IllegalStateException("Nested inner " + innerTestClass + " declares custom context "
+                + "configuration which differs from enclosing " + enclosingClass + ". "
+                + "This is not properly supported by the spring-test-smart-context ordering because of framework "
+                + "limitations. Please extract inner test class to upper level.");
         }
     }
 

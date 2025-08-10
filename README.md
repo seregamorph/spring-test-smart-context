@@ -36,7 +36,8 @@ As a result, in a suite of single module there will always be not more than 1 ac
 <img src="doc/reorder-and-smart-dirties-context.png" alt="Reordered suite with smart DirtiesContext" width="700"/>
 
 This chart is done via calculating the number of active docker containers while executing a suite of 120 integration
-test classes that actively uses TestContainers for databases (several datasources simultaneously) and other services:
+test classes that actively uses TestContainers for databases (several datasources simultaneously) and other services
+(as spring-managed `Bean`s):
 
 <img src="doc/active-docker-containers.png" alt="Number of active docker containers" width="700"/>
 

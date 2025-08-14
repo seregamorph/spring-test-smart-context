@@ -25,8 +25,8 @@ public class CloseableDelegatingDataSource extends DelegatingDataSource implemen
         if (targetDataSource == null) {
             throw new IllegalArgumentException("targetDataSource is null");
         }
-        if (!(targetDataSource instanceof Closeable)) {
-            throw new IllegalArgumentException("targetDataSource is not closeable");
+        if (!(targetDataSource instanceof AutoCloseable)) {
+            throw new IllegalArgumentException("targetDataSource is not AutoCloseable");
         }
         return targetDataSource;
     }
@@ -35,8 +35,14 @@ public class CloseableDelegatingDataSource extends DelegatingDataSource implemen
     public void close() throws IOException {
         DataSource targetDataSource = getTargetDataSource();
         // condition may be false for lazily initialized DataSource
-        if (targetDataSource instanceof Closeable) {
-            ((Closeable) targetDataSource).close();
+        if (targetDataSource instanceof AutoCloseable) {
+            try {
+                ((AutoCloseable) targetDataSource).close();
+            } catch (IOException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new IOException("Error while closing targetDataSource", e);
+            }
         }
     }
 }

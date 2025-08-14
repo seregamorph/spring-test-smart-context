@@ -3,6 +3,7 @@ package com.github.seregamorph.testsmartcontext.jdbc;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.springframework.lang.Nullable;
+import org.springframework.util.function.SingletonSupplier;
 
 /**
  * DataSource decorator which resolves delegate DataSource on first demand.
@@ -39,7 +40,7 @@ public class LateInitDataSource extends CloseableDelegatingDataSource {
 
     public LateInitDataSource(String name, Supplier<DataSource> dataSourceSupplier) {
         this.name = name;
-        this.dataSourceSupplier = GuavaSuppliers.memoize(() -> {
+        this.dataSourceSupplier = SingletonSupplier.of(() -> {
             DataSource dataSource = dataSourceSupplier.get();
             setTargetDataSource(dataSource);
             return dataSource;

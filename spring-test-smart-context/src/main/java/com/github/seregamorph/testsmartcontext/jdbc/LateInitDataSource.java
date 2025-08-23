@@ -47,6 +47,11 @@ public class LateInitDataSource extends CloseableDelegatingDataSource {
         });
     }
 
+    @Nullable
+    public String getName() {
+        return name;
+    }
+
     @Override
     public void afterPropertiesSet() {
         // no op to skip getTargetDataSource setup

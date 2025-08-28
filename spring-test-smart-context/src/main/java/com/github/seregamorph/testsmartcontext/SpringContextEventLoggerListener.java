@@ -28,7 +28,7 @@ public class SpringContextEventLoggerListener implements ApplicationListener<App
     protected void onCreated() {
         String currentTestClassName = CurrentTestContext.getCurrentTestClassName();
         if (currentTestClassName == null) {
-            logger.error("Could not resolve current class name, ensure that SmartDirtiesContextTestExecutionListener " +
+            logger.warn("Could not resolve current class name, ensure that SmartDirtiesContextTestExecutionListener " +
                 "is registered for test class. Hint:\n" +
                 "Maybe you should set @TestExecutionListeners.mergeMode to MERGE_WITH_DEFAULTS for your test class.");
         } else {
@@ -58,7 +58,7 @@ public class SpringContextEventLoggerListener implements ApplicationListener<App
         boolean isChild = event.getApplicationContext().getParent() != null;
         if (testClassIdentifier == null) {
             // system shutdown hook
-            logger.info("Destroying {} (hook)", isChild ? "child context" : "context");
+            logger.info("Destroying {}", isChild ? "child context" : "context");
         } else {
             // triggered via SmartDirtiesContextTestExecutionListener or spring DirtiesContextTestExecutionListener
             logger.info("Destroying {} for {}", isChild ? "child context" : "context", testClassIdentifier);

@@ -78,15 +78,15 @@ public class SmartDirtiesTestngEngineTest {
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.Integration1SecondIT");
         TestEventTracker.assertConsumedEvent("Running Integration1SecondIT");
         TestEventTracker.assertConsumedEvent("Running Integration1IT");
-        TestEventTracker.assertConsumedEvent("Destroying context for com.github.seregamorph.testsmartcontext.demo.Integration1IT");
+        TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.Integration1IT");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration2IT");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.Integration2IT");
         TestEventTracker.assertConsumedEvent("Running Integration2IT");
-        TestEventTracker.assertConsumedEvent("Destroying context for com.github.seregamorph.testsmartcontext.demo.Integration2IT");
+        TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.Integration2IT");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.SampleIT");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.SampleIT");
         TestEventTracker.assertConsumedEvent("Running SampleIT");
-        TestEventTracker.assertConsumedEvent("Destroying context for com.github.seregamorph.testsmartcontext.demo.SampleIT");
+        TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.SampleIT");
         TestEventTracker.assertEmpty();
 
         System.out.println("<<<EngineTestKit duplicating the suite<<<");

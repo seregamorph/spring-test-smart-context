@@ -19,11 +19,11 @@ public class MavenTestngTest {
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.Integration1SecondTest");
         TestEventTracker.assertConsumedEvent("Running Integration1SecondTest");
         TestEventTracker.assertConsumedEvent("Running Integration1Test");
-        TestEventTracker.assertConsumedEvent("Destroying context for com.github.seregamorph.testsmartcontext.demo.Integration1Test");
+        TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.Integration1Test");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration2Test");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.Integration2Test");
         TestEventTracker.assertConsumedEvent("Running Integration2Test");
-        TestEventTracker.assertConsumedEvent("Destroying context for com.github.seregamorph.testsmartcontext.demo.Integration2Test");
+        TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.Integration2Test");
         TestEventTracker.assertEmpty();
 
         TestEventTracker.stopTracking();

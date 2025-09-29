@@ -65,6 +65,10 @@ public class SpringContextEventLoggerListener implements ApplicationListener<App
         }
     }
 
+    protected boolean isCurrentAutoClosingContext() {
+        return SmartDirtiesContextTestExecutionListener.isCurrentAutoClosingContext();
+    }
+
     static String formatNanos(long timeNanos) {
         long millis = TimeUnit.NANOSECONDS.toMillis(timeNanos);
         return String.format(Locale.ROOT, "%.3f", millis / 1000.0d) + "s";

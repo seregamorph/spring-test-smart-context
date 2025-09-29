@@ -26,11 +26,15 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     private static final Logger logger = LoggerFactory.getLogger(SmartDirtiesContextTestExecutionListener.class);
 
+    private static final ThreadLocal<Boolean> currentAutoClosingContext = new ThreadLocal<>();
+
     @Override
     public int getOrder() {
-        // DirtiesContextTestExecutionListener.getOrder() + 1
+        // DirtiesContextTestExecutionListener.getOrder() - 10
+        // (executes afterTestClass later than DirtiesContextTestExecutionListener as
+        // listeners are reverse ordered for after-calls)
         //noinspection MagicNumber
-        return 3001;
+        return 2990;
     }
 
     @Override
@@ -45,17 +49,29 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     @Override
     public void afterTestClass(TestContext testContext) {
+        currentAutoClosingContext.set(true);
         try {
             Class<?> testClass = testContext.getTestClass();
             if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
-                logger.info("Auto-closing context after {}", testClass.getName());
-                testContext.markApplicationContextDirty(null);
+                if (testContext.hasApplicationContext()) {
+                    logger.info("Auto-closing context after {}", testClass.getName());
+                    testContext.markApplicationContextDirty(null);
+                } else {
+                    logger.info("Skipping auto-closing context after {} (already closed or failed to create)",
+                        testClass.getName());
+                }
             } else {
                 logger.debug("Reusing context after {}", testClass.getName());
             }
         } finally {
+            currentAutoClosingContext.remove();
             // pop Nested classes
             CurrentTestContext.popCurrentTestClass();
         }
+    }
+
+    static boolean isCurrentAutoClosingContext() {
+        Boolean autoClosingContext = currentAutoClosingContext.get();
+        return autoClosingContext != null && autoClosingContext;
     }
 }

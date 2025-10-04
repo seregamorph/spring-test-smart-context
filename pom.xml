@@ -6,7 +6,7 @@
 
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context-parent</artifactId>
-    <version>0.15-SNAPSHOT</version>
+    <version>0.15</version>
     <packaging>pom</packaging>
     <name>spring-test-smart-context parent</name>
     <description>
@@ -39,7 +39,7 @@
         <!--
         https://maven.apache.org/guides/mini/guide-reproducible-builds.html
         -->
-        <project.build.outputTimestamp>2025-01-01T01:00:00Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-10-04T10:47:34Z</project.build.outputTimestamp>
 
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>

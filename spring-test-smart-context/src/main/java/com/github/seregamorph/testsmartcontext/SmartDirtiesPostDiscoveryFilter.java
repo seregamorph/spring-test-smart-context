@@ -34,7 +34,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
     public FilterResult apply(TestDescriptor testDescriptor) {
         String engine = testDescriptor.getUniqueId().getEngineId().orElse("undefined");
         if (skippedEngines.contains(engine)) {
-            // JUnit 5 Jupiter and TestNG have their own test ordering solutions, skip it
+            // JUnit Jupiter and TestNG have their own test ordering solutions, skip it
             return FilterResult.included("Skipping engine " + engine);
         }
 

@@ -163,7 +163,7 @@ public class SmartDirtiesTestsSupport {
                             //@formatter:off
                             throw new IllegalStateException("engineClassOrderStateMap is not initialized, "
                                 + "because more than one junit-platform.properties was found in the classpath: "
-                                + junitPlatformConfigUrls + ". JUnit 5 supports only one configuration file "
+                                + junitPlatformConfigUrls + ". JUnit supports only one configuration file "
                                 + "https://github.com/junit-team/junit5/issues/2794\n"
                                 + "The " + junitPlatformConfigUrl + " "
                                 + (configClassOrderer == null ? "does not declare the "

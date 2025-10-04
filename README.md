@@ -67,8 +67,8 @@ own `@ContextConfiguration` or `@Import` of spring beans.
 `Spring Boot` 2.4+, 3.x as well as bare Spring framework
 
 Supported test frameworks:
-* `JUnit 4` (via JUnit 5 [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running))
-* `JUnit 5 Jupiter`
+* `JUnit 4` (via JUnit [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running))
+* `JUnit 5/6 Jupiter`
 * `TestNG` (both bare TestNG and JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
 
 Known test execution caching solutions correctly support changed behaviour.
@@ -79,13 +79,13 @@ Add maven dependency (available in maven central):
 <dependency>
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context</artifactId>
-    <version>0.14</version>
+    <version>0.15</version>
     <scope>test</scope>
 </dependency>
 ```
 Or Gradle dependency:
 ```groovy
-testImplementation("com.github.seregamorph:spring-test-smart-context:0.14")
+testImplementation("com.github.seregamorph:spring-test-smart-context:0.15")
 ```
 Then remove usages of standard `@DirtiesContext` annotation in your project on root test classes
 to use smart auto-close context implemented by this library instead. Keep the annotations for tests that really 
@@ -98,7 +98,7 @@ Check the [Demo projects](demo) for examples.
 ### How it works
 
 <details>
-  <summary>JUnit 5 Jupiter</summary>
+  <summary>JUnit 5/6 Jupiter</summary>
 
 Add the dependency to the library in test scope, it will automatically setup
 [SmartDirtiesClassOrderer](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/jupiter/SmartDirtiesClassOrderer.java)

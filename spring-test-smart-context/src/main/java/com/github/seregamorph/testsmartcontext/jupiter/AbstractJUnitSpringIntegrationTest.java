@@ -6,7 +6,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
- * Base class for JUnit 5 Jupiter integration tests that create spring context. Supports
+ * Base class for JUnit 5/6 Jupiter integration tests that create spring context. Supports
  * {@link SmartDirtiesContextTestExecutionListener} semantics to optimize IT suite execution.
  *
  * @author Sergey Chernov

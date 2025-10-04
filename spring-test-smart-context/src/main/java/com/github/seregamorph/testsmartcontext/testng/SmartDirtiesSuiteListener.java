@@ -70,7 +70,7 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
         // this intercept method is executed by TestNG before running the suite (both IDEA and maven)
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         // Do not store the failure as if it throws, TestNG will fail the suite
-        // (both pure TestNG and JUnit 5 testng-engine)
+        // (both pure TestNG and JUnit testng-engine)
         TestSortResult testClassesLists = sorter.sort(methods,
             TestClassExtractor.ofMethod(SmartDirtiesSuiteListener::getTestClass));
 

@@ -17,10 +17,10 @@
     <properties>
         <maven.install.skip>true</maven.install.skip>
 
-        <spring-framework.version>7.0.0-M9</spring-framework.version>
-        <logback.version>1.5.12</logback.version>
-        <junit-platform.version>1.11.3</junit-platform.version>
-        <junit-jupiter.version>5.11.3</junit-jupiter.version>
+        <spring-framework.version>7.0.0-RC2</spring-framework.version>
+        <logback.version>1.5.20</logback.version>
+        <junit-platform.version>6.0.0</junit-platform.version>
+        <junit-jupiter.version>6.0.0</junit-jupiter.version>
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
     </properties>
 

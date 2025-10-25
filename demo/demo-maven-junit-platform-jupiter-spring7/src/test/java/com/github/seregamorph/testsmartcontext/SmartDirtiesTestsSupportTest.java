@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -44,7 +45,7 @@ class TestRootTest {
 
     }
 
-    // @Nested // not marking as nested to avoid Maven failure since JUnit 6
+    @Nested // not marking as nested to avoid Maven failure since JUnit 6
     public class NestedInheritTest {
     }
 

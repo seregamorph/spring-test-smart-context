@@ -93,6 +93,11 @@ public class MavenSmartDirtiesJupiterEngineTest {
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextBeforeClassTest");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextBeforeClassTest");
         TestEventTracker.assertConsumedEvent("Running SampleDirtiesContextBeforeClassTest.test");
+        TestEventTracker.assertConsumedEvent("AfterAll SampleDirtiesContextBeforeClassTest");
+        TestEventTracker.assertConsumedEvent("Context paused for null");
+        TestEventTracker.assertConsumedEvent("Context restarted for com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextAfterClassTest");
+        TestEventTracker.assertConsumedEvent("Running SampleDirtiesContextAfterClassTest.test");
+        TestEventTracker.assertConsumedEvent("AfterAll SampleDirtiesContextAfterClassTest");
         TestEventTracker.assertConsumedEvent("Destroying context for com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextAfterClassTest");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest");

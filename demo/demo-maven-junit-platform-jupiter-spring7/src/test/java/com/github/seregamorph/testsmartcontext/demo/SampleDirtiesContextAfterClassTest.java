@@ -1,5 +1,7 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -12,6 +14,11 @@ public class SampleDirtiesContextAfterClassTest extends AbstractIntegrationTest 
 
     @Test
     public void test() {
-        System.out.println("Running " + getClass().getName() + ".test");
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName() + ".test");
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        TestEventTracker.trackEvent("AfterAll " + SampleDirtiesContextAfterClassTest.class.getSimpleName());
     }
 }

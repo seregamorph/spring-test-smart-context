@@ -1,5 +1,7 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +13,11 @@ public class ExtendWithTest {
 
     @Test
     public void test() {
-        System.out.println("Running " + getClass().getName() + ".test");
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName() + ".test");
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        TestEventTracker.trackEvent("AfterAll " + ExtendWithTest.class.getSimpleName());
     }
 }

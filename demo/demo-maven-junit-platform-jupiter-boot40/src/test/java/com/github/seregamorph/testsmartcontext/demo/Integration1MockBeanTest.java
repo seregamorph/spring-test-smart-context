@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +34,6 @@ public class Integration1MockBeanTest extends AbstractIntegrationTest {
     @Test
     public void test() {
         assertEquals("mock", sampleBean.getValue());
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName() + ".test");
     }
 }

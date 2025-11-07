@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
@@ -11,7 +12,7 @@ public class Integration2Test extends AbstractIntegrationTest {
 
     @Test
     public void test() {
-        System.out.println("Integration2Test.test");
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName() + ".test");
     }
 
     @Nested
@@ -19,7 +20,7 @@ public class Integration2Test extends AbstractIntegrationTest {
 
         @Test
         public void nested() {
-            System.out.println("Integration2Test.NestedTest.test");
+            TestEventTracker.trackEvent("Running " + getClass().getSimpleName() + ".test");
         }
     }
 

@@ -2,6 +2,7 @@ package com.github.seregamorph.testsmartcontext.demo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class Integration1Test extends AbstractIntegrationTest {
     @Test
     public void test() {
         System.out.println("Integration1Test.test " + rootBean);
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName() + ".test");
     }
 
     @Nested

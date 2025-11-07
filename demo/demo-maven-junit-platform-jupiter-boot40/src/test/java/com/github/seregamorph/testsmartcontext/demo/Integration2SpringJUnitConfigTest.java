@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext.demo;
 
+import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -10,7 +11,6 @@ public class Integration2SpringJUnitConfigTest {
 
     @Test
     public void test() {
-        System.out.println("Integration2SpringJUnitConfigTest.test");
+        TestEventTracker.trackEvent("Running " + getClass().getSimpleName() + ".test");
     }
-
 }

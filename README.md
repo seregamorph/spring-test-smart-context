@@ -46,14 +46,9 @@ As an advantage, the total test execution time will also become less, because re
 will be reduced, hence tests are executed faster.
 
 ### References
-This idea was submitted to the Spring Framework team as a feature request:
-* https://github.com/spring-projects/spring-framework/issues/32289
-
-Public presentation at Spring I/O:
-* https://www.youtube.com/watch?v=7jMIipe2AJI
-
-Public presentation with AtomicJar (TestContainers creators):
-* https://www.youtube.com/watch?v=_Vci_5nr8R0
+* This idea was submitted to the Spring Framework team as a feature request: [spring-framework#32289](https://github.com/spring-projects/spring-framework/issues/32289)
+* Public presentation at Spring I/O: [recording](https://www.youtube.com/watch?v=7jMIipe2AJI) [slides](https://miro.com/app/board/uXjVN3KJeCI=/?share_link_id=309027962805)
+* Public presentation with AtomicJar (TestContainers creators): [recording](https://www.youtube.com/watch?v=_Vci_5nr8R0)
 
 ### Limitations
 At the moment only single thread test execution per module is supported. Parallel test execution is work in progress.
@@ -203,11 +198,6 @@ Alternatively it can be defined explicitly
 or even inherited from
 [AbstractJUnit4SpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/junit4/AbstractJUnit4SpringIntegrationTest.java)
 </details>
-
-### Additional materials
-* See the online presentation of the project https://www.youtube.com/watch?v=_Vci_5nr8R0 hosted by 
-[AtomicJar](https://www.atomicjar.com/), the creators of [TestContainers](https://testcontainers.com/) framework.
-* Presentation slides: [Miro board](https://miro.com/app/board/uXjVN3KJeCI=/?share_link_id=309027962805)
 
 ### Known projects using library
 <img src="doc/miro-logo.png" alt="Miro" width="120"/>

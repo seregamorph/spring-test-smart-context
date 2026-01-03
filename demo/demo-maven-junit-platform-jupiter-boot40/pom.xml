@@ -16,7 +16,7 @@
         and Spring Framework 7.0</description>
 
     <properties>
-        <spring-boot.version>4.0.0</spring-boot.version>
+        <spring-boot.version>4.0.1</spring-boot.version>
         <maven.install.skip>true</maven.install.skip>
     </properties>
 

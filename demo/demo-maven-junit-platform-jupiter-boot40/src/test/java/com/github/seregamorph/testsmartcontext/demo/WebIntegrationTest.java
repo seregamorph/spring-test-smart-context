@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.resttestclient.TestRestTemplate;
-import org.springframework.boot.resttestclient.autoconfigure.TestRestTemplateAutoConfiguration;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,9 +15,9 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 @ContextConfiguration(classes = {
-    WebIntegrationTest.Configuration.class,
-    TestRestTemplateAutoConfiguration.class
+    WebIntegrationTest.TestConfiguration.class
 })
+@AutoConfigureTestRestTemplate
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
     "parameter = value"
@@ -33,7 +33,7 @@ public class WebIntegrationTest extends AbstractIntegrationTest {
         assertEquals(404, entity.getStatusCode().value());
     }
 
-    public static class Configuration {
+    public static class TestConfiguration {
 
     }
 }

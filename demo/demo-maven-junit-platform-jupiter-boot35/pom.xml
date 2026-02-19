@@ -15,7 +15,7 @@
     <description>Demo project with tests launched via Maven junit-platform jupiter with spring-boot 3.5</description>
 
     <properties>
-        <spring-boot.version>3.5.4</spring-boot.version>
+        <spring-boot.version>3.5.11</spring-boot.version>
         <maven.install.skip>true</maven.install.skip>
     </properties>
 

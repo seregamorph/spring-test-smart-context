@@ -59,7 +59,7 @@ own `@ContextConfiguration` or `@Import` of spring beans.
 ### Supported versions
 `Java` 8+ (`Java` 17+ for spring-boot 3.x projects)
 
-`Spring Boot` 2.4+, 3.x as well as bare Spring framework
+`Spring Boot` 2.4+, 3.x, 4.x as well as bare Spring framework
 
 Supported test frameworks:
 * `JUnit 4` (via JUnit [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running))

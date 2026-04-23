@@ -175,7 +175,7 @@
 
     <profiles>
         <profile>
-            <id>demo</id>
+            <id>tests</id>
             <activation>
                 <property>
                     <name>performRelease</name>
@@ -183,7 +183,7 @@
                 </property>
             </activation>
             <modules>
-                <module>demo</module>
+                <module>tests</module>
             </modules>
         </profile>
 

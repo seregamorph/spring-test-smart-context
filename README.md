@@ -204,3 +204,9 @@ or even inherited from
 
 [Miro](https://miro.com/) is using this approach to optimize huge integration test suites and it saved a lot of resource
 for CI/CD pipelines.
+
+### Related projects
+The [Spring Test Profiler](https://github.com/PragmaTech-GmbH/spring-test-profiler) is a Spring Test utility that
+provides visualization and insights for Spring Test execution, with a focus on Spring context caching. 
+It helps you identify optimization opportunities in your Spring Test suite to speed up your builds.
+This project is not alternative, but can be complementary to spring-test-smart-context library.

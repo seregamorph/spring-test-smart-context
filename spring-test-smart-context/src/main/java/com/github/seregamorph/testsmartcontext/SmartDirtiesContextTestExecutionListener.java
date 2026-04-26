@@ -2,6 +2,7 @@ package com.github.seregamorph.testsmartcontext;
 
 import static com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport.isInnerClass;
 
+import com.github.seregamorph.testsmartcontext.leakage.ResourceLeakageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.TestContext;
@@ -45,6 +46,13 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
         if (isInnerClass(testClass)) {
             SmartDirtiesTestsSupport.verifyInnerClass(testClass);
         }
+
+        ResourceLeakageManager leakageManager = ResourceLeakageManager.getInstance();
+        if (SmartDirtiesTestsSupport.isFirstClassPerConfig(testClass)) {
+            logger.info("firstClassPerConfig {}", testClass.getName());
+            leakageManager.handleBeforeClassGroup();
+        }
+        leakageManager.handleBeforeClass(testClass);
     }
 
     @Override
@@ -52,10 +60,13 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
         currentAutoClosingContext.set(true);
         try {
             Class<?> testClass = testContext.getTestClass();
+            ResourceLeakageManager leakageManager = ResourceLeakageManager.getInstance();
+            leakageManager.handleAfterClass(testClass);
             if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
                 if (testContext.hasApplicationContext()) {
                     logger.info("Auto-closing context after {}", testClass.getName());
                     testContext.markApplicationContextDirty(null);
+                    leakageManager.handleAfterClassGroup(testClass);
                 } else {
                     logger.info("Skipping auto-closing context after {} (already closed or failed to create)",
                         testClass.getName());

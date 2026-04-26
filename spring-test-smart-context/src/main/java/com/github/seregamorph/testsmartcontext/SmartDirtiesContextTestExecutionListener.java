@@ -39,9 +39,9 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     @Override
     public void beforeTestClass(TestContext testContext) {
-        // stack Nested classes
-        CurrentTestContext.pushCurrentTestClass(testContext.getTestClass());
         Class<?> testClass = testContext.getTestClass();
+        // stack Nested classes
+        CurrentTestContext.pushCurrentTestClass(testClass);
         if (isInnerClass(testClass)) {
             SmartDirtiesTestsSupport.verifyInnerClass(testClass);
         }

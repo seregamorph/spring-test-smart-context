@@ -5,30 +5,33 @@ import java.util.Queue;
 
 public class TestEventTracker {
 
-    private static final ThreadLocal<TestEventTracker> currentEventTracker = new ThreadLocal<>();
+    private static volatile TestEventTracker currentEventTracker;
 
     private final Queue<String> events = new LinkedList<>();
 
     public static void startTracking() {
-        currentEventTracker.set(new TestEventTracker());
+        if (currentEventTracker != null) {
+            throw new IllegalStateException("Tracker already started");
+        }
+        currentEventTracker = new TestEventTracker();
     }
 
     public static void stopTracking() {
-        currentEventTracker.remove();
+        currentEventTracker = null;
     }
 
     public static void trackEvent(String event) {
-        var testEventTracker = currentEventTracker.get();
-        if (testEventTracker != null) {
-            System.out.println("Tracked event: " + event);
-            testEventTracker.events.add(event);
+        var testEventTracker = currentEventTracker;
+        if (testEventTracker == null) {
+            System.out.println("[" + Thread.currentThread().getName() + "] Event: " + event);
         } else {
-            System.out.println("Event: " + event);
+            System.out.println("[" + Thread.currentThread().getName() + "] Tracked event: " + event);
+            testEventTracker.events.add(event);
         }
     }
 
     public static void assertConsumedEvent(String expected) {
-        var testEventTracker = currentEventTracker.get();
+        var testEventTracker = currentEventTracker;
         if (testEventTracker == null) {
             throw new IllegalStateException("currentEventTracker not initialized");
         }
@@ -40,7 +43,7 @@ public class TestEventTracker {
     }
 
     public static void assertEmpty() {
-        var testEventTracker = currentEventTracker.get();
+        var testEventTracker = currentEventTracker;
         if (testEventTracker == null) {
             throw new IllegalStateException("currentEventTracker not initialized");
         }

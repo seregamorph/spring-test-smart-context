@@ -16,6 +16,8 @@ public class MavenTestngTest {
         // hint: this test can fail if executed with test filtering (like run single test)
         TestEventTracker.assertConsumedEvent("Running Unit1Test.test");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration1SecondTest");
+        TestEventTracker.assertConsumedEvent("Creating slowlyCreatedBean");
+        TestEventTracker.assertConsumedEvent("Created slowlyCreatedBean");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.Integration1SecondTest");
         TestEventTracker.assertConsumedEvent("Running Integration1SecondTest");
         TestEventTracker.assertConsumedEvent("Running Integration1Test");

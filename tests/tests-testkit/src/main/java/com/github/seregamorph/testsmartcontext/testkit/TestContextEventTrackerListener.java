@@ -10,9 +10,11 @@ import org.springframework.util.Assert;
 
 public class TestContextEventTrackerListener extends SpringContextEventLoggerListener {
 
+    @Nullable
     private static final Class<? extends ApplicationContextEvent> CONTEXT_PAUSED_EVENT_CLASS =
         classForName("org.springframework.context.event.ContextPausedEvent", ApplicationContextEvent.class);
 
+    @Nullable
     private static final Class<? extends ApplicationContextEvent> CONTEXT_RESTARTED_EVENT_CLASS =
         classForName("org.springframework.context.event.ContextRestartedEvent", ApplicationContextEvent.class);
 

@@ -43,10 +43,10 @@ public class SmartDirtiesTestsSupport {
     private static Throwable failureCause;
 
     static class ClassOrderState {
-        private final boolean isIntegrationTest;
-        private final String testEngine;
-        private final boolean isFirst;
-        private final boolean isLast;
+        final boolean isIntegrationTest;
+        final String testEngine;
+        final boolean isFirst;
+        final boolean isLast;
 
         private ClassOrderState(boolean isIntegrationTest, String testEngine, boolean isFirst, boolean isLast) {
             this.isIntegrationTest = isIntegrationTest;
@@ -66,26 +66,6 @@ public class SmartDirtiesTestsSupport {
     protected static int classOrderStateMapSize(String engine) {
         Set<Class<?>> testClasses = getTestClasses(engine);
         return testClasses == null ? 0 : testClasses.size();
-    }
-
-    //@TestOnly
-    static boolean isFirstClassPerConfig(Class<?> testClass) {
-        if (isInnerClass(testClass)) {
-            // to support @Nested classes (without own context configuration)
-            return false;
-        }
-
-        // this method is only used in tests, so we don't need to be lenient there
-        List<ClassOrderState> classOrderStates = getOrderStates(testClass);
-        if (classOrderStates.size() == 1) {
-            ClassOrderState classOrderState = classOrderStates.get(0);
-            if (!classOrderState.isIntegrationTest) {
-                throw new IllegalStateException("Test " + testClass + " is not recognized as integration test");
-            }
-            return classOrderState.isFirst;
-        } else {
-            throw new IllegalStateException("Unexpected more than one matching test engine for " + testClass);
-        }
     }
 
     static boolean isLastClassPerConfig(Class<?> testClass) {
@@ -143,7 +123,7 @@ public class SmartDirtiesTestsSupport {
         }
     }
 
-    private static List<ClassOrderState> getOrderStates(Class<?> testClass) {
+    static List<ClassOrderState> getOrderStates(Class<?> testClass) {
         if (engineClassOrderStateMap == null) {
             if (failureCause != null) {
                 throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);

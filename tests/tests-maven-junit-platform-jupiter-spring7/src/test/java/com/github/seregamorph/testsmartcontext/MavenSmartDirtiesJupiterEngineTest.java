@@ -65,21 +65,21 @@ public class MavenSmartDirtiesJupiterEngineTest {
             SampleIntegrationTest.class
         ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.class));
-        assertFalse(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.NestedTest.class));
-        assertFalse(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.NestedTest.DeeplyNestedTest.class));
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
-        assertFalse(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleDirtiesContextAfterClassTest.class));
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleIntegrationTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration1Test.class));
+        assertFalse(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration1Test.NestedTest.class));
+        assertFalse(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration1Test.NestedTest.DeeplyNestedTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration2Test.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
+        assertFalse(SmartDirtiesTestKitSupport.isFirstClassPerConfig(SampleDirtiesContextAfterClassTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(SampleIntegrationTest.class));
 
-        assertFalse(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration1Test.NestedTest.DeeplyNestedTest.class));
-        assertFalse(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration1Test.NestedTest.class));
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration1Test.class));
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration2Test.class));
-        assertFalse(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleDirtiesContextAfterClassTest.class));
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleIntegrationTest.class));
+        assertFalse(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration1Test.NestedTest.DeeplyNestedTest.class));
+        assertFalse(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration1Test.NestedTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration1Test.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration2Test.class));
+        assertFalse(SmartDirtiesTestKitSupport.isLastClassPerConfig(SampleDirtiesContextBeforeClassTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(SampleDirtiesContextAfterClassTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(SampleIntegrationTest.class));
 
         TestEventTracker.assertConsumedEvent("Started SmartDirtiesJupiterTestsSorterTest.shouldSortMostlyAlphabeticallyAndGroupSameConfigurations");
         TestEventTracker.assertConsumedEvent("Finished SmartDirtiesJupiterTestsSorterTest.shouldSortMostlyAlphabeticallyAndGroupSameConfigurations");

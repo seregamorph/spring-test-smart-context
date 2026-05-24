@@ -58,11 +58,11 @@ public class MavenSmartDirtiesTestngEngineTest {
             SampleDirtiesContextAfterClassTest.class
         ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.class));
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleDirtiesContextAfterClassTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration1Test.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(SampleDirtiesContextAfterClassTest.class));
 
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration1Test.class));
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleDirtiesContextAfterClassTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration1Test.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(SampleDirtiesContextAfterClassTest.class));
 
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration1Test");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.Integration1Test");

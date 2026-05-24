@@ -61,13 +61,13 @@ public class MavenSmartDirtiesVintageEngineTest {
             SampleIntegrationTest.class
         ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
 
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration1Test.class));
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsSupport.isFirstClassPerConfig(SampleIntegrationTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration1Test.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration2Test.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(SampleIntegrationTest.class));
 
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration1Test.class));
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(Integration2Test.class));
-        assertTrue(SmartDirtiesTestsSupport.isLastClassPerConfig(SampleIntegrationTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration1Test.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration2Test.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(SampleIntegrationTest.class));
 
         TestEventTracker.assertConsumedEvent("Running Unit1Test");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration1Test");

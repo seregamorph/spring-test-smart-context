@@ -52,7 +52,7 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
         currentAutoClosingContext.set(true);
         try {
             Class<?> testClass = testContext.getTestClass();
-            if (SmartDirtiesTestsSupport.isLastClassPerConfig(testClass)) {
+            if (SmartDirtiesTestsSupport.markCompleteAndIsLastClassPerConfig(testClass)) {
                 if (testContext.hasApplicationContext()) {
                     logger.info("Auto-closing context after {}", testClass.getName());
                     testContext.markApplicationContextDirty(null);

@@ -1,4 +1,4 @@
-package com.github.seregamorph.testsmartcontext;
+package com.github.seregamorph.testsmartcontext.demo;
 
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import org.testng.annotations.AfterSuite;

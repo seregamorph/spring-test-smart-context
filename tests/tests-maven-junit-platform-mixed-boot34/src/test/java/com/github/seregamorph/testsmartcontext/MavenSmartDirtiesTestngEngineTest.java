@@ -20,7 +20,7 @@ public class MavenSmartDirtiesTestngEngineTest {
 
     private static final String ENGINE = "testng";
 
-    private static Map<String, Map<Class<?>, SmartDirtiesTestsSupport.ClassOrderState>> prevEngineClassOrderStateMap;
+    private static Map<String, Map<Class<?>, SmartDirtiesTestsSupport.ClassGroupState>> prevEngineClassOrderStateMap;
 
     @BeforeAll
     public static void beforeClass() {

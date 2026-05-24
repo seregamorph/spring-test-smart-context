@@ -1,13 +1,13 @@
 package com.github.seregamorph.testsmartcontext.testkit;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class TestEventTracker {
 
     private static volatile TestEventTracker currentEventTracker;
 
-    private final Queue<String> events = new LinkedList<>();
+    private final BlockingQueue<String> events = new LinkedBlockingQueue<>();
 
     public static void startTracking() {
         if (currentEventTracker != null) {

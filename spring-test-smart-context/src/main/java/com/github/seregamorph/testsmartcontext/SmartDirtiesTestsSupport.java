@@ -8,8 +8,8 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -35,30 +35,28 @@ public class SmartDirtiesTestsSupport {
     protected static final String ENGINE_JUNIT_JUPITER = "junit-jupiter";
 
     /**
-     * engine -> test class -> ClassOrderState
+     * engine -> test class -> ClassGroupState
      */
-    private static Map<String, Map<Class<?>, ClassOrderState>> engineClassOrderStateMap;
+    private static Map<String, Map<Class<?>, ClassGroupState>> engineClassOrderStateMap;
 
     @Nullable
     private static Throwable failureCause;
 
-    static class ClassOrderState {
-        final boolean isIntegrationTest;
-        final String testEngine;
-        final boolean isFirst;
-        final boolean isLast;
+    static class ClassGroupState {
+        private final Set<Class<?>> completedItClasses = Collections.synchronizedSet(new LinkedHashSet<>());
 
-        private ClassOrderState(boolean isIntegrationTest, String testEngine, boolean isFirst, boolean isLast) {
-            this.isIntegrationTest = isIntegrationTest;
-            this.testEngine = testEngine;
-            this.isFirst = isFirst;
-            this.isLast = isLast;
+        private final String engine;
+        final Set<Class<?>> discoveredItClasses;
+
+        private ClassGroupState(String engine, List<Class<?>> discoveredItClasses) {
+            this.engine = engine;
+            this.discoveredItClasses = Collections.unmodifiableSet(new LinkedHashSet<>(discoveredItClasses));
         }
     }
 
     @Nullable
     static Set<Class<?>> getTestClasses(String engine) {
-        Map<Class<?>, ClassOrderState> classOrderStateMap = engineClassOrderStateMap == null ? null
+        Map<Class<?>, ClassGroupState> classOrderStateMap = engineClassOrderStateMap == null ? null
             : engineClassOrderStateMap.get(engine);
         return classOrderStateMap == null ? null : classOrderStateMap.keySet();
     }
@@ -68,24 +66,24 @@ public class SmartDirtiesTestsSupport {
         return testClasses == null ? 0 : testClasses.size();
     }
 
-    static boolean isLastClassPerConfig(Class<?> testClass) {
+    static boolean markCompleteAndIsLastClassPerConfig(Class<?> testClass) {
         if (isInnerClass(testClass)) {
             // to support @Nested classes (without own context configuration)
             return false;
         }
 
-        List<ClassOrderState> classOrderStates = getOrderStates(testClass);
-        for (ClassOrderState classOrderState : classOrderStates) {
-            if (!classOrderState.isIntegrationTest) {
+        List<ClassGroupState> classGroupStates = getOrderStates(testClass);
+        for (ClassGroupState classGroupState : classGroupStates) {
+            if (!classGroupState.discoveredItClasses.contains(testClass)) {
                 // This can be a result of custom extension or listener.
                 // To fix this implement own IntegrationTestFilter and declare via META-INF SPI
                 log.warn("Test {} in suite of {} engine was not recognized as spring integration test by {}, "
                         + "it's recommended to override the IntegrationTestFilter accordingly",
-                    testClass, classOrderState.testEngine, IntegrationTestFilter.getInstance().getClass());
+                    testClass, classGroupState.engine, IntegrationTestFilter.getInstance().getClass());
             }
         }
 
-        if (classOrderStates.isEmpty()) {
+        if (classGroupStates.isEmpty()) {
             List<String> classes = engineClassOrderStateMap.entrySet().stream()
                 .map(entry -> {
                     String engineClassNames = entry.getValue().keySet().stream()
@@ -98,14 +96,19 @@ public class SmartDirtiesTestsSupport {
                 + testClass + ", it means that it was skipped on initial analysis or failed. "
                 + "Discovered classes by engine: " + classes + (failureCause == null ? "" : ": " + failureCause),
                 failureCause);
-        } else if (classOrderStates.size() == 1) {
-            return classOrderStates.get(0).isLast;
+        } else if (classGroupStates.size() == 1) {
+            ClassGroupState classGroupState = classGroupStates.get(0);
+            classGroupState.completedItClasses.add(testClass);
+            return classGroupState.discoveredItClasses.equals(classGroupState.completedItClasses);
         } else {
             // In the common case it's theoretically possible that the same class is discovered by more than one
             // test engine. And at this point we don't know which engine is running current test,
             // so we do a failover logic
-            Set<Boolean> isLasts = classOrderStates.stream()
-                .map(state -> state.isLast)
+            Set<Boolean> isLasts = classGroupStates.stream()
+                .map(classGroupState -> {
+                    classGroupState.completedItClasses.add(testClass);
+                    return classGroupState.discoveredItClasses.equals(classGroupState.completedItClasses);
+                })
                 .collect(Collectors.toSet());
 
             if (isLasts.size() == 1) {
@@ -114,8 +117,8 @@ public class SmartDirtiesTestsSupport {
             } else {
                 assert isLasts.size() == 2;
                 log.warn("Test {} was discovered by more than one test engine with different ordering {}", testClass,
-                    classOrderStates.stream()
-                        .map(state -> state.testEngine)
+                    classGroupStates.stream()
+                        .map(state -> state.engine)
                         .collect(Collectors.toList()));
                 // at least one engine considers it as last: do close the context
                 return true;
@@ -123,7 +126,7 @@ public class SmartDirtiesTestsSupport {
         }
     }
 
-    static List<ClassOrderState> getOrderStates(Class<?> testClass) {
+    static List<ClassGroupState> getOrderStates(Class<?> testClass) {
         if (engineClassOrderStateMap == null) {
             if (failureCause != null) {
                 throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);
@@ -184,32 +187,26 @@ public class SmartDirtiesTestsSupport {
             throw new IllegalStateException("Test ordering is not initialized or failed");
         }
 
-        List<ClassOrderState> classOrderStates = new ArrayList<>();
-        for (Map<Class<?>, ClassOrderState> classOrderStateMap : engineClassOrderStateMap.values()) {
-            ClassOrderState classOrderState = classOrderStateMap.get(testClass);
-            if (classOrderState != null) {
-                classOrderStates.add(classOrderState);
+        List<ClassGroupState> classGroupStates = new ArrayList<>();
+        for (Map<Class<?>, ClassGroupState> classOrderStateMap : engineClassOrderStateMap.values()) {
+            ClassGroupState classGroupState = classOrderStateMap.get(testClass);
+            if (classGroupState != null) {
+                classGroupStates.add(classGroupState);
             }
         }
-        return classOrderStates;
+        return classGroupStates;
     }
 
     protected static void setTestClassesLists(String engine, TestSortResult testSortResult) {
-        Map<Class<?>, ClassOrderState> classOrderStateMap = new LinkedHashMap<>();
+        Map<Class<?>, ClassGroupState> classOrderStateMap = new LinkedHashMap<>();
         for (List<Class<?>> testClasses : testSortResult.getSortedConfigToTests()) {
-            Iterator<Class<?>> iterator = testClasses.iterator();
-            boolean isFirst = true;
-            while (iterator.hasNext()) {
-                Class<?> testClass = iterator.next();
-                classOrderStateMap.put(testClass,
-                    new ClassOrderState(true, engine, isFirst, !iterator.hasNext()));
-                isFirst = false;
+            ClassGroupState classGroupState = new ClassGroupState(engine, testClasses);
+            for (Class<?> testClass : testClasses) {
+                classOrderStateMap.put(testClass, classGroupState);
             }
         }
         for (Class<?> nonItClass : testSortResult.getNonItClasses()) {
-            ClassOrderState prev = classOrderStateMap.put(nonItClass,
-                new ClassOrderState(false, engine, false, false));
-            assert prev == null;
+            classOrderStateMap.put(nonItClass, new ClassGroupState(engine, Collections.emptyList()));
         }
 
         if (SmartDirtiesTestsSupport.engineClassOrderStateMap == null) {
@@ -258,10 +255,10 @@ public class SmartDirtiesTestsSupport {
     }
 
     //@TestOnly
-    static Map<String, Map<Class<?>, ClassOrderState>> setEngineClassOrderStateMap(
-        Map<String, Map<Class<?>, ClassOrderState>> engineClassOrderStateMap
+    static Map<String, Map<Class<?>, ClassGroupState>> setEngineClassOrderStateMap(
+        Map<String, Map<Class<?>, ClassGroupState>> engineClassOrderStateMap
     ) {
-        Map<String, Map<Class<?>, ClassOrderState>> prev = SmartDirtiesTestsSupport.engineClassOrderStateMap;
+        Map<String, Map<Class<?>, ClassGroupState>> prev = SmartDirtiesTestsSupport.engineClassOrderStateMap;
         SmartDirtiesTestsSupport.engineClassOrderStateMap = engineClassOrderStateMap;
         return prev;
     }

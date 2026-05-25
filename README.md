@@ -132,8 +132,6 @@ parent.
 <details>
   <summary>JUnit 4</summary>
 
-Note: support of JUnit 4 is planned to be removed in version 1.0 (will stay available in 0.x versions).
-
 The JUnit 4 does not provide standard way to reorder test class execution, but it's still possible via
 [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running).
 This dependency should be added to test scope of the module:

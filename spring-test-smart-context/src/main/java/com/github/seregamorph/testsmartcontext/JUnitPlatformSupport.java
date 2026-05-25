@@ -15,7 +15,7 @@ final class JUnitPlatformSupport {
     private static final boolean JUNIT4_PRESENT = isClassPresent(
         "org.junit.runner.RunWith");
 
-    private static final boolean JUNIT5_JUPITER_API_PRESENT = isClassPresent(
+    private static final boolean JUNIT_JUPITER_API_PRESENT = isClassPresent(
         "org.junit.jupiter.api.extension.ExtendWith");
 
     private static final boolean JUNIT4_IDEA_TEST_RUNNER_PRESENT = isClassPresent(
@@ -31,8 +31,8 @@ final class JUnitPlatformSupport {
         return JUNIT4_PRESENT;
     }
 
-    static boolean isJunit5JupiterApiPresent() {
-        return JUNIT5_JUPITER_API_PRESENT;
+    static boolean isJunitJupiterApiPresent() {
+        return JUNIT_JUPITER_API_PRESENT;
     }
 
     @Deprecated

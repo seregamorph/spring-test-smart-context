@@ -67,7 +67,7 @@ public class IntegrationTestFilter {
         }
 
         //noinspection RedundantIfStatement
-        if (JUnitPlatformSupport.isJunit5JupiterApiPresent() && isIntegrationTestJUnit5Jupiter(testClass)) {
+        if (JUnitPlatformSupport.isJunitJupiterApiPresent() && isIntegrationTestJUnitJupiter(testClass)) {
             return true;
         }
 
@@ -89,9 +89,9 @@ public class IntegrationTestFilter {
     }
 
     /**
-     * This method should be only called if JUnit5 Jupiter API is on the classpath
+     * This method should be only called if JUnit Jupiter API is on the classpath
      */
-    protected boolean isIntegrationTestJUnit5Jupiter(Class<?> testClass) {
+    protected boolean isIntegrationTestJUnitJupiter(Class<?> testClass) {
         // can be inherited, can be meta-annotation e.g. via @SpringBootTest
         Set<ExtendWith> extendWith = AnnotatedElementUtils.findAllMergedAnnotations(testClass, ExtendWith.class);
         if (extendWith.isEmpty()) {

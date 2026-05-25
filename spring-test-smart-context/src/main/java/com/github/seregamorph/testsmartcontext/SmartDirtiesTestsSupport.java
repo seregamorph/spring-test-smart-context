@@ -131,7 +131,7 @@ public class SmartDirtiesTestsSupport {
             if (failureCause != null) {
                 throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);
             }
-            if (JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
+            if (JUnitPlatformSupport.isJunitJupiterApiPresent()) {
                 try {
                     ClassLoader classLoader = SmartDirtiesTestsSupport.class.getClassLoader();
                     List<URL> junitPlatformConfigUrls = Collections.list(classLoader.getResources(
@@ -173,7 +173,7 @@ public class SmartDirtiesTestsSupport {
             if (JUnitPlatformSupport.isJunit4Present() && JUnitPlatformSupport.isJUnit4IdeaTestRunnerPresent()) {
                 System.err.println("The test is started via IDEA old JUnit 4 runner (not vintage), "
                     + "the Smart DirtiesContext behaviour is disabled.");
-                if (!JUnitPlatformSupport.isJunit5JupiterApiPresent()) {
+                if (!JUnitPlatformSupport.isJunitJupiterApiPresent()) {
                     //@formatter:off
                     System.err.println("If you add org.junit.jupiter:junit-jupiter-api test dependency, \n"
                         + "it will allow to run packages/modules with tests with Smart DirtiesContext semantics via "

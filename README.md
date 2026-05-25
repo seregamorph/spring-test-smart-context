@@ -62,9 +62,10 @@ own `@ContextConfiguration` or `@Import` of spring beans.
 `Spring Boot` 2.4+, 3.x, 4.x as well as bare Spring framework
 
 Supported test frameworks:
-* `JUnit 4` (via JUnit [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running))
+* `JUnit 4` (via JUnit [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running)) removed; for JUnit 4 support use old `0.15` version
 * `JUnit 5/6 Jupiter`
 * `TestNG` (both bare TestNG and JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
+* `Kotest`
 
 Known test execution caching solutions correctly support changed behaviour.
 
@@ -140,69 +141,8 @@ which relies on enabled Kotest autoscan. It reorders Spec classes before executi
 <details>
   <summary>JUnit 4</summary>
 
-The JUnit 4 does not provide standard way to reorder test class execution, but it's still possible via
-[junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running).
-This dependency should be added to test scope of the module:
-```xml
-<dependency>
-    <groupId>org.junit.vintage</groupId>
-    <artifactId>junit-vintage-engine</artifactId>
-    <scope>test</scope>
-</dependency>
-```
-or for Gradle (see [detailed instruction](https://docs.gradle.org/current/userguide/java_testing.html#executing_legacy_tests_with_junit_vintage)):
-```groovy
-testRuntimeOnly('org.junit.vintage:junit-vintage-engine')
-testRuntimeOnly('org.junit.platform:junit-platform-launcher')
-```
-Also the `surefire`/`failsafe` plugins should be configured to use junit-platform:
-```xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <version>${maven-surefire.version}</version>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-junit-platform</artifactId>
-            <version>${maven-surefire.version}</version>
-        </dependency>
-    </dependencies>
-</plugin>
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-failsafe-plugin</artifactId>
-    <version>${maven-surefire.version}</version>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-junit-platform</artifactId>
-            <version>${maven-surefire.version}</version>
-        </dependency>
-    </dependencies>
-</plugin>
-```
-or for Gradle:
-```groovy
-tasks.named('test', Test) {
-    useJUnitPlatform()
-}
-```
-
-For projects with JUnit 4 it will automatically setup
-[SmartDirtiesPostDiscoveryFilter](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesPostDiscoveryFilter.java)
-which will reorder test classes on the level of junit-launcher and prepare the list of last test class per context configuration.
-Then this test execution listener
-[SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java)
-will be auto-discovered via [spring.factories](spring-test-smart-context/src/main/resources/META-INF/spring.factories).
-Alternatively it can be defined explicitly
-```java
-@TestExecutionListeners(listeners = {
-        SmartDirtiesContextTestExecutionListener.class
-}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
-```
-or even inherited from
-[AbstractJUnit4SpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/junit4/AbstractJUnit4SpringIntegrationTest.java)
+Note: support of JUnit 4 is removed in version 1.0.
+In case you need it, check the 0.15 [README](https://github.com/seregamorph/spring-test-smart-context/blob/v0.15/README.md).
 </details>
 
 ### Known projects using library

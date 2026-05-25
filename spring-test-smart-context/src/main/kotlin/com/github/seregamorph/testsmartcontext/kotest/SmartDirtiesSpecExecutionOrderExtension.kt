@@ -15,8 +15,7 @@ import io.kotest.core.spec.SpecRef
  * which is used by {@link com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener}.
  * <p>
  * For JUnit Jupiter classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer},
- * for TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, for
- * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
+ * for TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}.
  *
  * @author Sergey Chernov
  */

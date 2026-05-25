@@ -21,7 +21,6 @@ public class Integration1MockBeanTest extends AbstractIntegrationTest {
     @Autowired
     private SampleService sampleService;
 
-    @SuppressWarnings("removal")
     @MockitoBean
     private SampleBean sampleBean;
 

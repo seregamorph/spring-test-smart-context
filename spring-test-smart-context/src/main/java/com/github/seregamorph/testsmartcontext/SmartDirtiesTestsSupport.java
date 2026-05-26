@@ -33,6 +33,8 @@ public class SmartDirtiesTestsSupport {
 
     protected static final String ENGINE_TESTNG = "testng";
     protected static final String ENGINE_JUNIT_JUPITER = "junit-jupiter";
+    // note: same as KotestJunitPlatformTestEngine.EngineId = "kotest"
+    protected static final String ENGINE_KOTEST = "kotest";
 
     /**
      * engine -> test class -> ClassGroupState

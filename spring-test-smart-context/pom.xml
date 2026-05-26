@@ -21,10 +21,12 @@
     <properties>
         <slf4j.version>1.7.36</slf4j.version>
         <spring-framework.version>6.1.16</spring-framework.version>
+        <spring-boot.version>3.3.13</spring-boot.version>
         <testng.version>7.10.2</testng.version>
         <junit-platform.version>1.11.3</junit-platform.version>
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <testng-engine.version>1.0.5</testng-engine.version>
+        <kotest.version>5.9.1</kotest.version>
     </properties>
 
     <developers>
@@ -57,10 +59,17 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>${spring-framework.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <version>${spring-boot.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -99,6 +108,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring-framework.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.kotest</groupId>
+            <artifactId>kotest-framework-api-jvm</artifactId>
+            <version>${kotest.version}</version>
             <scope>provided</scope>
         </dependency>
 

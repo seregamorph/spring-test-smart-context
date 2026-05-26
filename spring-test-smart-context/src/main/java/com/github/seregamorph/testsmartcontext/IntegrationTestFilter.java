@@ -1,5 +1,6 @@
 package com.github.seregamorph.testsmartcontext;
 
+import io.kotest.core.spec.Spec;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -8,8 +9,10 @@ import java.util.Set;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.junit.runner.Runner;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -71,6 +74,10 @@ public class IntegrationTestFilter {
             return true;
         }
 
+        if (ClasspathPlatformSupport.isKotestSpecPresent() && isKotestSpringIntegrationTest(testClass)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -102,5 +109,17 @@ public class IntegrationTestFilter {
             .map(ExtendWith::value)
             .flatMap(Arrays::stream)
             .anyMatch(SpringExtension.class::isAssignableFrom);
+    }
+
+    /**
+     * This method should be only called if Kotest Api is on the classpath
+     */
+    protected boolean isKotestSpringIntegrationTest(Class<?> testClass) {
+        if (Spec.class.isAssignableFrom(testClass)) {
+            return AnnotatedElementUtils.findMergedAnnotation(testClass, ContextConfiguration.class) != null
+                || ClasspathPlatformSupport.isSpringBootTestPresent()
+                && AnnotatedElementUtils.hasAnnotation(testClass, SpringBootTest.class);
+        }
+        return false;
     }
 }

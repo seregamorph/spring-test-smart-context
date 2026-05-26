@@ -14,9 +14,8 @@ import org.springframework.lang.Nullable;
 
 /**
  * Auto-discovered JUnit platform {@link PostDiscoveryFilter} which reorders and groups integration test classes
- * according to their configuration. Note: this class sorts only JUnit 4 and Kotest tests executed via
- * <a href="https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running">vintage-engine</a>
- * or Kotest Engine.
+ * according to their configuration. Note: this class sorts only JUnit 4 tests executed via
+ * <a href="https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running">vintage-engine</a>.
  * <p>
  * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, for
  * Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}.
@@ -27,7 +26,8 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
 
     private static final List<String> skippedEngines = Arrays.asList(
         SmartDirtiesTestsSupport.ENGINE_JUNIT_JUPITER,
-        SmartDirtiesTestsSupport.ENGINE_TESTNG
+        SmartDirtiesTestsSupport.ENGINE_TESTNG,
+        SmartDirtiesTestsSupport.ENGINE_KOTEST
     );
 
     @Override
@@ -43,7 +43,7 @@ public class SmartDirtiesPostDiscoveryFilter implements PostDiscoveryFilter {
                 // If it is a testng-engine running TestNG test, rely on SmartDirtiesSuiteListener, because
                 // TestNG will alphabetically reorder it first anyway.
                 // Jupiter engine has its own sorting via SmartDirtiesClassOrderer, so skip them as well.
-                // Reorder only JUnit4 or Kotest here:
+                // Reorder only JUnit4 here:
                 return getTestClassOrNull(childTestDescriptor) != null;
             })
             .collect(Collectors.toList());

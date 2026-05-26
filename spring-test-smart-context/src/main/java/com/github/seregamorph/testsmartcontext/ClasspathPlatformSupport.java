@@ -5,7 +5,7 @@ import org.springframework.util.ClassUtils;
 /**
  * @author Sergey Chernov
  */
-final class JUnitPlatformSupport {
+final class ClasspathPlatformSupport {
 
     @Deprecated
     private static final boolean JUNIT_VINTAGE_ENGINE_PRESENT = isClassPresent(
@@ -41,9 +41,9 @@ final class JUnitPlatformSupport {
     }
 
     private static boolean isClassPresent(String className) {
-        return ClassUtils.isPresent(className, JUnitPlatformSupport.class.getClassLoader());
+        return ClassUtils.isPresent(className, ClasspathPlatformSupport.class.getClassLoader());
     }
 
-    private JUnitPlatformSupport() {
+    private ClasspathPlatformSupport() {
     }
 }

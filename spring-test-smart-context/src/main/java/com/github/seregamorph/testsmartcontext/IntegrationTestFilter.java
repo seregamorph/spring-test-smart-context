@@ -62,12 +62,12 @@ public class IntegrationTestFilter {
             return true;
         }
 
-        if (JUnitPlatformSupport.isJunit4Present() && isIntegrationTestJUnit4(testClass)) {
+        if (ClasspathPlatformSupport.isJunit4Present() && isIntegrationTestJUnit4(testClass)) {
             return true;
         }
 
         //noinspection RedundantIfStatement
-        if (JUnitPlatformSupport.isJunitJupiterApiPresent() && isIntegrationTestJUnitJupiter(testClass)) {
+        if (ClasspathPlatformSupport.isJunitJupiterApiPresent() && isIntegrationTestJUnitJupiter(testClass)) {
             return true;
         }
 

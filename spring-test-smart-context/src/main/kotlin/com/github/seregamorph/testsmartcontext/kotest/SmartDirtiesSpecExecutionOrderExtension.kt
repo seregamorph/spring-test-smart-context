@@ -21,7 +21,7 @@ import io.kotest.core.spec.SpecRef
  * @author Sergey Chernov
  */
 @AutoScan
-class KotestSpecSorter : SmartDirtiesTestsSupport(), SpecExecutionOrderExtension, Extension {
+class SmartDirtiesSpecExecutionOrderExtension : SmartDirtiesTestsSupport(), SpecExecutionOrderExtension, Extension {
 
     override fun sort(specs: List<SpecRef>): List<SpecRef> {
         if (specs.isEmpty()) {

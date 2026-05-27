@@ -95,9 +95,9 @@ Check the [Demo projects](demo) for examples.
 <details>
   <summary>JUnit 5/6 Jupiter</summary>
 
-Add the dependency to the library in test scope, it will automatically setup
+Add the library dependency in test scope, it will automatically setup
 [SmartDirtiesClassOrderer](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/jupiter/SmartDirtiesClassOrderer.java)
-which will reorder test classes on each execution and prepare the list of last test class per context configuration.
+which will reorder test classes before execution and prepare the list of last test class per context configuration.
 Then this test execution listener
 [SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java)
 will be auto-discovered via [spring.factories](spring-test-smart-context/src/main/resources/META-INF/spring.factories).
@@ -114,9 +114,9 @@ or even inherited from
 <details>
   <summary>TestNG</summary>
 
-Add the dependency to the library in test scope, it will automatically setup
+Add the library dependency in test scope, it will automatically setup
 [SmartDirtiesSuiteListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/testng/SmartDirtiesSuiteListener.java)
-which will reorder test classes on each execution and prepare the list of last test class per context configuration.
+which will reorder test classes before execution and prepare the list of last test class per context configuration.
 The integration test classes should add
 [SmartDirtiesContextTestExecutionListener](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/SmartDirtiesContextTestExecutionListener.java)
 ```java
@@ -127,6 +127,14 @@ The integration test classes should add
 Note: the annotation is inherited, so it makes sense to annotate the base test class or use
 [AbstractTestNGSpringIntegrationTest](spring-test-smart-context/src/main/java/com/github/seregamorph/testsmartcontext/testng/AbstractTestNGSpringIntegrationTest.java)
 parent.
+</details>
+
+<details>
+  <summary>Kotest</summary>
+
+Add the library dependency in test scope, it will automatically setup
+[SmartDirtiesSpecExecutionOrderExtension](spring-test-smart-context/src/main/kotlin/com/github/seregamorph/testsmartcontext/kotest/SmartDirtiesSpecExecutionOrderExtension.kt)
+which relies on enabled Kotest autoscan. It reorders Spec classes before execution and prepares the list of test class per context configuration.
 </details>
 
 <details>

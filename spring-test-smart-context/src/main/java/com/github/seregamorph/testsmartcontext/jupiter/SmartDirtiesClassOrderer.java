@@ -19,7 +19,7 @@ import org.springframework.core.annotation.AnnotationUtils;
  * {@link com.github.seregamorph.testsmartcontext.SmartDirtiesContextTestExecutionListener}.
  * <p>
  * For TestNG test classes - see {@link com.github.seregamorph.testsmartcontext.testng.SmartDirtiesSuiteListener}, for
- * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
+ * Kotest test classes - see com.github.seregamorph.testsmartcontext.kotest.KotestSpecSorter.
  *
  * @author Sergey Chernov
  */

@@ -7,14 +7,11 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.Set;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.junit.runner.Runner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Integration Test class filter that should be ordered (as they use spring context). The logic of this class can be
@@ -65,10 +62,6 @@ public class IntegrationTestFilter {
             return true;
         }
 
-        if (ClasspathPlatformSupport.isJunit4Present() && isIntegrationTestJUnit4(testClass)) {
-            return true;
-        }
-
         //noinspection RedundantIfStatement
         if (ClasspathPlatformSupport.isJunitJupiterApiPresent() && isIntegrationTestJUnitJupiter(testClass)) {
             return true;
@@ -79,20 +72,6 @@ public class IntegrationTestFilter {
         }
 
         return false;
-    }
-
-    /**
-     * This method should be only called if JUnit4 is on the classpath
-     */
-    protected boolean isIntegrationTestJUnit4(Class<?> testClass) {
-        // can be inherited, but cannot be meta-annotation
-        RunWith runWith = testClass.getAnnotation(RunWith.class);
-        if (runWith == null) {
-            return false;
-        }
-        Class<? extends Runner> runner = runWith.value();
-        // includes org.springframework.test.context.junit4.SpringRunner
-        return SpringJUnit4ClassRunner.class.isAssignableFrom(runner);
     }
 
     /**

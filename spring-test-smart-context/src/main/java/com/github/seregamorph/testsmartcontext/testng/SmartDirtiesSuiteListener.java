@@ -22,7 +22,7 @@ import org.testng.xml.XmlSuite;
  * existing contexts.
  * <p>
  * For Jupiter test classes - see {@link com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer}, for
- * JUnit 4 test classes - see {@link com.github.seregamorph.testsmartcontext.SmartDirtiesPostDiscoveryFilter}.
+ * Kotest test classes - see com.github.seregamorph.testsmartcontext.kotest.KotestSpecSorter.
  *
  * @author Sergey Chernov
  */

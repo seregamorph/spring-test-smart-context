@@ -45,6 +45,7 @@
 
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
         <maven-surefire.version>3.5.5</maven-surefire.version>
@@ -102,6 +103,25 @@
                             <sourceDirs>
                                 <sourceDir>src/test/kotlin</sourceDir>
                             </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-kotlin-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/kotlin</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>

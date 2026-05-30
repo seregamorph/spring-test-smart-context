@@ -21,7 +21,6 @@
     <properties>
         <slf4j.version>1.7.36</slf4j.version>
         <spring-framework.version>6.1.16</spring-framework.version>
-        <spring-boot.version>3.3.13</spring-boot.version>
         <testng.version>7.10.2</testng.version>
         <junit4.version>4.13.2</junit4.version>
         <junit-platform.version>1.11.3</junit-platform.version>
@@ -65,12 +64,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>${spring-framework.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test</artifactId>
-            <version>${spring-boot.version}</version>
             <scope>provided</scope>
         </dependency>
 

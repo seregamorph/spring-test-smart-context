@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.Set;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.test.context.BootstrapWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -96,8 +96,7 @@ public class IntegrationTestFilter {
     protected boolean isKotestSpringIntegrationTest(Class<?> testClass) {
         if (Spec.class.isAssignableFrom(testClass)) {
             return AnnotatedElementUtils.findMergedAnnotation(testClass, ContextConfiguration.class) != null
-                || ClasspathPlatformSupport.isSpringBootTestPresent()
-                && AnnotatedElementUtils.hasAnnotation(testClass, SpringBootTest.class);
+                || AnnotatedElementUtils.findMergedAnnotation(testClass, BootstrapWith.class) != null;
         }
         return false;
     }

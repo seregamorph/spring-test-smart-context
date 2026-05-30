@@ -7,9 +7,6 @@ import org.springframework.util.ClassUtils;
  */
 final class ClasspathPlatformSupport {
 
-    private static final boolean SPRING_BOOT_TEST_PRESENT = isClassPresent(
-        "org.springframework.boot.test.context.SpringBootTest");
-
     private static final boolean JUNIT4_PRESENT = isClassPresent(
         "org.junit.runner.RunWith");
 
@@ -18,10 +15,6 @@ final class ClasspathPlatformSupport {
 
     private static final boolean KOTEST_SPEC_PRESENT = isClassPresent(
         "io.kotest.core.spec.Spec");
-
-    static boolean isSpringBootTestPresent() {
-        return SPRING_BOOT_TEST_PRESENT;
-    }
 
     @Deprecated
     static boolean isJunit4Present() {

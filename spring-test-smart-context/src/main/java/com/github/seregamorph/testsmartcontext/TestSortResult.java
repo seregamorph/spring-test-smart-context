@@ -11,10 +11,12 @@ import java.util.Set;
  */
 public class TestSortResult {
 
+    private final IntegrationTestFilter integrationTestFilter;
     private final List<List<Class<?>>> sortedConfigToTests;
     private final Set<Class<?>> nonItClasses;
 
-    TestSortResult(List<List<Class<?>>> sortedConfigToTests, Set<Class<?>> nonItClasses) {
+    TestSortResult(IntegrationTestFilter integrationTestFilter, List<List<Class<?>>> sortedConfigToTests, Set<Class<?>> nonItClasses) {
+        this.integrationTestFilter = integrationTestFilter;
         this.sortedConfigToTests = sortedConfigToTests;
         this.nonItClasses = nonItClasses;
     }
@@ -22,7 +24,12 @@ public class TestSortResult {
     public static TestSortResult singletonList(Class<?> testClass) {
         // This single test is either integration or not, it will be checked only in case if it's integration.
         // So we can skip IntegrationTestFilter
-        return new TestSortResult(Collections.singletonList(Collections.singletonList(testClass)), emptySet());
+        return new TestSortResult(new IntegrationTestFilter.NoOpIntegrationTestFilter(),
+            Collections.singletonList(Collections.singletonList(testClass)), emptySet());
+    }
+
+    public IntegrationTestFilter getIntegrationTestFilter() {
+        return integrationTestFilter;
     }
 
     public List<List<Class<?>>> getSortedConfigToTests() {

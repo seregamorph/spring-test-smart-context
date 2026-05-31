@@ -2,6 +2,7 @@ package com.github.seregamorph.testsmartcontext.demo
 
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter
 import com.github.seregamorph.testsmartcontext.TestClassExtractor
+import com.github.seregamorph.testsmartcontext.kotest.KotestIntegrationTestFilter
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -24,7 +25,8 @@ class SmartDirtiesKotestTestsSorterSpec : FunSpec({
             NoBaseClass1IntegrationSpec::class.java,
             SmartDirtiesKotestTestsSorterSpec::class.java
         )
-        val itClassesLists = sorter.sort(testItems, TestClassExtractor.ofClass { testClass -> testClass })
+        val itClassesLists = sorter.sort(testItems, TestClassExtractor.ofClass { testClass -> testClass },
+            KotestIntegrationTestFilter.getInstance())
 
         testItems shouldBe listOf(
             // UTs

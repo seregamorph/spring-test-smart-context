@@ -1,48 +1,24 @@
 package com.github.seregamorph.testsmartcontext;
 
-import io.kotest.core.spec.Spec;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.ServiceLoader;
-import java.util.Set;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.test.context.BootstrapWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import java.util.function.Supplier;
 
 /**
- * Integration Test class filter that should be ordered (as they use spring context). The logic of this class can be
- * customized via
- * <pre>
- * META-INF/services/com.github.seregamorph.testsmartcontext.IntegrationTestFilter
- * </pre>
- * defining subtype of this class overriding methods.
+ * Integration Test class filter
  *
  * @author Sergey Chernov
  */
-public class IntegrationTestFilter {
+public abstract class IntegrationTestFilter {
 
-    private static final IntegrationTestFilter instance = initInstance();
-
-    private static IntegrationTestFilter initInstance() {
-        ServiceLoader<IntegrationTestFilter> serviceLoader = ServiceLoader.load(IntegrationTestFilter.class,
-            IntegrationTestFilter.class.getClassLoader());
-        Iterator<IntegrationTestFilter> iterator = serviceLoader.iterator();
+    protected static <T extends IntegrationTestFilter> T initInstance(Class<T> type, Supplier<T> defaultSupplier) {
+        ServiceLoader<T> serviceLoader = ServiceLoader.load(type, type.getClassLoader());
+        Iterator<T> iterator = serviceLoader.iterator();
         if (iterator.hasNext()) {
             return iterator.next();
         } else {
-            return new IntegrationTestFilter();
+            return defaultSupplier.get();
         }
-    }
-
-    public static IntegrationTestFilter getInstance() {
-        return instance;
-    }
-
-    protected IntegrationTestFilter() {
     }
 
     /**
@@ -51,53 +27,17 @@ public class IntegrationTestFilter {
      * @param testClass
      * @return
      */
-    protected boolean isIntegrationTest(Class<?> testClass) {
-        if (Modifier.isAbstract(testClass.getModifiers())) {
-            return false;
-        }
+    protected abstract boolean isIntegrationTest(Class<?> testClass);
 
-        if (ApplicationContextAware.class.isAssignableFrom(testClass)) {
-            // Subtypes of org.springframework.test.context.testng.AbstractTestNGSpringContextTests
-            // and org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests
-            return true;
-        }
-
-        //noinspection RedundantIfStatement
-        if (ClasspathPlatformSupport.isJunitJupiterApiPresent() && isIntegrationTestJUnitJupiter(testClass)) {
-            return true;
-        }
-
-        if (ClasspathPlatformSupport.isKotestSpecPresent() && isKotestSpringIntegrationTest(testClass)) {
-            return true;
-        }
-
-        return false;
+    @Override
+    public String toString() {
+        return getClass().getName();
     }
 
-    /**
-     * This method should be only called if JUnit Jupiter API is on the classpath
-     */
-    protected boolean isIntegrationTestJUnitJupiter(Class<?> testClass) {
-        // can be inherited, can be meta-annotation e.g. via @SpringBootTest
-        Set<ExtendWith> extendWith = AnnotatedElementUtils.findAllMergedAnnotations(testClass, ExtendWith.class);
-        if (extendWith.isEmpty()) {
-            return false;
+    public static class NoOpIntegrationTestFilter extends IntegrationTestFilter {
+        @Override
+        protected boolean isIntegrationTest(Class<?> testClass) {
+            return true;
         }
-
-        return extendWith.stream()
-            .map(ExtendWith::value)
-            .flatMap(Arrays::stream)
-            .anyMatch(SpringExtension.class::isAssignableFrom);
-    }
-
-    /**
-     * This method should be only called if Kotest Api is on the classpath
-     */
-    protected boolean isKotestSpringIntegrationTest(Class<?> testClass) {
-        if (Spec.class.isAssignableFrom(testClass)) {
-            return AnnotatedElementUtils.findMergedAnnotation(testClass, ContextConfiguration.class) != null
-                || AnnotatedElementUtils.findMergedAnnotation(testClass, BootstrapWith.class) != null;
-        }
-        return false;
     }
 }

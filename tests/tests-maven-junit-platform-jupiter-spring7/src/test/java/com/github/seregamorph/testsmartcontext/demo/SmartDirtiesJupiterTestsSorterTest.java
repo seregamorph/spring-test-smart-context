@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import com.github.seregamorph.testsmartcontext.TestClassExtractor;
+import com.github.seregamorph.testsmartcontext.jupiter.JupiterIntegrationTestFilter;
 import com.github.seregamorph.testsmartcontext.testkit.TestEventTracker;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,8 @@ public class SmartDirtiesJupiterTestsSorterTest {
             SampleDirtiesContextBeforeClassTest.class,
             SmartDirtiesJupiterTestsSorterTest.class
         );
-        var itClassesLists = sorter.sort(testItems, TestClassExtractor.ofClass(testClass -> testClass));
+        var itClassesLists = sorter.sort(testItems, TestClassExtractor.ofClass(testClass -> testClass),
+            JupiterIntegrationTestFilter.getInstance());
 
         assertEquals(Arrays.asList(
             // UT

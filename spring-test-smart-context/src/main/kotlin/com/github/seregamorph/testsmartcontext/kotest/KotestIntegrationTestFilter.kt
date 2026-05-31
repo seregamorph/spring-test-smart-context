@@ -6,6 +6,16 @@ import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.test.context.BootstrapWith
 import org.springframework.test.context.ContextConfiguration
 
+/**
+ * Kotest integration Test class filter.
+ * The logic of this class can be customized via
+ * <pre>
+ * META-INF/services/com.github.seregamorph.testsmartcontext.kotest.KotestIntegrationTestFilter
+ * </pre>
+ * defining subtype of this class overriding methods.
+ *
+ * @author Sergey Chernov
+ */
 open class KotestIntegrationTestFilter: IntegrationTestFilter() {
 
     override fun isIntegrationTest(testClass: Class<*>): Boolean {

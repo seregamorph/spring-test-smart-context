@@ -48,7 +48,8 @@ class SmartDirtiesSpecExecutionOrderExtension : SmartDirtiesTestsSupport(), Spec
         val testClassesLists: TestSortResult
         val sortedSpecs = ArrayList<SpecRef>(specs)
         try {
-            testClassesLists = sorter.sort(sortedSpecs, TestClassExtractor.ofClass { it.kclass.java })
+            testClassesLists = sorter.sort(sortedSpecs, TestClassExtractor.ofClass { it.kclass.java },
+                KotestIntegrationTestFilter.getInstance())
         } catch (e: Throwable) {
             setFailureCause(e)
             throw e

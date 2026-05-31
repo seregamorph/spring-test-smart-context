@@ -13,9 +13,6 @@ final class ClasspathPlatformSupport {
     private static final boolean JUNIT_JUPITER_API_PRESENT = isClassPresent(
         "org.junit.jupiter.api.extension.ExtendWith");
 
-    private static final boolean KOTEST_SPEC_PRESENT = isClassPresent(
-        "io.kotest.core.spec.Spec");
-
     @Deprecated
     static boolean isJunit4Present() {
         return JUNIT4_PRESENT;
@@ -23,10 +20,6 @@ final class ClasspathPlatformSupport {
 
     static boolean isJunitJupiterApiPresent() {
         return JUNIT_JUPITER_API_PRESENT;
-    }
-
-    static boolean isKotestSpecPresent() {
-        return KOTEST_SPEC_PRESENT;
     }
 
     private static boolean isClassPresent(String className) {

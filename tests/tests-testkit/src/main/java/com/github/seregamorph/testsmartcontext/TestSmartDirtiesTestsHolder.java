@@ -1,20 +1,20 @@
 package com.github.seregamorph.testsmartcontext;
 
+import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport.ClassGroupState;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.springframework.util.Assert;
 
 class TestSmartDirtiesTestsHolder {
 
     static List<Class<?>> getIntegrationTestClasses(String engine) {
-        Set<Class<?>> testClasses = SmartDirtiesTestsSupport.getTestClasses(engine);
+        Map<Class<?>, ClassGroupState> testClasses = SmartDirtiesTestsSupport.getTestClasses(engine);
         List<Class<?>> integrationTestClasses = new ArrayList<>();
-        IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
         Assert.state(testClasses != null, "Test classes are not initialized");
-        for (Class<?> testClass : testClasses) {
-            if (integrationTestFilter.isIntegrationTest(testClass)) {
-                integrationTestClasses.add(testClass);
+        for (Map.Entry<Class<?>, ClassGroupState> testClassEntry : testClasses.entrySet()) {
+            if (testClassEntry.getValue().integrationTestFilter.isIntegrationTest(testClassEntry.getKey())) {
+                integrationTestClasses.add(testClassEntry.getKey());
             }
         }
         return integrationTestClasses;

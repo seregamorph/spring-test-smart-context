@@ -51,23 +51,23 @@ public class SmartDirtiesTestsSupport {
         private final Set<Class<?>> completedItClasses = Collections.synchronizedSet(new LinkedHashSet<>());
 
         private final String engine;
+        final IntegrationTestFilter integrationTestFilter;
         final Set<Class<?>> discoveredItClasses;
 
-        private ClassGroupState(String engine, List<Class<?>> discoveredItClasses) {
+        private ClassGroupState(String engine, IntegrationTestFilter integrationTestFilter, List<Class<?>> discoveredItClasses) {
             this.engine = engine;
+            this.integrationTestFilter = integrationTestFilter;
             this.discoveredItClasses = Collections.unmodifiableSet(new LinkedHashSet<>(discoveredItClasses));
         }
     }
 
     @Nullable
-    static Set<Class<?>> getTestClasses(String engine) {
-        Map<Class<?>, ClassGroupState> classOrderStateMap = engineClassOrderStateMap == null ? null
-            : engineClassOrderStateMap.get(engine);
-        return classOrderStateMap == null ? null : classOrderStateMap.keySet();
+    static Map<Class<?>, ClassGroupState> getTestClasses(String engine) {
+        return engineClassOrderStateMap == null ? null : engineClassOrderStateMap.get(engine);
     }
 
     protected static int classOrderStateMapSize(String engine) {
-        Set<Class<?>> testClasses = getTestClasses(engine);
+        Map<Class<?>, ClassGroupState> testClasses = getTestClasses(engine);
         return testClasses == null ? 0 : testClasses.size();
     }
 
@@ -84,7 +84,7 @@ public class SmartDirtiesTestsSupport {
                 // To fix this implement own IntegrationTestFilter and declare via META-INF SPI
                 log.warn("Test {} in suite of {} engine was not recognized as spring integration test by {}, "
                         + "it's recommended to override the IntegrationTestFilter accordingly",
-                    testClass, classGroupState.engine, IntegrationTestFilter.getInstance().getClass());
+                    testClass, classGroupState.engine, classGroupState.integrationTestFilter);
             }
         }
 
@@ -196,13 +196,15 @@ public class SmartDirtiesTestsSupport {
     protected static void setTestClassesLists(String engine, TestSortResult testSortResult) {
         Map<Class<?>, ClassGroupState> classOrderStateMap = new LinkedHashMap<>();
         for (List<Class<?>> testClasses : testSortResult.getSortedConfigToTests()) {
-            ClassGroupState classGroupState = new ClassGroupState(engine, testClasses);
+            ClassGroupState classGroupState = new ClassGroupState(engine,
+                testSortResult.getIntegrationTestFilter(), testClasses);
             for (Class<?> testClass : testClasses) {
                 classOrderStateMap.put(testClass, classGroupState);
             }
         }
         for (Class<?> nonItClass : testSortResult.getNonItClasses()) {
-            classOrderStateMap.put(nonItClass, new ClassGroupState(engine, Collections.emptyList()));
+            classOrderStateMap.put(nonItClass, new ClassGroupState(engine,
+                testSortResult.getIntegrationTestFilter(), Collections.emptyList()));
         }
 
         if (SmartDirtiesTestsSupport.engineClassOrderStateMap == null) {

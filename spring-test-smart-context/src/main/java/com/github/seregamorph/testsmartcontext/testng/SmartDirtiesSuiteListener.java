@@ -72,7 +72,8 @@ public class SmartDirtiesSuiteListener extends SmartDirtiesTestsSupport
         // Do not store the failure as if it throws, TestNG will fail the suite
         // (both pure TestNG and JUnit testng-engine)
         TestSortResult testClassesLists = sorter.sort(methods,
-            TestClassExtractor.ofMethod(SmartDirtiesSuiteListener::getTestClass));
+            TestClassExtractor.ofMethod(SmartDirtiesSuiteListener::getTestClass),
+            TestNGIntegrationTestFilter.getInstance());
 
         SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_TESTNG, testClassesLists);
 

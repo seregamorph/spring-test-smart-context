@@ -89,7 +89,8 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         TestSortResult testClassesLists;
         try {
-            testClassesLists = sorter.sort(classDescriptors, TestClassExtractor.ofClass(ClassDescriptor::getTestClass));
+            testClassesLists = sorter.sort(classDescriptors, TestClassExtractor.ofClass(ClassDescriptor::getTestClass),
+                JupiterIntegrationTestFilter.getInstance());
         } catch (Throwable e) {
             SmartDirtiesTestsSupport.setFailureCause(e);
             throw e;

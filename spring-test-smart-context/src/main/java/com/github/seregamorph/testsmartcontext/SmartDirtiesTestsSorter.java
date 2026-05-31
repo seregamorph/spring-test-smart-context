@@ -65,12 +65,16 @@ public class SmartDirtiesTestsSorter {
      *
      * @param testItems
      * @param testClassExtractor
+     * @param integrationTestFilter
      * @return integration test classes lists grouped by config (non-integration tests classes not included)
      */
-    public <T> TestSortResult sort(List<T> testItems, TestClassExtractor<? super T> testClassExtractor) {
+    public <T> TestSortResult sort(
+        List<T> testItems,
+        TestClassExtractor<? super T> testClassExtractor,
+        IntegrationTestFilter integrationTestFilter
+    ) {
         initialSort(testItems, testClassExtractor);
 
-        IntegrationTestFilter integrationTestFilter = IntegrationTestFilter.getInstance();
         Set<Class<?>> itClasses = new LinkedHashSet<>();
         Set<Class<?>> nonItClasses = new LinkedHashSet<>();
         for (T t : testItems) {
@@ -133,7 +137,7 @@ public class SmartDirtiesTestsSorter {
             logSuiteTestsPerConfig(itClasses.size(), nonItClasses.size(), sortedConfigToTests);
         }
 
-        return new TestSortResult(sortedConfigToTests, nonItClasses);
+        return new TestSortResult(integrationTestFilter, sortedConfigToTests, nonItClasses);
     }
 
     /**
@@ -152,7 +156,8 @@ public class SmartDirtiesTestsSorter {
     }
 
     private static int getDirtiesContextBeforeAfterOrder(Class<?> testClass) {
-        DirtiesContext dirtiesContext = TestContextAnnotationUtils.findMergedAnnotation(testClass, DirtiesContext.class);
+        DirtiesContext dirtiesContext = TestContextAnnotationUtils.findMergedAnnotation(testClass,
+            DirtiesContext.class);
         if (dirtiesContext != null) {
             if (dirtiesContext.classMode() == DirtiesContext.ClassMode.BEFORE_CLASS) {
                 return -1;
@@ -200,7 +205,8 @@ public class SmartDirtiesTestsSorter {
                 boolean isLast = !it.hasNext();
                 String suffix1 = isFirst && isLast ? "creates and closes context"
                     : isFirst ? "creates context" : isLast ? "closes context" : null;
-                DirtiesContext dirtiesContext = AnnotatedElementUtils.findMergedAnnotation(itClass, DirtiesContext.class);
+                DirtiesContext dirtiesContext = AnnotatedElementUtils.findMergedAnnotation(itClass,
+                    DirtiesContext.class);
                 String suffix2 = dirtiesContext == null ? null :
                     "marked @DirtiesContext(" + dirtiesContext.classMode().name() + ")";
                 pw.print(itClass.getName());

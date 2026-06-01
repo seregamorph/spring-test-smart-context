@@ -65,7 +65,7 @@ public class GradleSmartDirtiesJupiterEngineTest {
             NoBaseClass1IntegrationTest.class,
             SampleIntegrationTest.class,
             Unit1Test.class
-        ), new ArrayList<>(SmartDirtiesTestsSupport.getTestClasses(ENGINE)));
+        ), new ArrayList<>(SmartDirtiesTestsSupport.getTestClasses(ENGINE).keySet()));
 
         assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration1Test.class));
         assertFalse(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration1Test.NestedTest.class));

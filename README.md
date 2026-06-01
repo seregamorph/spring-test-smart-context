@@ -75,13 +75,13 @@ Add maven dependency (available in maven central):
 <dependency>
     <groupId>com.github.seregamorph</groupId>
     <artifactId>spring-test-smart-context</artifactId>
-    <version>0.15</version>
+    <version>1.0</version>
     <scope>test</scope>
 </dependency>
 ```
 Or Gradle dependency:
 ```groovy
-testImplementation("com.github.seregamorph:spring-test-smart-context:0.15")
+testImplementation("com.github.seregamorph:spring-test-smart-context:1.0")
 ```
 Then remove usages of standard `@DirtiesContext` annotation in your project on root test classes
 to use smart auto-close context implemented by this library instead. Keep the annotations for tests that really 

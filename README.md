@@ -31,7 +31,7 @@ can be executed sequentially
 * the order of tests is known, so if current test class is last per current configuration, the spring context
 will be automatically closed (it's called `Smart DirtiesContext`) and the beans will be disposed releasing resources
 
-As a result, in a suite of single module there will always be not more than 1 active spring contexts:
+As a result, in a suite of a single module there will always be not more than 1 active spring contexts:
 
 <img src="doc/reorder-and-smart-dirties-context.png" alt="Reordered suite with smart DirtiesContext" width="700"/>
 
@@ -51,8 +51,9 @@ will be reduced, hence tests are executed faster.
 * Public presentation with AtomicJar (TestContainers creators): [recording](https://www.youtube.com/watch?v=_Vci_5nr8R0)
 
 ### Limitations
-At the moment only single thread test execution per module is supported. Parallel test execution is work in progress.
-Also there can be problems with Jupiter
+Multi-threaded (per module) test execution is now supported since version `1.0`, but in this case the number of 
+active spring contexts is not more than number of threads.
+Also, there can be problems with Jupiter
 [Nested](https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested) test classes if they declare
 own `@ContextConfiguration` or `@Import` of spring beans.
 
@@ -64,7 +65,7 @@ own `@ContextConfiguration` or `@Import` of spring beans.
 Supported test frameworks:
 * `JUnit 4` (via JUnit [junit-vintage-engine](https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-running)) removed; for JUnit 4 support use old `0.15` version
 * `JUnit 5/6 Jupiter`
-* `TestNG` (both bare TestNG and JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
+* `TestNG` (both bare TestNG and via JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
 * `Kotest`
 
 Known test execution caching solutions correctly support changed behaviour.

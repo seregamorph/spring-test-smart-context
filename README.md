@@ -90,7 +90,7 @@ to use smart auto-close context implemented by this library instead. Keep the an
 
 Also it's recommended to configure `"INFO"` level for `com.github.seregamorph.testsmartcontext` logger.
 
-Check the [Demo projects](demo) for examples.
+Check the [Demo projects](tests) for examples.
 
 ### How it works
 

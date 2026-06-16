@@ -25,7 +25,7 @@
 
     <modules>
         <module>tests-maven-junit-platform-jupiter-boot35</module>
-        <module>tests-maven-junit-platform-jupiter-boot40</module>
+        <module>tests-maven-junit-platform-jupiter-boot41</module>
         <module>tests-maven-junit-platform-jupiter-spring5</module>
         <module>tests-maven-junit-platform-jupiter-spring7</module>
         <module>tests-maven-junit-platform-kotest-boot40</module>

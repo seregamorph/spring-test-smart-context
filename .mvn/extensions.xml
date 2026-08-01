@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extensions>
     <extension>
+        <!-- https://github.com/maven-turbo-reactor/maven-timeline-extension -->
+        <groupId>com.github.seregamorph</groupId>
+        <artifactId>maven-timeline-extension</artifactId>
+        <version>0.6</version>
+    </extension>
+    <extension>
         <!-- https://github.com/seregamorph/maven-surefire-cached -->
         <groupId>com.github.seregamorph</groupId>
         <artifactId>surefire-cached-extension</artifactId>

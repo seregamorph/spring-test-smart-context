@@ -7,11 +7,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(classes = {
     SmartDirtiesTestsSupportTest.Configuration.class
 })
+// hint: @ContextConfiguration is needed since 7.1.0-M1 (see https://github.com/spring-projects/spring-framework/issues/37189)
+@ContextConfiguration
 class SmartDirtiesTestsSupportTest {
 
     @BeforeEach

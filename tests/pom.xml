@@ -38,6 +38,9 @@
     <profiles>
         <profile>
             <id>include-gradle-build</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <modules>
                 <module>tests-gradle-junit-platform-jupiter-boot32</module>
             </modules>

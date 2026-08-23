@@ -5,18 +5,20 @@ import com.github.seregamorph.testsmartcontext.SpringContextEventLoggerListener;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.ContextStartedEvent;
+import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 public class TestContextEventTrackerListener extends SpringContextEventLoggerListener {
 
     @Nullable
-    private static final Class<? extends ApplicationContextEvent> CONTEXT_PAUSED_EVENT_CLASS =
-        classForName("org.springframework.context.event.ContextPausedEvent", ApplicationContextEvent.class);
+    private static final Class<? extends ContextStoppedEvent> CONTEXT_PAUSED_EVENT_CLASS =
+        tryClassForName("org.springframework.context.event.ContextPausedEvent", ContextStoppedEvent.class);
 
     @Nullable
-    private static final Class<? extends ApplicationContextEvent> CONTEXT_RESTARTED_EVENT_CLASS =
-        classForName("org.springframework.context.event.ContextRestartedEvent", ApplicationContextEvent.class);
+    private static final Class<? extends ContextStartedEvent> CONTEXT_RESTARTED_EVENT_CLASS =
+        tryClassForName("org.springframework.context.event.ContextRestartedEvent", ContextStartedEvent.class);
 
     @Override
     public void onApplicationEvent(ApplicationContextEvent event) {
@@ -60,7 +62,7 @@ public class TestContextEventTrackerListener extends SpringContextEventLoggerLis
     }
 
     @Nullable
-    private static <T> Class<? extends T> classForName(String className, Class<T> baseClass) {
+    private static <T> Class<? extends T> tryClassForName(String className, Class<T> baseClass) {
         try {
             return Class.forName(className).asSubclass(baseClass);
         } catch (ClassNotFoundException e) {

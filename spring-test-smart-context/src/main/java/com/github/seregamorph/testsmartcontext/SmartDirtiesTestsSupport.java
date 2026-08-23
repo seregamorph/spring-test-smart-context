@@ -30,7 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  * @author Sergey Chernov
  */
-public class SmartDirtiesTestsSupport {
+public abstract class SmartDirtiesTestsSupport {
 
     private static final Logger log = LoggerFactory.getLogger(SmartDirtiesTestsSupport.class);
 

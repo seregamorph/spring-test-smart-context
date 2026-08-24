@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Spring Test Context Timeline</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <style>
+        :root {
+            --ink: #1f2933; --muted: #7b8794; --grid: #eceff1; --border: #e0e4e8;
+            --accent: #2f6fed; --crosshair: #d23f3f;
+            /* lifecycle phase palette — validated on the light chart surface (#fafbfc):
+               lightness band / chroma floor / adjacent CVD ΔE 13.0 / normal-vision ΔE 16.3.
+               contrast relief for the sub-3:1 steps = in-bar labels + legend + context table. */
+            --ph-creating:   #1baf7a;
+            --ph-refreshing: #2a78d6;
+            --ph-inuse:      #4a3aa7;
+            --ph-paused:     #eda100;
+            --ph-closing:    #e34948;
+            /* "kept alive" is an idle state, not an activity — deliberately neutral so the
+               band that covers most of the timeline stays recessive and the real work pops. */
+            --ph-keepalive:      #ccd7e3;
+            --ph-keepalive-edge: #93a3b5;
+            --ph-keepalive-ink:  #46525f;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; background: #f5f6f8; color: var(--ink);
+            font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .wrap { max-width: 1500px; margin: 0 auto; padding: 10px 26px 14px; }
+        header.report-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 2px; }
+        header.report-head h1 { font-size: 18px; font-weight: 600; margin: 0; }
+        header.report-head .sub { color: var(--muted); font-size: 12px; }
+        .toolbar { display: flex; align-items: center; gap: 10px; margin: 6px 0 8px; flex-wrap: wrap; }
+        .toolbar button { border: 1px solid var(--border); background: #fff; color: var(--ink);
+            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+        .toolbar .hint { color: var(--muted); font-size: 12px; }
+        .panel { background: #fff; border: 1px solid var(--border); border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(16,24,40,.04); margin-bottom: 6px; overflow: hidden; }
+        .panel.hidden { display: none; }
+        .panel .panel-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase;
+            letter-spacing: .04em; padding: 4px 12px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        /* per-series swatches in the panel title double as the metric legend, so a
+           two-series chart never identifies its series by color alone */
+        .panel .panel-title .key { display: inline-flex; align-items: center; gap: 4px;
+            text-transform: none; letter-spacing: 0; font-weight: 500; }
+        .panel .panel-title .key i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+        .panel .panel-title .note { text-transform: none; letter-spacing: 0; font-weight: 400; opacity: .8; }
+        svg { display: block; width: 100%; }
+        .axis path, .axis line { stroke: var(--grid); }
+        .axis text { fill: var(--muted); font-size: 11px; }
+        .grid line { stroke: var(--grid); }
+        .grid path { stroke: none; }
+        /* alternation is kept subtle: the idle "kept alive" band is itself a light neutral
+           and has to stay legible on both row shades */
+        .lane.alt { fill: #f4f6f9; }
+        .lane { fill: #fcfdfd; }
+        .lane-label { fill: var(--muted); font-size: 11px; cursor: default; }
+        .lane-label.hl { fill: var(--ink); font-weight: 600; }
+        .seg rect { rx: 2; cursor: pointer; }
+        .seg rect:hover { stroke: #1f2933; stroke-width: 1.5; }
+        /* outline framing the whole lifespan of the hovered context */
+        .ctx-frame { fill: rgba(31,41,51,.05); stroke: #1f2933; stroke-width: 1.5;
+            pointer-events: none; opacity: 0; }
+        .seg text { font-size: 10px; fill: #fff; pointer-events: none; }
+        .seg text.dark { fill: var(--ph-keepalive-ink); }
+        .crosshair { stroke: var(--crosshair); stroke-width: 1; stroke-dasharray: 3 2; pointer-events: none; opacity: 0; }
+        .zoom-overlay { fill: none; pointer-events: all; cursor: crosshair; }
+        .nav-area { fill: #cfd6df; }
+        .brush .selection { fill: rgba(47,111,237,.16); stroke: var(--accent); shape-rendering: crispEdges; }
+        .brush .handle { fill: var(--accent); }
+        .brush .overlay { cursor: pointer; }
+        .legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 2px 12px 4px; color: var(--muted); font-size: 11px; }
+        .legend span { display: inline-flex; align-items: center; gap: 5px; }
+        .legend i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+        .tip { position: fixed; pointer-events: none; z-index: 50; opacity: 0; background: #1f2933; color: #fff;
+            padding: 7px 9px; border-radius: 6px; font-size: 12px; max-width: 360px;
+            box-shadow: 0 4px 14px rgba(0,0,0,.25); transition: opacity .08s; }
+        .tip b { color: #ffd479; } .tip .row { color: #cbd2d9; }
+        details.table-panel { margin-bottom: 6px; }
+        details.table-panel > summary { cursor: pointer; font-size: 11px; font-weight: 600; color: var(--muted);
+            text-transform: uppercase; letter-spacing: .04em; padding: 6px 12px; background: #fff;
+            border: 1px solid var(--border); border-radius: 8px; list-style: none; }
+        details.table-panel > summary::-webkit-details-marker { display: none; }
+        details.table-panel > summary::before { content: "▸ "; }
+        details.table-panel[open] > summary { border-radius: 8px 8px 0 0; border-bottom: none; }
+        details.table-panel[open] > summary::before { content: "▾ "; }
+        .table-body { background: #fff; border: 1px solid var(--border); border-top: none;
+            border-radius: 0 0 8px 8px; overflow-x: auto; }
+        table.ctx { border-collapse: collapse; width: 100%; font-size: 12px; }
+        table.ctx th, table.ctx td { padding: 4px 10px; text-align: right; white-space: nowrap;
+            border-top: 1px solid var(--grid); }
+        table.ctx th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase;
+            letter-spacing: .03em; border-top: none; }
+        table.ctx td.l, table.ctx th.l { text-align: left; }
+        table.ctx td.dim { color: var(--muted); }
+        table.ctx tbody tr:hover { background: #f7f9fb; }
+        .report-foot { text-align: center; color: var(--muted); font-size: 11px; padding: 8px 0 4px; }
+        .report-foot a { color: var(--muted); text-decoration: none; }
+        .report-foot a:hover { color: var(--accent); text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header class="report-head">
+        <h1 id="headline">Spring test context timeline</h1>
+        <span class="sub" id="subline"></span>
+    </header>
+    <div class="toolbar">
+        <button id="resetZoom">Reset zoom</button>
+        <span class="hint">Scroll / pinch / double-click to zoom · drag or two-finger swipe to pan · all charts stay aligned</span>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Execution — Spring contexts</div>
+        <div id="legend" class="legend"></div>
+        <div id="gantt"></div>
+    </div>
+    <div class="panel"><div class="panel-title">Navigator — drag to scroll, resize handles to zoom</div><div id="nav"></div></div>
+    <div class="panel" id="panel-contexts"><div class="panel-title">Live Spring contexts</div><div id="ctxcount"></div></div>
+    <div class="panel" id="panel-cpu"><div class="panel-title">CPU utilization (%)</div><div id="cpu"></div></div>
+    <div class="panel" id="panel-threads"><div class="panel-title">Live threads</div><div id="threads"></div></div>
+    <div class="panel" id="panel-heap"><div class="panel-title">Heap memory<span class="note">dashed rule = GC</span></div><div id="heap"></div></div>
+    <div class="panel" id="panel-containers"><div class="panel-title">Testcontainers (running containers)</div><div id="containers"></div></div>
+
+    <details class="table-panel" id="tablePanel">
+        <summary>Context table</summary>
+        <div class="table-body"><table class="ctx" id="ctxTable"></table></div>
+    </details>
+
+    <div class="report-foot">
+        Generated by <a href="https://github.com/seregamorph/spring-test-smart-context" target="_blank" rel="noopener">spring-test-timeline</a> (uses D3.js v7)
+    </div>
+</div>
+<div class="tip" id="tip"></div>
+
+<!-- Timeline data. TimelineHtmlReport substitutes the placeholder token below with the
+     contents of spring-test-timeline.json, producing a self-contained single-file report.
+     If this file is opened as the raw template (token not substituted) the loader falls
+     back to fetching spring-test-timeline.json next to this page. -->
+<script id="timelineData" type="application/json">__SPRING_TEST_TIMELINE_JSON__</script>
+
+<script>
+    "use strict";
+    /* ====================== model ======================
+       The JSON records *instants* (Spring lifecycle events) but emits them as *intervals*:
+       every entry covers [previous event → this event] and is named after the event that
+       ENDS it. So the entry typed "paused" is the stretch during which the context was in
+       use, terminated by ContextPausedEvent. PHASE maps each terminating event onto what
+       the interval actually was; `key` drives color + legend, `ends` names the boundary. */
+    const PHASE = {
+        creating:   {key:"creating",   label:"Creating",    ends:"bean creation callback"},
+        started:    {key:"refreshing", label:"Starting",    ends:"ContextStartedEvent"},
+        refreshed:  {key:"refreshing", label:"Refreshing",  ends:"ContextRefreshedEvent"},
+        paused:     {key:"inuse",      label:"In use",      ends:"ContextPausedEvent"},
+        restarted:  {key:"paused",     label:"Paused",      ends:"ContextRestartedEvent"},
+        stopped:    {key:"inuse",      label:"In use",      ends:"ContextStoppedEvent"},
+        closed:     {key:"inuse",      label:"In use",      ends:"ContextClosedEvent"},
+        destroying: {key:"closing",    label:"Closing",     ends:"bean destruction callback"},
+        keep_alive: {key:"keepalive",  label:"Kept alive",  ends:"end of the test run"},
+    };
+    const UNKNOWN_PHASE = t => ({key:"inuse", label:t, ends:t});
+    const phaseOf = t => PHASE[t] || UNKNOWN_PHASE(t);
+
+    const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    // fixed slot order, never cycled — a phase always wears the same hue
+    const PHASE_KEYS = ["creating","refreshing","inuse","paused","keepalive","closing"];
+    const PHASE_TITLE = {creating:"Creating",refreshing:"Refreshing / starting",inuse:"In use",
+        paused:"Paused",keepalive:"Kept alive",closing:"Closing"};
+    let PHASE_FILL = {};
+    function initPalette(){
+        PHASE_FILL = {creating:css("--ph-creating"), refreshing:css("--ph-refreshing"),
+            inuse:css("--ph-inuse"), paused:css("--ph-paused"), closing:css("--ph-closing"),
+            keepalive:css("--ph-keepalive")};
+    }
+    const isIdle = d => d.key === "keepalive";
+
+    let contexts=[], segs=[], metrics=[], N_LANES=0, T0=0, T1=1, META={};
+    const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const simpleName=fqn=>{const s=String(fqn||"");const i=s.lastIndexOf(".");return i<0?s:s.slice(i+1);};
+
+    /* ====================== layout / shared scale ====================== */
+    const fmtTime=s=>{const m=Math.floor(s/60),sec=s-m*60;return m>0?`${m}m ${sec.toFixed(1)}s`:`${sec.toFixed(1)}s`;};
+    const fmtAxis=(s,dec=1)=>{const m=Math.floor(s/60),sec=s-m*60;const ss=+sec.toFixed(dec);return m>0?`${m}m ${ss}s`:`${ss}s`;};
+    // tick precision follows the visible span: at deep zoom — or on a sub-second test run —
+    // a fixed 0.1s rounding would print the same label on every tick.
+    const decFor=span=>Math.min(4,Math.max(1,Math.ceil(-Math.log10(Math.max(1e-9,span)/10))+1));
+    const fmtAxisZoomed=()=>{const d=xz.domain(), dec=decFor(d[1]-d[0]); return s=>fmtAxis(s,dec);};
+    // phase durations span orders of magnitude — a bean-destroy callback is sub-millisecond
+    // while "kept alive" runs for minutes. switch unit so two decimals stay meaningful.
+    const fmtDur=v=>v>=0.01?`${v.toFixed(2)}s`:v>=1e-5?`${(v*1e3).toFixed(2)}ms`:`${(v*1e6).toFixed(2)}µs`;
+
+    // left gutter is wider than the reference report's: lanes are named after the test class
+    // that triggered the context, not "worker-N". Every chart shares it so columns line up.
+    const M={left:172,right:18,top:8,bottom:18};
+    const width = () => document.getElementById("gantt").clientWidth || 1400;
+    const x = d3.scaleLinear().domain([T0,T1]);      // base scale; domain set after load, range per render
+    let xz = x;                                       // current (zoomed) scale, shared by all charts
+
+    const tip=d3.select("#tip");
+    function showTip(html,ev){tip.html(html).style("opacity",1);
+        const pad=14,r=tip.node().getBoundingClientRect();
+        let X=ev.clientX+pad,Y=ev.clientY+pad;
+        if(X+r.width>innerWidth)X=ev.clientX-r.width-pad;
+        if(Y+r.height>innerHeight)Y=ev.clientY-r.height-pad;
+        tip.style("left",X+"px").style("top",Y+"px");}
+    const hideTip=()=>tip.style("opacity",0);
+
+    /* registry of focus charts so a zoom on one re-renders all */
+    const charts=[];
+    let INNERW=0;                 // shared inner pixel width (same for every chart)
+    let current=d3.zoomIdentity;  // single source of truth for the view transform
+    let suppress=false;           // re-entrancy guard between zoom <-> brush
+    let navMove=null;             // navigator's window setter, in timeline seconds
+    let navDraw=null;             // navigator's context redraw
+
+    // k=1 is "whole run visible" (the default view); k<1 zooms out past it, leaving slack —
+    // d3's default constrain() would center the run in that slack, we pin it left (tx=0)
+    // instead so t=0 always sits at the y-axis.
+    const K_MIN=0.5, K_MAX=20000;
+    const K_MAX_BRUSH=10000;        // navigator handles are coarse, so they zoom less deep
+    const clampTx=(tx,k,w)=>Math.max(Math.min(0,(1-k)*w), Math.min(0,tx));
+
+    function constrainLeft(t,extent){
+        const tx=clampTx(t.x,t.k,extent[1][0]-extent[0][0]);
+        const ty=clampTx(t.y,t.k,extent[1][1]-extent[0][1]);
+        return (tx===t.x&&ty===t.y) ? t : d3.zoomIdentity.translate(tx,ty).scale(t.k);
+    }
+    const zoom=d3.zoom().scaleExtent([K_MIN,K_MAX]).constrain(constrainLeft).on("zoom",onZoom);
+
+    function syncTransform(t){ d3.selectAll("svg .zoom-overlay").property("__zoom", t); }
+
+    function applyView(syncWindow){
+        syncTransform(current);
+        xz = current.rescaleX(x);
+        charts.forEach(c=>c.draw());
+        if(navDraw) navDraw();
+        if(syncWindow&&navMove){ suppress=true; navMove(xz.domain()); suppress=false; }
+    }
+
+    function onZoom(ev){
+        if(suppress) return;
+        current = ev.transform;
+        applyView(true);
+    }
+
+    function setView(t0,t1){
+        const px0=x(t0), px1=x(t1);
+        const k=Math.max(K_MIN, Math.min(K_MAX_BRUSH, INNERW/Math.max(1, px1-px0)));
+        current=d3.zoomIdentity.translate(clampTx(-k*px0,k,INNERW),0).scale(k);
+        applyView(false);
+    }
+
+    // trackpad two-finger horizontal swipe → pan; at k<=1 the whole run is visible and
+    // pinned left, so there is nothing to pan.
+    function panBy(dpx){
+        const k=current.k;
+        if(k<=1) return;
+        const tx=clampTx(current.x-dpx,k,INNERW);
+        if(tx===current.x) return;
+        current=d3.zoomIdentity.translate(tx,0).scale(k);
+        applyView(true);
+    }
+
+    function applyZoomBehavior(svg,innerW,innerH){
+        zoom.translateExtent([[0,0],[innerW,innerH]]).extent([[0,0],[innerW,innerH]]);
+        svg.select(".zoom-overlay").call(zoom).property("__zoom", current);
+    }
+
+    function resetZoom(){
+        current=d3.zoomIdentity;
+        applyView(true);
+    }
+
+    /* shared crosshair */
+    function moveCrosshair(tVal){
+        charts.forEach(c=>{
+            const px=xz(tVal);
+            const vis = tVal!=null && px>=0 && px<=c.innerW;
+            c.crosshair.attr("x1",px).attr("x2",px).style("opacity",vis?1:0);
+        });
+    }
+
+    // SVG has no text-overflow, so trim to the gutter by measuring the rendered run length
+    function fitLabel(node,full,maxPx){
+        node.textContent=full;
+        if(node.getComputedTextLength()<=maxPx) return;
+        let s=full;
+        while(s.length>1&&node.getComputedTextLength()>maxPx){ s=s.slice(0,-1); node.textContent=s+"…"; }
+    }
+
+    /* ====================== Gantt swimlanes ====================== */
+    function buildGantt(){
+        const W=width(), LANE_H=24, GAP=3;
+        const innerW=W-M.left-M.right, innerH=N_LANES*(LANE_H+GAP);
+        const H=innerH+M.top+M.bottom;
+        INNERW=innerW; x.range([0,innerW]);
+        const svg=d3.select("#gantt").html("").append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("height",H);
+        const g=svg.append("g").attr("transform",`translate(${M.left},${M.top})`);
+
+        const lanes=g.append("g");
+        const grid=g.append("g").attr("class","grid");
+        const xAxisG=g.append("g").attr("class","axis").attr("transform",`translate(0,${innerH})`);
+        const labels=g.append("g");
+        const bars=g.append("g").attr("clip-path","url(#clipG)");
+        const frame=g.append("rect").attr("class","ctx-frame");
+        const defs=svg.append("defs");
+        defs.append("clipPath").attr("id","clipG")
+            .append("rect").attr("width",innerW).attr("height",innerH);
+
+        // static lane backgrounds + labels: "#<contextId> <SimpleTestClassName>"
+        contexts.forEach((c,i)=>{
+            lanes.append("rect").attr("class","lane"+(i%2?" alt":"")).attr("x",0)
+                .attr("y",i*(LANE_H+GAP)).attr("width",innerW).attr("height",LANE_H);
+            const t=labels.append("text").attr("class","lane-label").attr("x",-8)
+                .attr("y",i*(LANE_H+GAP)+LANE_H/2+4).attr("text-anchor","end");
+            fitLabel(t.node(), `#${c.id} ${simpleName(c.testClass)}`, M.left-14);
+            t.on("pointerenter",ev=>{ frameKey=c.lane; drawFrame();
+                    showTip(`<b>context #${esc(c.id)}</b>`+
+                        `<br><span class="row">${esc(c.testClass)}</span>`+
+                        `<br><span class="row">alive: <b>${fmtTime(c.start)} → ${fmtTime(c.end)}</b> (${fmtDur(c.end-c.start)})</span>`+
+                        `<br><span class="row">worker-${c.thread+1}</span>`,ev);})
+                .on("pointerleave",()=>{frameKey=null;drawFrame();hideTip();});
+        });
+
+        const crosshair=g.append("line").attr("class","crosshair").attr("y1",0).attr("y2",innerH);
+        g.append("rect").attr("class","zoom-overlay").attr("width",innerW).attr("height",innerH);
+
+        // lane currently framed (set by hover). kept as state so the frame survives
+        // zoom/pan re-renders, mirroring the crosshair/tooltip behavior.
+        let frameKey=null;
+        function drawFrame(){
+            labels.selectAll("text").classed("hl",(d,i)=>i===frameKey);
+            if(frameKey==null){frame.style("opacity",0);return;}
+            const c=contexts[frameKey];
+            const x0=Math.max(0,xz(c.start)), x1=Math.min(innerW,xz(c.end));
+            if(x1<=0||x0>=innerW){frame.style("opacity",0);return;}
+            frame.attr("x",x0).attr("y",frameKey*(LANE_H+GAP)-1)
+                .attr("width",Math.max(1,x1-x0)).attr("height",LANE_H+2)
+                .attr("rx",3).style("opacity",1);
+        }
+
+        function draw(){
+            xAxisG.call(d3.axisBottom(xz).ticks(10).tickFormat(fmtAxisZoomed()));
+            grid.call(d3.axisBottom(xz).ticks(10).tickSize(innerH).tickFormat(""))
+                .attr("transform",`translate(0,0)`).selectAll("text").remove();
+
+            const sel=bars.selectAll("g.seg").data(
+                segs.filter(d=>d.end>=xz.domain()[0]&&d.start<=xz.domain()[1]),
+                d=>d.uid);
+            sel.exit().remove();
+            const ent=sel.enter().append("g").attr("class","seg");
+            ent.append("rect");
+            ent.append("text");
+            const merged=ent.merge(sel);
+            // 1px surface gap between abutting phases once they are wide enough to spare it,
+            // so "creating|refreshing|in use" never reads as one block
+            const px0=d=>Math.max(0,xz(d.start));
+            const pxw=d=>{const w=Math.min(innerW,xz(d.end))-px0(d);return Math.max(1,w>4?w-1:w);};
+            merged.select("rect")
+                .attr("x",px0)
+                .attr("y",d=>d.lane*(LANE_H+GAP)+2)
+                .attr("width",pxw)
+                .attr("height",LANE_H-4)
+                .attr("fill",d=>PHASE_FILL[d.key])
+                .attr("stroke",d=>isIdle(d)?css("--ph-keepalive-edge"):null)
+                .attr("stroke-width",d=>isIdle(d)?1:null);
+            merged.select("text")
+                .attr("class",d=>isIdle(d)?"dark":null)
+                .attr("x",d=>px0(d)+5)
+                .attr("y",d=>d.lane*(LANE_H+GAP)+LANE_H/2+3.5)
+                // the lane label already names the context, so the spare room goes to the
+                // duration rather than to d.testClass — which for most phases is the class
+                // that *triggered the closing event*, not the context's own class
+                .text(d=>{const w=pxw(d);
+                    if(w<=46)return "";
+                    return w>150?`${d.label} · ${fmtDur(d.dur)}`:d.label;});
+            drawFrame();
+        }
+
+        svg.select(".zoom-overlay")
+            .on("pointermove.cross",ev=>{
+                const [px,py]=d3.pointer(ev);
+                moveCrosshair(xz.invert(px));
+                // hit-test the phase rectangle under the cursor (the overlay sits above the bars)
+                const lane=Math.floor(py/(LANE_H+GAP)), tm=xz.invert(px);
+                const hit=(lane>=0&&lane<N_LANES)?segs.find(d=>d.lane===lane&&d.start<=tm&&d.end>tm):null;
+                const key=hit?hit.lane:null;
+                if(key!==frameKey){ frameKey=key; drawFrame(); }
+                if(hit){
+                    // the event's own testClassName is the class that was running when the
+                    // closing event fired — for a pause/close that is the *next* test class,
+                    // not the one the context belongs to. Only worth showing when they differ.
+                    const own=contexts[hit.lane].testClass;
+                    showTip(
+                        `<b>context #${esc(hit.ctxId)} · ${esc(hit.label)}</b>`+
+                        `<br><span class="row">${esc(own)}</span>`+
+                        `<br><span class="row">start: <b>${fmtTime(hit.start)}</b></span>`+
+                        `<br><span class="row">duration: <b>${fmtDur(hit.dur)}</b></span>`+
+                        `<br><span class="row">ends with: <b>${esc(hit.ends)}</b></span>`+
+                        (hit.testClass&&hit.testClass!==own
+                            ? `<br><span class="row">triggered by: <b>${esc(simpleName(hit.testClass))}</b></span>`:"")+
+                        `<br><span class="row">worker-${hit.thread+1} · json type "<b>${esc(hit.type)}</b>"</span>`,ev);
+                }
+                else hideTip();
+            })
+            .on("pointerleave.cross",()=>{moveCrosshair(null);hideTip();frameKey=null;drawFrame();});
+        applyZoomBehavior(svg,innerW,innerH);
+        return {draw,crosshair,innerW};
+    }
+
+    /* ====================== metric chart ====================== */
+    function buildMetric(id,opts){
+        const W=width(), H=opts.height, innerW=W-M.left-M.right, innerH=H-M.top-M.bottom;
+        const svg=d3.select("#"+id).html("").append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("height",H);
+        const g=svg.append("g").attr("transform",`translate(${M.left},${M.top})`);
+        const yMax=opts.yMax ?? (d3.max(opts.series.flatMap(s=>metrics.map(m=>+m[s.key]||0)))||1)*1.1;
+        const y=d3.scaleLinear().domain([0,yMax]).range([innerH,0]).nice();
+
+        g.append("g").attr("class","grid")
+            .call(d3.axisLeft(y).ticks(2).tickSize(-innerW).tickFormat("")).select(".domain").remove();
+        g.append("g").attr("class","axis")
+            .call(d3.axisLeft(y).ticks(2).tickFormat(v=>(opts.fmtY?opts.fmtY(v):v)+(opts.unit||"")));
+        const xAxisG=g.append("g").attr("class","axis").attr("transform",`translate(0,${innerH})`);
+
+        const clipId="clip_"+id;
+        svg.append("defs").append("clipPath").attr("id",clipId).append("rect").attr("width",innerW).attr("height",innerH);
+        const plot=g.append("g").attr("clip-path",`url(#${clipId})`);
+        const gcLayer=plot.append("g");
+        const paths=opts.series.map(s=>plot.append("path")
+            .attr("fill",s.fill||s.color).attr("fill-opacity",s.fillOpacity??0.4)
+            .attr("stroke",s.color).attr("stroke-width",1.4));
+
+        const crosshair=g.append("line").attr("class","crosshair").attr("y1",0).attr("y2",innerH);
+        g.append("rect").attr("class","zoom-overlay").attr("width",innerW).attr("height",innerH);
+
+        const bisect=d3.bisector(m=>m.t).center;
+        function draw(){
+            xAxisG.call(d3.axisBottom(xz).ticks(10).tickFormat(fmtAxisZoomed()));
+            opts.series.forEach((s,i)=>{
+                const area=d3.area()
+                    .curve(opts.step?d3.curveStepAfter:d3.curveLinear)
+                    .x(m=>xz(m.t)).y0(innerH).y1(m=>y(+m[s.key]||0));
+                paths[i].attr("d",area(metrics));
+            });
+            if(opts.gcMarkers){
+                const gcs=gcLayer.selectAll("line").data(metrics.filter(m=>m.gc));
+                gcs.exit().remove();
+                gcs.enter().append("line").attr("y1",0).attr("y2",innerH)
+                    .attr("stroke","#9aa5b1").attr("stroke-width",1).attr("stroke-dasharray","2 3").attr("opacity",0.6)
+                    .merge(gcs).attr("x1",m=>xz(m.t)).attr("x2",m=>xz(m.t));
+            }
+        }
+
+        svg.select(".zoom-overlay")
+            .on("pointermove.cross",ev=>{
+                const px=d3.pointer(ev)[0], tVal=xz.invert(px);
+                moveCrosshair(tVal);
+                if(!metrics.length) return;
+                const m=metrics[Math.max(0,Math.min(metrics.length-1,bisect(metrics,tVal)))];
+                let rows=`<b>t = ${fmtTime(m.t)}</b>`;
+                opts.series.forEach(s=>rows+=`<br><span class="row">${s.label}: <b>${(opts.fmtY?opts.fmtY(m[s.key]):Math.round(m[s.key]))}${opts.unit||""}</b></span>`);
+                if(m.gc&&opts.gcMarkers)rows+=`<br><span class="row" style="color:#ffd479">⟳ GC pause</span>`;
+                showTip(rows,ev);
+            })
+            .on("pointerleave.cross",()=>{moveCrosshair(null);hideTip();});
+        applyZoomBehavior(svg,innerW,innerH);
+        return {draw,crosshair,innerW};
+    }
+
+    // series swatches next to the panel title: identity is never carried by color alone
+    function metricKeys(panelId,series){
+        const t=d3.select("#"+panelId+" .panel-title");
+        t.selectAll(".key").remove();
+        if(series.length<2) return;
+        series.forEach(s=>t.append("span").attr("class","key")
+            .html(`<i style="background:${s.fill||s.color}"></i>${esc(s.label)}`));
+    }
+
+    /* ====================== navigator (scroll / context brush) ====================== */
+    function buildNavigator(){
+        const W=width(), H=42, innerW=W-M.left-M.right, innerH=H-M.top-M.bottom;
+        const svg=d3.select("#nav").html("").append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("height",H);
+        const g=svg.append("g").attr("transform",`translate(${M.left},${M.top})`);
+
+        // faint context: live-context count across the whole run, so the scrollbar has reference
+        const yMax=d3.max(metrics,m=>m.active)||1;
+        const y=d3.scaleLinear().domain([0,yMax]).range([innerH,0]);
+        const xn=d3.scaleLinear().domain([T0,T1]).range([0,innerW]);
+        const area=d3.area().curve(d3.curveStepAfter).x(m=>xn(m.t)).y0(innerH).y1(m=>y(m.active));
+        const areaPath=g.append("path").attr("class","nav-area").attr("fill-opacity",0.7);
+        const axisG=g.append("g").attr("class","axis").attr("transform",`translate(0,${innerH})`);
+
+        // a brush gesture changes k, which would rescale the context mid-drag and make the
+        // handle chase its own tail; freeze the context for the gesture, resync on release.
+        let frozen=null;
+        function draw(){
+            if(frozen) return;
+            xn.range([0, innerW*Math.min(1,current.k)]);
+            areaPath.attr("d",area(metrics));
+            // the navigator always shows the whole run, so its precision is fixed by T1-T0
+            axisG.call(d3.axisBottom(xn).ticks(10).tickFormat(s=>fmtAxis(s,decFor(T1-T0))));
+        }
+
+        const brush=d3.brushX().extent([[0,0],[innerW,innerH]]).on("start brush end",ev=>{
+            if(suppress) return;
+            if(ev.type==="start"){ frozen=xn.copy(); return; }
+            const sx=frozen||xn;
+            if(ev.selection) setView(sx.invert(ev.selection[0]), sx.invert(ev.selection[1]));
+            else if(ev.type==="end") setView(T0,T1);
+            if(ev.type==="end"){ frozen=null; draw(); suppress=true; navMove(xz.domain()); suppress=false; }
+        });
+        const brushG=g.append("g").attr("class","brush").call(brush);
+        navMove = dom => brushG.call(brush.move,
+            [Math.max(0,xn(dom[0])), Math.min(innerW,xn(dom[1]))]);
+        navDraw = draw;
+        draw();
+        navMove(x.domain());   // start fully zoomed-out
+    }
+
+    /* ====================== legend ====================== */
+    function buildLegend(){
+        const legend=d3.select("#legend").html("");
+        PHASE_KEYS.forEach(k=>{
+            const border = k==="keepalive" ? `;border:1px solid ${css("--ph-keepalive-edge")}` : "";
+            legend.append("span").html(`<i style="background:${PHASE_FILL[k]}${border}"></i>${PHASE_TITLE[k]}`);
+        });
+        legend.append("span").style("opacity",.85)
+            .html(`<span title="each bar spans [previous event → this event]">each bar ends at the Spring event that closes it</span>`);
+    }
+
+    /* ====================== context table (accessibility relief + the numbers) ====================== */
+    function buildTable(){
+        const byKey=c=>{const o={};c.events.forEach(e=>{o[e.key]=(o[e.key]||0)+e.dur;});return o;};
+        const cols=["creating","refreshing","inuse","paused","keepalive","closing"];
+        let html=`<thead><tr><th class="l">#</th><th class="l">Test class</th><th>Created</th>`
+            +cols.map(k=>`<th>${PHASE_TITLE[k]}</th>`).join("")
+            +`<th>Alive</th><th class="l">Final state</th></tr></thead><tbody>`;
+        contexts.forEach(c=>{
+            const s=byKey(c);
+            const last=c.events[c.events.length-1];
+            const fin=last?(last.type==="keep_alive"?"kept alive at exit":`${last.label} → ${last.ends}`):"—";
+            html+=`<tr><td class="l">#${esc(c.id)}</td><td class="l">${esc(c.testClass)}</td>`
+                +`<td>${fmtTime(c.start)}</td>`
+                +cols.map(k=>`<td class="${s[k]?"":"dim"}">${s[k]?fmtDur(s[k]):"–"}</td>`).join("")
+                +`<td>${fmtDur(c.end-c.start)}</td><td class="l dim">${esc(fin)}</td></tr>`;
+        });
+        d3.select("#ctxTable").html(html+"</tbody>");
+    }
+
+    /* ====================== build & wire ====================== */
+    function buildAll(){
+        charts.length=0; current=d3.zoomIdentity; xz=x; navMove=null; navDraw=null;
+        charts.push(buildGantt());
+
+        const ctxSeries=[{key:"active",label:"live contexts",color:"#2f8f6b",fill:"#46b289",fillOpacity:0.4}];
+        charts.push(buildMetric("ctxcount",{height:64,step:true,fmtY:Math.round,
+            yMax:(d3.max(metrics,m=>m.active)||1)+1,series:ctxSeries}));
+
+        const heapSeries=[
+            {key:"heapCommitted",label:"committed",color:"#c0c7d1",fill:"#c0c7d1",fillOpacity:0.5},
+            {key:"heapUsed",label:"used",color:"#b54a3a",fill:"#c46352",fillOpacity:0.55}];
+        charts.push(buildMetric("heap",{height:74,unit:" MB",gcMarkers:true,fmtY:Math.round,series:heapSeries}));
+
+        // daemon threads are a subset of the total, so the total is drawn first as the wider
+        // backdrop and the daemon area nests inside it (same idiom as heap used/committed)
+        const threadSeries=[
+            {key:"totalThreads",label:"total",color:"#7c9fe8",fill:"#a8c1f2",fillOpacity:0.45},
+            {key:"daemonThreads",label:"daemon",color:"#2f6fed",fill:"#5b8def",fillOpacity:0.5}];
+        charts.push(buildMetric("threads",{height:64,series:threadSeries}));
+
+        const cpuSeries=[
+            {key:"systemCpu",label:"system",color:"#a0863a",fill:"#d8b85a",fillOpacity:0.35},
+            {key:"processCpu",label:"process",color:"#444b53",fill:"#6b7480",fillOpacity:0.5}];
+        charts.push(buildMetric("cpu",{height:64,unit:"%",yMax:100,series:cpuSeries}));
+
+        // containersCount is null unless Testcontainers is on the classpath — hide the panel
+        // rather than show an empty axis
+        const hasContainers=metrics.some(m=>m.containersCount!=null);
+        d3.select("#panel-containers").classed("hidden",!hasContainers);
+        if(hasContainers){
+            const cSeries=[{key:"containersCount",label:"containers",color:"#8a5aa8",fill:"#b07cc6",fillOpacity:0.4}];
+            charts.push(buildMetric("containers",{height:64,step:true,fmtY:Math.round,
+                yMax:(d3.max(metrics,m=>+m.containersCount||0)||1)+1,series:cSeries}));
+            metricKeys("panel-containers",cSeries);
+        }
+
+        metricKeys("panel-contexts",ctxSeries);
+        metricKeys("panel-heap",heapSeries);
+        metricKeys("panel-threads",threadSeries);
+        metricKeys("panel-cpu",cpuSeries);
+        charts.forEach(c=>c.draw());
+        buildNavigator();
+    }
+    d3.select("#resetZoom").on("click",resetZoom);
+    let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{xz=x;buildAll();},150);});
+
+    // trackpad two-finger horizontal swipe → pan the timeline left/right. captured before
+    // d3.zoom's wheel handler (bubble phase, on the overlay) so a dominant deltaX is never
+    // misread as a zoom; vertical wheels and pinch (ctrlKey) fall through to d3.zoom.
+    addEventListener("wheel",ev=>{
+        if(ev.ctrlKey) return;
+        if(!ev.target.closest||!ev.target.closest(".zoom-overlay")) return;
+        if(Math.abs(ev.deltaX)<=Math.abs(ev.deltaY)) return;
+        ev.preventDefault(); ev.stopPropagation();
+        panBy(ev.deltaX);
+    },{capture:true,passive:false});
+
+    /* ====================== load data & render ====================== */
+    function ingest(data){
+        initPalette();
+        META    = data.meta || {};
+        metrics = (data.metrics||[]).slice().sort((a,b)=>a.t-b.t);
+
+        contexts = (data.contexts||[]).map((c,lane)=>{
+            const evs=(c.events||[]).map((e,i)=>{
+                const p=phaseOf(e.type);
+                return {uid:c.contextId+"#"+i, lane, ctxId:c.contextId, type:e.type,
+                    key:p.key, label:p.label, ends:p.ends,
+                    start:+e.start, end:+e.end, dur:e.duration!=null?+e.duration:(+e.end-+e.start),
+                    thread:e.threadId|0, testClass:e.testClassName||""};
+            });
+            return {id:c.contextId, lane, events:evs,
+                testClass: evs.length?evs[0].testClass:"",
+                thread: evs.length?evs[0].thread:0,
+                start: evs.length?evs[0].start:0,
+                end: evs.length?evs[evs.length-1].end:0};
+        });
+        segs=contexts.flatMap(c=>c.events);
+
+        N_LANES=Math.max(1,contexts.length);
+        T0=0;
+        T1=META.duration!=null?+META.duration:(d3.max(segs,d=>d.end)||1);
+        x.domain([T0,T1]);
+
+        const kept=contexts.filter(c=>c.events.some(e=>e.type==="keep_alive")).length;
+        const closed=contexts.filter(c=>c.events.some(e=>e.type==="destroying")).length;
+        const nClasses=new Set(segs.map(s=>s.testClass).filter(Boolean)).size;
+        const threads=META.threads??1;
+        d3.select("#headline").text(
+            `${contexts.length} Spring context${contexts.length===1?"":"s"} across ${nClasses} test class${nClasses===1?"":"es"} in ${fmtTime(T1)}`);
+        d3.select("#subline").text(
+            `${threads} worker thread${threads===1?"":"s"} · ${kept} kept alive at exit · ${closed} closed`);
+
+        buildLegend();
+        buildTable();
+        buildAll();
+    }
+
+    // Prefer data inlined into this file (self-contained report); a real JSON object starts
+    // with "{", whereas the unreplaced placeholder token does not. Otherwise fall back to
+    // fetching the sibling spring-test-timeline.json.
+    const inlineEl = document.getElementById("timelineData");
+    const inline = inlineEl ? inlineEl.textContent.trim() : "";
+    if (inline.charAt(0) === "{") {
+        ingest(JSON.parse(inline));
+    } else {
+        d3.json("spring-test-timeline.json")
+            .then(ingest)
+            .catch(err=>{
+                d3.select("#headline").text("Could not load spring-test-timeline.json");
+                d3.select("#subline").html(
+                    `Serve this report over HTTP (e.g. <code>python3 -m http.server</code>) — `+
+                    `browsers block fetch() on file:// URLs. `+
+                    `<span style="color:#b54a3a">${err}</span>`);
+                console.error(err);
+            });
+    }
+</script>
+</body>
+</html>

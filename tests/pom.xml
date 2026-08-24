@@ -54,6 +54,11 @@
                 <artifactId>spring-test-smart-context</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.seregamorph</groupId>
+                <artifactId>spring-test-timeline</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.github.seregamorph</groupId>

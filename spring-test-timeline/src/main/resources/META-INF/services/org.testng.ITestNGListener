@@ -1,0 +1,2 @@
+com.github.seregamorph.testtimeline.testng.SuiteExecutionListener
+com.github.seregamorph.testtimeline.testng.CurrentTestListener

@@ -59,6 +59,7 @@
 
     <modules>
         <module>spring-test-smart-context</module>
+        <module>spring-test-timeline</module>
     </modules>
 
     <scm>

@@ -2,6 +2,7 @@ package com.github.seregamorph.testsmartcontext;
 
 import static com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport.isInnerClass;
 
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.TestContext;
@@ -49,15 +50,24 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     @Override
     public void afterTestClass(TestContext testContext) {
+        try {
+            completeTestClass(testContext.getTestClass(), () -> testContext);
+        } finally {
+            // pop Nested classes
+            CurrentTestContext.popCurrentTestClass();
+        }
+    }
+
+    static void completeTestClass(Class<?> testClass, Supplier<TestContext> testContextSupplier) {
         currentAutoClosingContext.set(true);
         try {
-            Class<?> testClass = testContext.getTestClass();
             if (SmartDirtiesTestsSupport.markCompleteAndIsLastClassPerConfig(testClass)) {
+                TestContext testContext = testContextSupplier.get();
                 if (testContext.hasApplicationContext()) {
                     logger.info("Auto-closing context after {}", testClass.getName());
                     testContext.markApplicationContextDirty(null);
                 } else {
-                    logger.info("Skipping auto-closing context after {} (already closed or failed to create)",
+                    logger.info("Skipping auto-closing context after {} (no cached application context)",
                         testClass.getName());
                 }
             } else {
@@ -65,8 +75,6 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
             }
         } finally {
             currentAutoClosingContext.remove();
-            // pop Nested classes
-            CurrentTestContext.popCurrentTestClass();
         }
     }
 

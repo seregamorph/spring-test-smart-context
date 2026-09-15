@@ -7,12 +7,16 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
-import org.springframework.test.context.TestContextManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.test.context.BootstrapUtilsHelper;
 
 /**
  * Completes skipped Jupiter classes which never receive Spring's afterTestClass callback.
  */
 public class SmartDirtiesSkippedClassListener implements TestExecutionListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(SmartDirtiesSkippedClassListener.class);
 
     @Override
     public void executionSkipped(TestIdentifier testIdentifier, String reason) {
@@ -37,10 +41,11 @@ public class SmartDirtiesSkippedClassListener implements TestExecutionListener {
 
         CurrentTestContext.pushCurrentTestClass(testClass);
         try {
+            logger.debug("Completing skipped test class {}", testClass.getName());
             // Build metadata only when this completes the group. hasApplicationContext()
             // in the shared close path avoids loading a context for an entirely skipped group.
             SmartDirtiesContextTestExecutionListener.completeTestClass(testClass,
-                () -> new TestContextManager(testClass).getTestContext());
+                () -> BootstrapUtilsHelper.resolveTestContextBootstrapper(testClass).buildTestContext());
         } finally {
             CurrentTestContext.popCurrentTestClass();
         }

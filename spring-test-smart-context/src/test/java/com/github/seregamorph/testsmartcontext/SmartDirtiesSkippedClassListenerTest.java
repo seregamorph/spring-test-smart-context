@@ -23,7 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.TestContextManager;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.support.AbstractTestExecutionListener;
 
 class SmartDirtiesSkippedClassListenerTest {
 
@@ -35,6 +37,7 @@ class SmartDirtiesSkippedClassListenerTest {
     public void reset() {
         prevEngineClassOrderStateMap = SmartDirtiesTestsSupport.setEngineClassOrderStateMap(null);
         createdMarkers.clear();
+        CountingListener.instanceCount = 0;
     }
 
     @AfterEach
@@ -77,12 +80,20 @@ class SmartDirtiesSkippedClassListenerTest {
     public void allSkippedClassesDoNotLoadAContext() {
         run(0, 2, ADisabled.class, ZDisabled.class);
         assertTrue(createdMarkers.isEmpty());
+        assertEquals(0, CountingListener.instanceCount);
     }
 
     @Test
     public void skippedUnitClassIsIgnored() {
         run(0, 1, DisabledUnit.class);
         assertTrue(createdMarkers.isEmpty());
+    }
+
+    @Test
+    public void skippedClassDoesNotCreateTestExecutionListeners() {
+        run(1, 1, BRunning.class, ZDisabled.class);
+        assertEquals(1, CountingListener.instanceCount, "Only the executed class needs test execution listeners");
+        assertClosedOnce();
     }
 
     private void assertClosedOnce() {
@@ -127,6 +138,17 @@ class SmartDirtiesSkippedClassListenerTest {
         }
     }
 
+    public static class CountingListener extends AbstractTestExecutionListener {
+
+        private static int instanceCount;
+
+        public CountingListener() {
+            instanceCount++;
+        }
+    }
+
+    @TestExecutionListeners(listeners = CountingListener.class,
+        mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
     @SpringJUnitConfig(Config.class)
     public abstract static class Shared {
 

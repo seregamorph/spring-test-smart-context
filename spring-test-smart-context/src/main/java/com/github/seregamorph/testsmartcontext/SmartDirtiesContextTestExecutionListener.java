@@ -67,7 +67,7 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
                     logger.info("Auto-closing context after {}", testClass.getName());
                     testContext.markApplicationContextDirty(null);
                 } else {
-                    logger.info("Skipping auto-closing context after {} (already closed or failed to create)",
+                    logger.info("Skipping auto-closing context after {} (no cached application context)",
                         testClass.getName());
                 }
             } else {

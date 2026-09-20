@@ -1,18 +1,16 @@
-# Dependabot opens pull requests for outdated dependencies.
-# It only proposes changes, every update is a regular PR that still requires review and merge.
-# Doc: https://docs.github.com/code-security/dependabot/dependabot-version-updates
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates
 version: 2
 updates:
-  # Root pom.xml: slf4j, kotlin and the maven plugin versions.
-  # The tests/* modules are intentionally not watched, their spring-boot versions are pinned
-  # on purpose to cover the supported range (including milestones).
+  # Root pom.xml only: slf4j, kotlin and the plugin versions.
+  # tests/* modules are skipped on purpose, their spring-boot versions are pinned
+  # to cover the supported range.
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
 
-  # Keeps the versions of the actions used in workflows up to date.
+  # Versions of the actions used in workflows.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

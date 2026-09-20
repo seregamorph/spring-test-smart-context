@@ -37,7 +37,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <slf4j.version>2.0.18</slf4j.version>
-        <kotlin.version>1.9.23</kotlin.version>
+        <kotlin.version>2.4.10</kotlin.version>
 
         <!--
         https://maven.apache.org/guides/mini/guide-reproducible-builds.html

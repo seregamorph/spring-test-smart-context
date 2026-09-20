@@ -1,0 +1,18 @@
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates
+version: 2
+updates:
+  # Root pom.xml only: slf4j, kotlin and the plugin versions.
+  # tests/* modules are skipped on purpose, their spring-boot versions are pinned
+  # to cover the supported range.
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Versions of the actions used in workflows.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

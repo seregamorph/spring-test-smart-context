@@ -1,18 +1,57 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates
 version: 2
 updates:
-  # Root pom.xml only: slf4j, kotlin and the plugin versions.
-  # tests/* modules are skipped on purpose, their spring-boot versions are pinned
-  # to cover the supported range.
+  # Maven. Note that `directory: "/"` does not mean "root pom.xml only":
+  # Dependabot follows <modules> from the root pom, so spring-test-smart-context/pom.xml
+  # is scanned as well. The tests/* aggregator is declared inside a profile and is
+  # not traversed, so the spring-boot versions pinned there are out of scope anyway.
+  #
+  # The provided-scope dependencies of spring-test-smart-context (Spring, JUnit 4/5,
+  # testng-engine, Kotest) are the *minimum supported* versions of the library.
+  # Bumping them compiles and passes tests, but silently raises the floor for
+  # consumers, so they are ignored below and stay a deliberate manual decision.
+  # What is left for Dependabot: build plugins, Kotlin and slf4j.
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+    # Avoid churning on freshly released versions.
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+    groups:
+      # One PR for the build plugins instead of a dozen.
+      maven-build-plugins:
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "org.codehaus.mojo:*"
+          - "org.sonatype.central:*"
+    ignore:
+      # forward compatibility
+      - dependency-name: "org.springframework:*"
+      - dependency-name: "org.junit.jupiter:*"
+      - dependency-name: "org.junit.platform:*"
+      - dependency-name: "org.junit.support:*"
+      - dependency-name: "junit:junit"
+      - dependency-name: "io.kotest:*"
+      - dependency-name: "org.slf4j:*"
+        update-types: ["version-update:semver-major"]
 
-  # Versions of the actions used in workflows.
+  # Versions of the actions used in workflows. No-op until the CI workflow lands
+  # (see issue #35), kept here so it is active from the first workflow on.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

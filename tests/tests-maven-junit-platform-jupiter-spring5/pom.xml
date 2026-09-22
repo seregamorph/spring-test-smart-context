@@ -18,7 +18,7 @@
         <maven.install.skip>true</maven.install.skip>
 
         <spring-framework.version>5.3.39</spring-framework.version>
-        <logback.version>1.2.3</logback.version>
+        <logback.version>1.6.3</logback.version>
         <junit-platform.version>1.11.3</junit-platform.version>
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>

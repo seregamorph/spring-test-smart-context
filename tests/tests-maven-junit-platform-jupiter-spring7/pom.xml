@@ -22,6 +22,9 @@
         <junit-platform.version>6.0.3</junit-platform.version>
         <junit-jupiter.version>6.0.3</junit-jupiter.version>
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
+        <hikaricp.version>7.1.0</hikaricp.version>
+        <postgresql.version>42.7.13</postgresql.version>
+        <testcontainers.version>2.0.5</testcontainers.version>
     </properties>
 
     <build>
@@ -86,6 +89,30 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring-framework.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring-framework.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-postgresql</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

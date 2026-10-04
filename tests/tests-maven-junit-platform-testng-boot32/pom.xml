@@ -17,6 +17,8 @@
     <properties>
         <spring-boot.version>3.2.2</spring-boot.version>
         <testng-engine.version>1.0.5</testng-engine.version>
+        <!-- overrides spring-boot managed 1.19.3, which is not compatible with Docker 29+ -->
+        <testcontainers.version>1.21.4</testcontainers.version>
         <maven.install.skip>true</maven.install.skip>
     </properties>
 
@@ -49,6 +51,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -86,6 +95,26 @@
                     <artifactId>mockito-junit-jupiter</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>

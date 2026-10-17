@@ -4,8 +4,10 @@ import static java.util.Comparator.comparing;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -94,24 +96,63 @@ public class SmartDirtiesTestsSorter {
 
         Map<MergedContextConfiguration, TestClasses> configToTests = new LinkedHashMap<>();
         Map<Class<?>, Integer> classToOrder = new LinkedHashMap<>();
+        Map<Class<?>, List<Class<?>>> itClassToNestedClasses = new LinkedHashMap<>();
+        // enclosing classes without own Spring context, which declare nested Spring integration test classes
+        Set<Class<?>> containerClasses = new LinkedHashSet<>();
         AtomicInteger orderCounter = new AtomicInteger();
         for (Class<?> itClass : itClasses) {
-            TestContextBootstrapper bootstrapper = BootstrapUtilsHelper.resolveTestContextBootstrapper(itClass);
-            MergedContextConfiguration mergedContextConfiguration;
-            try {
-                mergedContextConfiguration = bootstrapper.buildMergedContextConfiguration();
-            } catch (RuntimeException e) {
-                // failed to calculate configuration
-                throw new IllegalStateException("Failed to build MergedContextConfiguration for " + itClass, e);
+            boolean isContainer = !integrationTestFilter.isSpringTestClass(itClass);
+            MergedContextConfiguration mergedContextConfiguration = null;
+            if (isContainer) {
+                containerClasses.add(itClass);
+            } else {
+                TestContextBootstrapper bootstrapper = BootstrapUtilsHelper.resolveTestContextBootstrapper(itClass);
+                try {
+                    mergedContextConfiguration = bootstrapper.buildMergedContextConfiguration();
+                } catch (RuntimeException e) {
+                    // failed to calculate configuration
+                    throw new IllegalStateException("Failed to build MergedContextConfiguration for " + itClass, e);
+                }
+                // Sequentially each unique mergedContextConfiguration will have own order
+                // via orderCounter. initial order values all have a gap to allow for moving
+                // @DirtiesContext annotated classes to the back later.
+                TestClasses testClasses = configToTests.computeIfAbsent(mergedContextConfiguration,
+                    $ -> new TestClasses(orderCounter.addAndGet(3), new LinkedHashSet<>()));
+                testClasses.classes.add(itClass);
+                classToOrder.put(itClass, testClasses.order);
             }
-            // Sequentially each unique mergedContextConfiguration will have own order
-            // via orderCounter. initial order values all have a gap to allow for moving
-            // @DirtiesContext annotated classes to the back later.
-            TestClasses testClasses = configToTests.computeIfAbsent(mergedContextConfiguration,
-                $ -> new TestClasses(orderCounter.addAndGet(3), new LinkedHashSet<>()));
-            testClasses.classes.add(itClass);
-            classToOrder.put(itClass, testClasses.order);
+
+            List<Class<?>> nestedClasses = new ArrayList<>();
+            for (Class<?> nestedClass : NestedTestClasses.getNestedTestClasses(itClass)) {
+                if (isContainer && !isSpringTestClassOrEnclosed(integrationTestFilter, nestedClass, itClass)) {
+                    continue;
+                }
+                MergedContextConfiguration nestedMergedContextConfiguration;
+                try {
+                    nestedMergedContextConfiguration = BootstrapUtilsHelper.resolveTestContextBootstrapper(nestedClass)
+                        .buildMergedContextConfiguration();
+                } catch (RuntimeException e) {
+                    logger.warn("Failed to build MergedContextConfiguration for {}", nestedClass, e);
+                    continue;
+                }
+                if (!nestedMergedContextConfiguration.equals(mergedContextConfiguration)) {
+                    TestClasses nestedTestClasses = configToTests.computeIfAbsent(nestedMergedContextConfiguration,
+                        $ -> new TestClasses(orderCounter.addAndGet(3), new LinkedHashSet<>()));
+                    nestedTestClasses.classes.add(nestedClass);
+                    nestedClasses.add(nestedClass);
+                    if (isContainer) {
+                        // the container is ordered next to the group of its first nested class
+                        classToOrder.putIfAbsent(itClass, nestedTestClasses.order);
+                    }
+                }
+            }
+            itClassToNestedClasses.put(itClass, nestedClasses);
         }
+
+        // Container classes never receive Spring callbacks themselves, so they are registered as non-IT classes
+        // (without own context group)
+        Set<Class<?>> registeredNonItClasses = new LinkedHashSet<>(nonItClasses);
+        registeredNonItClasses.addAll(containerClasses);
 
         testItems.sort(comparing(testItem -> {
             Class<?> testClass = testClassExtractor.getTestClass(testItem);
@@ -127,9 +168,21 @@ public class SmartDirtiesTestsSorter {
             }
         }));
 
+        Map<Class<?>, Integer> completionOrder = new HashMap<>();
+        for (T testItem : testItems) {
+            Class<?> testClass = testClassExtractor.getTestClass(testItem);
+            List<Class<?>> nestedClasses = itClassToNestedClasses.get(testClass);
+            if (nestedClasses != null && !completionOrder.containsKey(testClass)) {
+                for (Class<?> nestedClass : nestedClasses) {
+                    completionOrder.putIfAbsent(nestedClass, completionOrder.size());
+                }
+                completionOrder.put(testClass, completionOrder.size());
+            }
+        }
+
         List<List<Class<?>>> sortedConfigToTests = configToTests.values().stream()
             .map(testClasses -> testClasses.classes.stream()
-                .sorted(comparing(SmartDirtiesTestsSorter::getDirtiesContextBeforeAfterOrder))
+                .sorted(comparing(completionOrder::get))
                 .collect(Collectors.toList()))
             .collect(Collectors.toList());
 
@@ -137,7 +190,24 @@ public class SmartDirtiesTestsSorter {
             logSuiteTestsPerConfig(itClasses.size(), nonItClasses.size(), sortedConfigToTests);
         }
 
-        return new TestSortResult(integrationTestFilter, sortedConfigToTests, nonItClasses);
+        return new TestSortResult(integrationTestFilter, sortedConfigToTests, registeredNonItClasses);
+    }
+
+    /**
+     * Jupiter extensions (including SpringExtension) of enclosing classes are inherited by @Nested classes
+     */
+    private static boolean isSpringTestClassOrEnclosed(
+        IntegrationTestFilter integrationTestFilter,
+        Class<?> nestedClass,
+        Class<?> containerClass
+    ) {
+        for (Class<?> clazz = nestedClass; clazz != null && clazz != containerClass;
+             clazz = clazz.getEnclosingClass()) {
+            if (integrationTestFilter.isSpringTestClass(clazz)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

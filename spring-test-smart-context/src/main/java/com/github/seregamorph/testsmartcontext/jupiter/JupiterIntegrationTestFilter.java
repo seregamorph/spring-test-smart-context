@@ -1,6 +1,7 @@
 package com.github.seregamorph.testsmartcontext.jupiter;
 
 import com.github.seregamorph.testsmartcontext.IntegrationTestFilter;
+import com.github.seregamorph.testsmartcontext.NestedTestClasses;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Set;
@@ -35,6 +36,16 @@ public class JupiterIntegrationTestFilter extends IntegrationTestFilter {
         if (Modifier.isAbstract(testClass.getModifiers())) {
             return false;
         }
+        if (isSpringTestClass(testClass)) {
+            return true;
+        }
+        // enclosing class without Spring configuration, which declares @Nested Spring integration test classes
+        return NestedTestClasses.getNestedTestClasses(testClass).stream()
+            .anyMatch(this::isSpringTestClass);
+    }
+
+    @Override
+    protected boolean isSpringTestClass(Class<?> testClass) {
         // can be inherited, can be meta-annotation e.g. via @SpringBootTest
         Set<ExtendWith> extendWith = AnnotatedElementUtils.findAllMergedAnnotations(testClass, ExtendWith.class);
         if (extendWith.isEmpty()) {

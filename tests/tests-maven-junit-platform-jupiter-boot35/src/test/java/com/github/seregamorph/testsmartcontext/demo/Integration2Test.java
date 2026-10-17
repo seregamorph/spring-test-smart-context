@@ -2,6 +2,7 @@ package com.github.seregamorph.testsmartcontext.demo;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(classes = {
@@ -12,6 +13,21 @@ public class Integration2Test extends AbstractIntegrationTest {
     @Test
     public void test() {
         System.out.println("Integration2Test.test");
+    }
+
+    @Nested
+    @ContextConfiguration(classes = {
+        Integration1Test.Configuration.class
+    })
+    public class NestedCustomConfigTest {
+
+        @Autowired
+        private SampleService sampleService;
+
+        @Test
+        public void nested() {
+            System.out.println("Integration2Test.NestedCustomConfigTest.test " + sampleService);
+        }
     }
 
     @Nested

@@ -1,7 +1,5 @@
 package com.github.seregamorph.testsmartcontext;
 
-import static com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport.isInnerClass;
-
 import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +38,8 @@ public class SmartDirtiesContextTestExecutionListener extends AbstractTestExecut
 
     @Override
     public void beforeTestClass(TestContext testContext) {
-        Class<?> testClass = testContext.getTestClass();
         // stack Nested classes
-        CurrentTestContext.pushCurrentTestClass(testClass);
-        if (isInnerClass(testClass)) {
-            SmartDirtiesTestsSupport.verifyInnerClass(testClass);
-        }
+        CurrentTestContext.pushCurrentTestClass(testContext.getTestClass());
     }
 
     @Override

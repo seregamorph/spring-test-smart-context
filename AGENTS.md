@@ -28,9 +28,8 @@
 - **Build JDK**: the enforcer plugin requires JDK `[17,22)`.
 - **Docker**: several `tests/*` modules use Testcontainers, so Docker must be running.
 - **Test-result caching**: `.mvn/extensions.xml` enables `surefire-cached-extension` (configured in
-  `.mvn/surefire-cached.json`), so unchanged modules can skip their tests.
-- **Releases**: run `./release.sh`, which also writes `deploy-log-*.txt`. The `tests` profile is disabled when
-  `-DperformRelease=true` is set.
+  `.mvn/surefire-cached.json`), so unchanged modules can skip their tests. To run the build without the cache, add
+  `-DskipCache`, for example `./mvnw clean install -DskipCache`.
 
 ## Coding Style & Naming Conventions
 These rules come from `.editorconfig`:

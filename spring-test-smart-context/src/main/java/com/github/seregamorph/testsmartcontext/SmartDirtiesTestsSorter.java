@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.BootstrapUtilsHelper;
 import org.springframework.test.context.MergedContextConfiguration;
@@ -187,7 +188,8 @@ public class SmartDirtiesTestsSorter {
             .collect(Collectors.toList());
 
         if (!sortedConfigToTests.isEmpty()) {
-            logSuiteTestsPerConfig(itClasses.size(), nonItClasses.size(), sortedConfigToTests);
+            logSuiteTestsPerConfig(itClasses.size(), nonItClasses.size(), sortedConfigToTests,
+                itClassToNestedClasses, containerClasses);
         }
 
         return new TestSortResult(integrationTestFilter, sortedConfigToTests, registeredNonItClasses);
@@ -260,36 +262,91 @@ public class SmartDirtiesTestsSorter {
     private void logSuiteTestsPerConfig(
         int itClassesSize,
         int nonItClassesSize,
-        List<List<Class<?>>> sortedConfigToTests
+        List<List<Class<?>>> sortedConfigToTests,
+        Map<Class<?>, List<Class<?>>> itClassToNestedClasses,
+        Set<Class<?>> containerClasses
     ) {
+        // Groups consisting only of @Nested classes of a single enclosing class (which has own context) are
+        // printed indented under this enclosing class: they are executed and closed within its execution,
+        // while the context of the enclosing class remains open.
+        Map<Class<?>, List<List<Class<?>>>> enclosingClassToNestedGroups = new HashMap<>();
+        List<List<Class<?>>> topLevelGroups = new ArrayList<>();
+        for (List<Class<?>> itClasses : sortedConfigToTests) {
+            Class<?> enclosingClass = findEnclosingClass(itClasses, itClassToNestedClasses, containerClasses);
+            if (enclosingClass == null) {
+                topLevelGroups.add(itClasses);
+            } else {
+                enclosingClassToNestedGroups.computeIfAbsent(enclosingClass, $ -> new ArrayList<>())
+                    .add(itClasses);
+            }
+        }
+
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
         pw.println("Running suite of " + (nonItClassesSize > 0 ? nonItClassesSize + " unit and " : "")
             + itClassesSize + " integration test classes grouped and reordered by their MergedContextConfiguration "
             + "(" + sortedConfigToTests.size() + " groups):");
-        sortedConfigToTests.forEach(itClasses -> {
-            pw.println("---");
-            boolean isFirst = true;
-            for (Iterator<Class<?>> it = itClasses.iterator(); it.hasNext(); ) {
-                Class<?> itClass = it.next();
-                boolean isLast = !it.hasNext();
-                String suffix1 = isFirst && isLast ? "creates and closes context"
-                    : isFirst ? "creates context" : isLast ? "closes context" : null;
-                DirtiesContext dirtiesContext = AnnotatedElementUtils.findMergedAnnotation(itClass,
-                    DirtiesContext.class);
-                String suffix2 = dirtiesContext == null ? null :
-                    "marked @DirtiesContext(" + dirtiesContext.classMode().name() + ")";
-                pw.print(itClass.getName());
-                if (suffix1 != null || suffix2 != null) {
-                    pw.print(" (" + (suffix1 == null ? "" : suffix1 + (suffix2 == null ? "" : "; "))
-                        + (suffix2 == null ? "" : suffix2) + ")");
-                }
-                pw.println();
-                isFirst = false;
-            }
-        });
+        topLevelGroups.forEach(itClasses -> printGroup(pw, "", itClasses, itClassToNestedClasses,
+            enclosingClassToNestedGroups));
         // logger may be not yet initialized at this moment
         System.out.println(sw);
+    }
+
+    private static void printGroup(
+        PrintWriter pw,
+        String indent,
+        List<Class<?>> itClasses,
+        Map<Class<?>, List<Class<?>>> itClassToNestedClasses,
+        Map<Class<?>, List<List<Class<?>>>> enclosingClassToNestedGroups
+    ) {
+        pw.println(indent + "---");
+        boolean isFirst = true;
+        for (Iterator<Class<?>> it = itClasses.iterator(); it.hasNext(); ) {
+            Class<?> itClass = it.next();
+            boolean isLast = !it.hasNext();
+            List<Class<?>> nestedClasses = itClassToNestedClasses.get(itClass);
+            // the enclosing class is completed (and its context is closed) only after all its nested classes
+            String closesSuffix = nestedClasses == null || nestedClasses.isEmpty() ? "closes context"
+                : "closes context after its nested classes";
+            String suffix1 = isFirst && isLast ? "creates and " + closesSuffix
+                : isFirst ? "creates context" : isLast ? closesSuffix : null;
+            DirtiesContext dirtiesContext = AnnotatedElementUtils.findMergedAnnotation(itClass,
+                DirtiesContext.class);
+            String suffix2 = dirtiesContext == null ? null :
+                "marked @DirtiesContext(" + dirtiesContext.classMode().name() + ")";
+            pw.print(indent + itClass.getName());
+            if (suffix1 != null || suffix2 != null) {
+                pw.print(" (" + (suffix1 == null ? "" : suffix1 + (suffix2 == null ? "" : "; "))
+                    + (suffix2 == null ? "" : suffix2) + ")");
+            }
+            pw.println();
+            List<List<Class<?>>> nestedGroups = enclosingClassToNestedGroups.get(itClass);
+            if (nestedGroups != null) {
+                nestedGroups.forEach(nestedGroup -> printGroup(pw, indent + "    ", nestedGroup,
+                    itClassToNestedClasses, enclosingClassToNestedGroups));
+            }
+            isFirst = false;
+        }
+    }
+
+    /**
+     * Returns the enclosing class (with own context) if all classes of the group are its nested classes, otherwise
+     * null.
+     */
+    @Nullable
+    private static Class<?> findEnclosingClass(
+        List<Class<?>> itClasses,
+        Map<Class<?>, List<Class<?>>> itClassToNestedClasses,
+        Set<Class<?>> containerClasses
+    ) {
+        for (Map.Entry<Class<?>, List<Class<?>>> entry : itClassToNestedClasses.entrySet()) {
+            Class<?> enclosingClass = entry.getKey();
+            if (!containerClasses.contains(enclosingClass) && !itClasses.contains(enclosingClass)
+                && entry.getValue().containsAll(itClasses)) {
+                return enclosingClass;
+            }
+        }
+        return null;
     }
 
     private static final class TestClasses {

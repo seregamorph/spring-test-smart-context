@@ -21,8 +21,6 @@ import org.junit.runner.Runner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
-import org.springframework.test.context.BootstrapUtilsHelper;
-import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
@@ -68,12 +66,17 @@ public abstract class SmartDirtiesTestsSupport {
 
     protected static int classOrderStateMapSize(String engine) {
         Map<Class<?>, ClassGroupState> testClasses = getTestClasses(engine);
-        return testClasses == null ? 0 : testClasses.size();
+        return testClasses == null ? 0 : (int) testClasses.keySet().stream()
+            .filter(testClass -> !isInnerClass(testClass))
+            .count();
+    }
+
+    protected static boolean hasNestedTestClasses(Class<?> testClass) {
+        return !NestedTestClasses.getNestedTestClasses(testClass).isEmpty();
     }
 
     static boolean markCompleteAndIsLastClassPerConfig(Class<?> testClass) {
-        if (isInnerClass(testClass)) {
-            // to support @Nested classes (without own context configuration)
+        if (isInnerClass(testClass) && !isRegistered(testClass)) {
             return false;
         }
 
@@ -217,24 +220,28 @@ public abstract class SmartDirtiesTestsSupport {
         SmartDirtiesTestsSupport.failureCause = failureCause;
     }
 
-    protected static void verifyInnerClass(Class<?> innerTestClass) {
-        // @ContextConfiguration, @Import, etc. on Nested class will lead to creation of separate spring context.
-        // We can order enclosing classes, but tests of Nested test classes will always go sequentially is scope
-        // of their enclosing class. And the spring context may be shared between these inner Nested classes of
-        // different tests.
-        Class<?> enclosingClass = getEnclosingClass(innerTestClass);
-        MergedContextConfiguration enclosingContextConfiguration =
-            BootstrapUtilsHelper.resolveTestContextBootstrapper(enclosingClass).buildMergedContextConfiguration();
-        MergedContextConfiguration innerContextConfiguration =
-            BootstrapUtilsHelper.resolveTestContextBootstrapper(innerTestClass).buildMergedContextConfiguration();
-
-        // TODO find compromising solution for @Nested classes
-        if (!enclosingContextConfiguration.equals(innerContextConfiguration)) {
-            throw new IllegalStateException("Nested inner " + innerTestClass + " declares custom context "
-                + "configuration which differs from enclosing " + enclosingClass + ". "
-                + "This is not properly supported by the spring-test-smart-context ordering because of framework "
-                + "limitations. Please extract inner test class to upper level.");
+    static void completeNestedClassesMissingInTestPlan(String engine, Set<Class<?>> testPlanClasses) {
+        Map<Class<?>, ClassGroupState> testClasses = getTestClasses(engine);
+        if (testClasses == null) {
+            return;
         }
+        for (Class<?> testPlanClass : testPlanClasses) {
+            if (isInnerClass(testPlanClass)) {
+                continue;
+            }
+            for (Class<?> nestedClass : NestedTestClasses.getNestedTestClasses(testPlanClass)) {
+                ClassGroupState classGroupState = testClasses.get(nestedClass);
+                if (classGroupState != null && !testPlanClasses.contains(nestedClass)) {
+                    log.debug("Nested {} is not included in the test plan", nestedClass);
+                    classGroupState.completedItClasses.add(nestedClass);
+                }
+            }
+        }
+    }
+
+    private static boolean isRegistered(Class<?> testClass) {
+        return engineClassOrderStateMap != null && engineClassOrderStateMap.values().stream()
+            .anyMatch(classOrderStateMap -> classOrderStateMap.containsKey(testClass));
     }
 
     protected static boolean isInnerClass(Class<?> clazz) {
@@ -243,13 +250,6 @@ public abstract class SmartDirtiesTestsSupport {
 
     private static boolean isStatic(Class<?> clazz) {
         return Modifier.isStatic(clazz.getModifiers());
-    }
-
-    private static Class<?> getEnclosingClass(Class<?> clazz) {
-        Class<?> enclosingClass = clazz.getEnclosingClass();
-        // it can be deeply nesting - with recursion avoid possible infinite cycle
-        // (see org.junit.platform.commons.util.ReflectionUtils.detectInnerClassCycle)
-        return enclosingClass == null ? clazz : getEnclosingClass(enclosingClass);
     }
 
     //@TestOnly

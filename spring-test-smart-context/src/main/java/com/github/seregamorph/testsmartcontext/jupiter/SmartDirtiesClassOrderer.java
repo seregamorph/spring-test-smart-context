@@ -1,5 +1,7 @@
 package com.github.seregamorph.testsmartcontext.jupiter;
 
+import static java.util.Comparator.comparing;
+
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSorter;
 import com.github.seregamorph.testsmartcontext.SmartDirtiesTestsSupport;
 import com.github.seregamorph.testsmartcontext.TestClassExtractor;
@@ -52,11 +54,6 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
                     // this should not happen
                     throw new IllegalStateException("Missing @Nested annotation for inner " + testClass);
                 }
-                // implementation notice: if the exception is thrown from this block, it does not break the
-                // test execution as it's suppressed in
-                // org.junit.jupiter.engine.discovery.AbstractOrderingVisitor.doWithMatchingDescriptor
-                // So this validation will be repeated at BeforeClass
-                verifyInnerClass(testClass);
             } else {
                 // regular test class
                 uniqueClasses.add(testClass);
@@ -64,12 +61,14 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
         }
 
         if (uniqueClasses.isEmpty()) {
-            // All are internal (@Nested), we do not reorder them.
-            // The enclosing classes are already in the SmartDirtiesTestsHolder from previous call
+            // All are internal (@Nested), they are sorted by name (same order as registered by
+            // SmartDirtiesTestsSorter). The enclosing classes are already in the SmartDirtiesTestsHolder from
+            // previous call
             if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE_JUNIT_JUPITER) == 0) {
                 throw new IllegalStateException("orderClasses is called with inner classes list " + classDescriptors
                     + " before being called with enclosing class list");
             }
+            classDescriptors.sort(comparing((ClassDescriptor descriptor) -> descriptor.getTestClass().getName()));
             return;
         }
 
@@ -78,12 +77,15 @@ public class SmartDirtiesClassOrderer extends SmartDirtiesTestsSupport implement
             // it's not possible to distinguish them here. Sometimes per single test is sent as argument,
             // sometimes - the whole suite. If it's a suite more than 1, we can save it and never update.
             // If it's 1 - we should also distinguish single test execution.
-            if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE_JUNIT_JUPITER) <= 1) {
-                Class<?> testClass = classDescriptors.get(0).getTestClass();
+            if (SmartDirtiesTestsSupport.classOrderStateMapSize(ENGINE_JUNIT_JUPITER) > 1) {
+                return;
+            }
+            Class<?> testClass = uniqueClasses.iterator().next();
+            if (!hasNestedTestClasses(testClass)) {
                 SmartDirtiesTestsSupport.setTestClassesLists(ENGINE_JUNIT_JUPITER,
                     TestSortResult.singletonList(testClass));
+                return;
             }
-            return;
         }
 
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();

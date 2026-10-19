@@ -19,6 +19,7 @@ public class SmartDirtiesJupiterTestsSorterTest {
         // mostly: @DirtiesContext should go last.
         SmartDirtiesTestsSorter sorter = SmartDirtiesTestsSorter.getInstance();
         var testItems = Arrays.asList(
+            Integration3Test.class,
             Integration2Test.class,
             SampleIntegrationTest.class,
             Integration1Test.class,
@@ -50,7 +51,9 @@ public class SmartDirtiesJupiterTestsSorterTest {
             Integration1Test.class,
             // IT 4
             Integration2Test.class,
-            // IT 5
+            // IT 5 (shared with Integration2Test.NestedCustomConfigTest)
+            Integration3Test.class,
+            // IT 6
             SampleIntegrationTest.class
         ), testItems);
 
@@ -61,6 +64,7 @@ public class SmartDirtiesJupiterTestsSorterTest {
             List.of(Integration1MockBeanTest.class),
             List.of(Integration1Test.class),
             List.of(Integration2Test.class),
+            List.of(Integration2Test.NestedCustomConfigTest.class, Integration3Test.class),
             List.of(SampleIntegrationTest.class)
         ), itClassesLists.getSortedConfigToTests());
 

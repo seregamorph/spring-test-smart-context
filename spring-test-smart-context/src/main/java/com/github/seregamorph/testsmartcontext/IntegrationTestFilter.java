@@ -22,12 +22,24 @@ public abstract class IntegrationTestFilter {
     }
 
     /**
-     * Returns true if testClass is a Spring integration test class
+     * Returns true if testClass is a Spring integration test class or declares nested Spring integration test classes
+     * (e.g. JUnit Jupiter {@code @Nested}).
      *
      * @param testClass
      * @return
      */
     protected abstract boolean isIntegrationTest(Class<?> testClass);
+
+    /**
+     * Returns true if testClass itself (not only its nested test classes) is a Spring integration test class.
+     * Delegates to {@link #isIntegrationTest(Class)} by default.
+     *
+     * @param testClass
+     * @return
+     */
+    protected boolean isSpringTestClass(Class<?> testClass) {
+        return isIntegrationTest(testClass);
+    }
 
     @Override
     public String toString() {

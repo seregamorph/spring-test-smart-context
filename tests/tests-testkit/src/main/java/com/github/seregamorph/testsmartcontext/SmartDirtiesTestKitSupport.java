@@ -5,14 +5,13 @@ import java.util.List;
 public final class SmartDirtiesTestKitSupport {
 
     static boolean isFirstClassPerConfig(Class<?> testClass) {
-        if (SmartDirtiesTestsSupport.isInnerClass(testClass)) {
-            // to support @Nested classes (without own context configuration)
-            return false;
-        }
-
         // this method is only used in tests, so we don't need to be lenient there
         List<SmartDirtiesTestsSupport.ClassGroupState> classGroupStates =
             SmartDirtiesTestsSupport.getOrderStates(testClass);
+        if (SmartDirtiesTestsSupport.isInnerClass(testClass) && classGroupStates.isEmpty()) {
+            // @Nested classes without own context configuration
+            return false;
+        }
         if (classGroupStates.size() == 1) {
             SmartDirtiesTestsSupport.ClassGroupState classGroupState = classGroupStates.get(0);
             if (!classGroupState.discoveredItClasses.contains(testClass)) {
@@ -26,14 +25,13 @@ public final class SmartDirtiesTestKitSupport {
 
 
     static boolean isLastClassPerConfig(Class<?> testClass) {
-        if (SmartDirtiesTestsSupport.isInnerClass(testClass)) {
-            // to support @Nested classes (without own context configuration)
-            return false;
-        }
-
         // this method is only used in tests, so we don't need to be lenient there
         List<SmartDirtiesTestsSupport.ClassGroupState> classGroupStates =
             SmartDirtiesTestsSupport.getOrderStates(testClass);
+        if (SmartDirtiesTestsSupport.isInnerClass(testClass) && classGroupStates.isEmpty()) {
+            // @Nested classes without own context configuration
+            return false;
+        }
         if (classGroupStates.size() == 1) {
             SmartDirtiesTestsSupport.ClassGroupState classGroupState = classGroupStates.get(0);
             if (!classGroupState.discoveredItClasses.contains(testClass)) {

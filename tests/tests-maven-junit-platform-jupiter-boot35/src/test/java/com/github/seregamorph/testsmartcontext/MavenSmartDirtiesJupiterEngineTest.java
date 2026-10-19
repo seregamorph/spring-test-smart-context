@@ -11,6 +11,7 @@ import com.github.seregamorph.testsmartcontext.demo.Integration1MockBeanTest;
 import com.github.seregamorph.testsmartcontext.demo.Integration1Test;
 import com.github.seregamorph.testsmartcontext.demo.Integration2SpringJUnitConfigTest;
 import com.github.seregamorph.testsmartcontext.demo.Integration2Test;
+import com.github.seregamorph.testsmartcontext.demo.Integration3Test;
 import com.github.seregamorph.testsmartcontext.demo.NoBaseClass1IntegrationTest;
 import com.github.seregamorph.testsmartcontext.demo.NoBaseClass2IntegrationTest;
 import com.github.seregamorph.testsmartcontext.demo.SampleDirtiesContextAfterClassTest;
@@ -55,11 +56,11 @@ public class MavenSmartDirtiesJupiterEngineTest {
                 .build())
             .containerEvents();
 
-        // 16 = 10 ITs + 3 Nested + 2 UTs + 1 suite
+        // 19 = 12 ITs + 4 Nested + 2 UTs + 1 suite
         events.assertStatistics(stats -> stats
-            .started(17)
-            .succeeded(17)
-            .finished(17)
+            .started(19)
+            .succeeded(19)
+            .finished(19)
             .aborted(0)
             .failed(0));
 
@@ -73,6 +74,7 @@ public class MavenSmartDirtiesJupiterEngineTest {
             Integration1Test.class,
             Integration2SpringJUnitConfigTest.class,
             Integration2Test.class,
+            Integration3Test.class,
             SampleIntegrationTest.class,
             WebIntegrationTest.class
         ), new ArrayList<>(TestSmartDirtiesTestsHolder.getIntegrationTestClasses(ENGINE)));
@@ -89,6 +91,8 @@ public class MavenSmartDirtiesJupiterEngineTest {
         assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration2SpringJUnitConfigTest.class));
         assertFalse(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration2Test.class));
         assertFalse(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration2Test.NestedTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration2Test.NestedCustomConfigTest.class));
+        assertFalse(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration3Test.class));
         assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(SampleIntegrationTest.class));
         assertTrue(SmartDirtiesTestKitSupport.isFirstClassPerConfig(WebIntegrationTest.class));
 
@@ -104,6 +108,8 @@ public class MavenSmartDirtiesJupiterEngineTest {
         assertFalse(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration2SpringJUnitConfigTest.class));
         assertFalse(SmartDirtiesTestKitSupport.isFirstClassPerConfig(Integration2Test.NestedTest.class));
         assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration2Test.class));
+        assertFalse(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration2Test.NestedCustomConfigTest.class));
+        assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(Integration3Test.class));
         assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(SampleIntegrationTest.class));
         assertTrue(SmartDirtiesTestKitSupport.isLastClassPerConfig(WebIntegrationTest.class));
 
@@ -122,7 +128,10 @@ public class MavenSmartDirtiesJupiterEngineTest {
         TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.Integration1Test");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration2SpringJUnitConfigTest");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.Integration2SpringJUnitConfigTest");
+        TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.Integration2Test$NestedCustomConfigTest");
+        TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.Integration2Test$NestedCustomConfigTest");
         TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.Integration2Test");
+        TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.Integration3Test");
         TestEventTracker.assertConsumedEvent("Creating context for com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest");
         TestEventTracker.assertConsumedEvent("Created context for com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest");
         TestEventTracker.assertConsumedEvent("Auto-destroying context for com.github.seregamorph.testsmartcontext.demo.SampleIntegrationTest");

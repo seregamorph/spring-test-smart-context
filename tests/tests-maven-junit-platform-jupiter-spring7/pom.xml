@@ -23,7 +23,7 @@
         <junit-jupiter.version>6.0.3</junit-jupiter.version>
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
         <hikaricp.version>7.1.0</hikaricp.version>
-        <postgresql.version>42.7.13</postgresql.version>
+        <postgresql.version>42.7.14</postgresql.version>
         <testcontainers.version>2.0.5</testcontainers.version>
     </properties>
 

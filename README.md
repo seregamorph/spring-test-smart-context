@@ -53,9 +53,9 @@ will be reduced, hence tests are executed faster.
 ### Limitations
 Multi-threaded (per module) test execution is now supported since version `1.0`, but in this case the number of 
 active spring contexts is not more than number of threads.
-Also, there can be problems with Jupiter
-[Nested](https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested) test classes if they declare
-own `@ContextConfiguration` or `@Import` of spring beans.
+Also there can be more than 1 active contexts in case when JUnit
+[Nested](https://docs.junit.org/6.1.3/writing-tests/nested-tests.html) test classes declare
+their own context configurations.
 
 ### Supported versions
 `Java` 8+ (`Java` 17+ for spring-boot 3.x projects)

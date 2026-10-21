@@ -153,6 +153,10 @@ In case you need it, check the 0.15 [README](https://github.com/seregamorph/spri
 for CI/CD pipelines.
 
 ### Related projects
+The [Spring Test Timeline](https://github.com/seregamorph/spring-test-timeline) generates a timeline report
+which gives insights on how many separate spring contexts are created, which of them are closed early or at the
+JVM EoL, CPU/heap consumption, number of threads and Docker containers.
+
 The [Spring Test Profiler](https://github.com/PragmaTech-GmbH/spring-test-profiler) is a Spring Test utility that
 provides visualization and insights for Spring Test execution, with a focus on Spring context caching. 
 It helps you identify optimization opportunities in your Spring Test suite to speed up your builds.

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.ClassOrderer;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -26,18 +27,37 @@ public class SmartDirtiesSkippedClassListener implements TestExecutionListener {
     @Override
     public void testPlanExecutionStarted(TestPlan testPlan) {
         Set<Class<?>> testPlanClasses = new HashSet<>();
+        boolean hasIntegrationTests = false;
         for (TestIdentifier root : testPlan.getRoots()) {
             if (isJupiter(root)) {
                 for (TestIdentifier testIdentifier : testPlan.getDescendants(root)) {
                     TestSource testSource = testIdentifier.getSource().orElse(null);
                     if (testSource instanceof ClassSource) {
-                        testPlanClasses.add(((ClassSource) testSource).getJavaClass());
+                        Class<?> testClass = ((ClassSource) testSource).getJavaClass();
+                        testPlanClasses.add(testClass);
+                        hasIntegrationTests = hasIntegrationTests
+                            || JupiterIntegrationTestFilter.getInstance().isIntegrationTest(testClass);
                     }
                 }
             }
         }
+        checkClassOrderer(testPlan, hasIntegrationTests);
         SmartDirtiesTestsSupport.completeNestedClassesMissingInTestPlan(SmartDirtiesTestsSupport.ENGINE_JUNIT_JUPITER,
             testPlanClasses);
+    }
+
+    private static void checkClassOrderer(TestPlan testPlan, boolean hasIntegrationTests) {
+        if (!hasIntegrationTests) {
+            SmartDirtiesTestsSupport.resetClassOrdererMisconfiguration();
+            return;
+        }
+        String classOrderer = testPlan.getConfigurationParameters()
+            .get(ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME)
+            .orElse(null);
+        String misconfiguration = SmartDirtiesTestsSupport.checkJupiterClassOrderer(classOrderer);
+        if (misconfiguration != null) {
+            logger.warn(misconfiguration);
+        }
     }
 
     @Override

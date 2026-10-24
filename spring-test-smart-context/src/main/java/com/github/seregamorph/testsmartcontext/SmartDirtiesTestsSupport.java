@@ -45,6 +45,12 @@ public abstract class SmartDirtiesTestsSupport {
     @Nullable
     private static Throwable failureCause;
 
+    /**
+     * Not null if the effective Jupiter class orderer of the current test plan is not SmartDirtiesClassOrderer
+     */
+    @Nullable
+    private static String classOrdererMisconfiguration;
+
     static class ClassGroupState {
         private final Set<Class<?>> completedItClasses = Collections.synchronizedSet(new LinkedHashSet<>());
 
@@ -102,7 +108,8 @@ public abstract class SmartDirtiesTestsSupport {
                 .collect(Collectors.toList());
             throw new IllegalStateException("engineClassOrderStateMap is not defined for "
                 + testClass + ", it means that it was skipped on initial analysis or failed. "
-                + "Discovered classes by engine: " + classes + (failureCause == null ? "" : ": " + failureCause),
+                + "Discovered classes by engine: " + classes + (failureCause == null ? "" : ": " + failureCause)
+                + (classOrdererMisconfiguration == null ? "" : ". " + classOrdererMisconfiguration),
                 failureCause);
         } else if (classGroupStates.size() == 1) {
             ClassGroupState classGroupState = classGroupStates.get(0);
@@ -136,6 +143,10 @@ public abstract class SmartDirtiesTestsSupport {
 
     static List<ClassGroupState> getOrderStates(Class<?> testClass) {
         if (engineClassOrderStateMap == null) {
+            if (classOrdererMisconfiguration != null) {
+                throw new IllegalStateException("Test ordering is not initialized. " + classOrdererMisconfiguration,
+                    failureCause);
+            }
             if (failureCause != null) {
                 throw new IllegalStateException("Test ordering is not initialized or failed", failureCause);
             }
@@ -218,6 +229,40 @@ public abstract class SmartDirtiesTestsSupport {
 
     protected static void setFailureCause(Throwable failureCause) {
         SmartDirtiesTestsSupport.failureCause = failureCause;
+    }
+
+    /**
+     * Validates the effective {@value ClassOrderer#DEFAULT_ORDER_PROPERTY_NAME} configuration parameter of the
+     * Jupiter test plan which is about to be executed. It can differ from the bundled junit-platform.properties,
+     * because explicit configuration parameters of the launcher discovery request take precedence, e.g. Maven
+     * Surefire/Failsafe 3.6.0 overrides it for runOrder=alphabetical, random or reversealphabetical.
+     *
+     * @param classOrderer effective class orderer or null if not defined
+     * @return error message if the class orderer is misconfigured, otherwise null
+     */
+    @Nullable
+    static String checkJupiterClassOrderer(@Nullable String classOrderer) {
+        String expectedClassOrderer = SmartDirtiesClassOrderer.class.getName();
+        if (classOrderer != null && expectedClassOrderer.equals(classOrderer.trim())) {
+            classOrdererMisconfiguration = null;
+        } else {
+            //@formatter:off
+            classOrdererMisconfiguration = "The " + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + " configuration "
+                + "parameter of the test plan "
+                + (classOrderer == null ? "is not defined" : "is " + classOrderer)
+                + ", but should be " + expectedClassOrderer + ". "
+                + "If you use Maven Surefire/Failsafe 3.6.x (or newer) with runOrder, remove runOrder "
+                + "(the test classes are sorted alphabetically within the groups anyway) or declare "
+                + "<properties><configurationParameters>" + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + "="
+                + expectedClassOrderer + "</configurationParameters></properties> "
+                + "(fixed in Surefire by https://github.com/apache/maven-surefire/pull/3530)";
+            //@formatter:on
+        }
+        return classOrdererMisconfiguration;
+    }
+
+    static void resetClassOrdererMisconfiguration() {
+        classOrdererMisconfiguration = null;
     }
 
     static void completeNestedClassesMissingInTestPlan(String engine, Set<Class<?>> testPlanClasses) {

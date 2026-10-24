@@ -18,6 +18,11 @@
     <properties>
         <spring-boot.version>4.2.0-M1</spring-boot.version>
         <maven.install.skip>true</maven.install.skip>
+        <!-- Surefire 3.6.0 with runOrder overrides the junit.jupiter.testclass.order.default of
+        junit-platform.properties (fixed by https://github.com/apache/maven-surefire/pull/3530), see
+        https://github.com/seregamorph/spring-test-smart-context/issues/65
+        Drop this override and configurationParameters below when the fixed version is released -->
+        <maven-surefire.version>3.6.0</maven-surefire.version>
     </properties>
 
     <build>
@@ -25,6 +30,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <runOrder>alphabetical</runOrder>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.testclass.order.default=com.github.seregamorph.testsmartcontext.jupiter.SmartDirtiesClassOrderer
+                        </configurationParameters>
+                    </properties>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>

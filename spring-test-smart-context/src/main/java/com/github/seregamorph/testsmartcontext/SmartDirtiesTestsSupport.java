@@ -251,11 +251,11 @@ public abstract class SmartDirtiesTestsSupport {
                 + "parameter of the test plan "
                 + (classOrderer == null ? "is not defined" : "is " + classOrderer)
                 + ", but should be " + expectedClassOrderer + ". "
-                + "If you use Maven Surefire/Failsafe 3.6.x (or newer) with runOrder, remove runOrder "
+                + "If you use Maven Surefire/Failsafe 3.6.0 with runOrder, remove runOrder "
                 + "(the test classes are sorted alphabetically within the groups anyway) or declare "
                 + "<properties><configurationParameters>" + ClassOrderer.DEFAULT_ORDER_PROPERTY_NAME + "="
                 + expectedClassOrderer + "</configurationParameters></properties> "
-                + "(fixed in Surefire by https://github.com/apache/maven-surefire/pull/3530)";
+                + "(fixed in Surefire by https://github.com/apache/maven-surefire/pull/3530 and to be released in 3.6.1)";
             //@formatter:on
         }
         return classOrdererMisconfiguration;

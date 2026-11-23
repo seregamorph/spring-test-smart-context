@@ -16,7 +16,7 @@
         and Spring Framework 7.0</description>
 
     <properties>
-        <spring-boot.version>4.2.0-M1</spring-boot.version>
+        <spring-boot.version>4.1.2</spring-boot.version>
         <maven.install.skip>true</maven.install.skip>
         <!-- Surefire 3.6.0 with runOrder overrides the junit.jupiter.testclass.order.default of
         junit-platform.properties (fixed by https://github.com/apache/maven-surefire/pull/3530), see
